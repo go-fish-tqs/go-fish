@@ -11,6 +11,9 @@
     <properties>
         <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 
+        <sonar.organization>go-fish-tqs</sonar.organization>
+        <sonar.projectKey>go-fish-tqs_go-fish</sonar.projectKey>
+
         <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
 
