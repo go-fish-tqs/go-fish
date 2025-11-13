@@ -1,5 +1,18 @@
-# go-fish
+# Go Fish 
+A fishing equipment rental company 
 
-This was made to test git and jira integration
 
-Once again test
+## Tech stack
+> Frontend: 
+     React
+    + Next
+    + Tailwind
+
+> Backend: 
+     Spring
+
+> Database:
+    PostgreSQL
+
+> Deployment:
+    Docker
