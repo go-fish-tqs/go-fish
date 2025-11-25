@@ -77,12 +77,11 @@ jobs:
             -Dsonar.pullrequest.base=${{ github.base_ref }}
   
   codeql-analysis:
-    analyze:
-      name: Analyze (Java)
-      runs-on: ubuntu-latest
-      permissions:
-        contents: read
-        security-events: write
+    name: Analyze (Java)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
 
     steps:
       - name: Checkout repository
