@@ -96,7 +96,6 @@ jobs:
             java
             javascript
             typescript
-          fail-on: never
           build-mode: autobuild
 
       - name: Autobuild
