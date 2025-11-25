@@ -1,11 +1,11 @@
-name: Backend CI
+name: Code analysis
 
 on:
   pull_request:
     branches: [main]
 
 jobs:
-  backend-build:
+  sonarcloud-analysis:
     runs-on: ubuntu-latest
 
     steps:
@@ -42,3 +42,27 @@ jobs:
             -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
             -Dsonar.pullrequest.branch=${{ github.head_ref }} \
             -Dsonar.pullrequest.base=${{ github.base_ref }}
+  
+  codeql-analysis:
+    analyze:
+    name: Analyze (Java)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+          build-mode: auto
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
