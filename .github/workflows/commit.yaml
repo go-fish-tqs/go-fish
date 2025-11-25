@@ -2,7 +2,7 @@ name: Backend Build & Test
 
 on:
   push:
-    branches: ["BF-[0-9]*"] # Runs on jira created branches
+    branches: ["BF-[0-9]+.*"] # Runs on jira created branches
 
 jobs:
   build-test:
