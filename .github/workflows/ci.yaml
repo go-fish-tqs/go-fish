@@ -93,7 +93,6 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: |
-            java
             javascript
             typescript
           build-mode: autobuild
