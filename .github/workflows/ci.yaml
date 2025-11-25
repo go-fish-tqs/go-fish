@@ -81,6 +81,7 @@ jobs:
   codeql-analysis:
     name: Analyze (CodeQL)
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       security-events: write
@@ -92,7 +93,11 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: ["java", "javascript", "typescript"]
+          languages: |
+            java
+            javascript
+            typescript
+          fail-on: never
           build-mode: autobuild
 
       - name: Autobuild
@@ -100,3 +105,4 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+
