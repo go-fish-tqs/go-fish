@@ -1,0 +1,59 @@
+package gofish.pt.integration;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import gofish.pt.entity.Category;
+import gofish.pt.entity.Item;
+import gofish.pt.entity.Material;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+import gofish.pt.repository.ItemRepository;
+
+import java.util.List;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+public class ItemControllerIT {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ItemRepository itemRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private Item item1;
+    private Item item2;
+
+    @BeforeEach
+    void setUp() {
+        itemRepository.deleteAll();
+
+        item1 = new Item(1L, "simple rod", "very simple", List.of(), Material.CARBON_FIBER, Category.RODS, 5.0);
+        item2 = new Item(2L, "cool rod", "very cool", List.of(), Material.GRAPHITE, Category.RODS, 5.0);
+
+        itemRepository.save(item1);
+        itemRepository.save(item2);
+    }
+
+    @Test
+    void getAllItems() throws Exception {
+        mockMvc.perform(get("/api/items"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].name").value("simple rod"));
+    }
+}
