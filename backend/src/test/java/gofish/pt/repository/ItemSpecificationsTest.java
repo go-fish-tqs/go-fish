@@ -58,7 +58,7 @@ class ItemSpecificationsTest {
         result = itemRepository.findAll(spec);
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().getCategory()).isEqualTo(Category.RODS);
+        assertThat(result.get(0).getCategory()).isEqualTo(Category.RODS);
     }
 
     @Test
@@ -70,7 +70,7 @@ class ItemSpecificationsTest {
         spec = nameContains("rod");
         result = itemRepository.findAll(spec);
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().getName()).isEqualTo("Fishing Rod");
+        assertThat(result.get(0).getName()).isEqualTo("Fishing Rod");
 
     }
 
@@ -79,7 +79,7 @@ class ItemSpecificationsTest {
         spec = materialIs(Material.CARBON_FIBER);
         result = itemRepository.findAll(spec);
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().getMaterial()).isEqualTo(Material.CARBON_FIBER);
+        assertThat(result.get(0).getMaterial()).isEqualTo(Material.CARBON_FIBER);
     }
 
     @Test
@@ -87,7 +87,7 @@ class ItemSpecificationsTest {
         spec = Specification.allOf(nameContains("fishing"), priceBetween(10d, 20d), availableIs(true));
         result = itemRepository.findAll(spec);
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().getName()).isEqualTo("Fishing Rod");
+        assertThat(result.get(0).getName()).isEqualTo("Fishing Rod");
     }
 
     @Test
