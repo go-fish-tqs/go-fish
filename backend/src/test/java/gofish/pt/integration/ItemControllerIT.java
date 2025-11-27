@@ -3,7 +3,7 @@ package gofish.pt.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
-import gofish.pt.entity.ItemDTO;
+import gofish.pt.dto.ItemDTO;
 import gofish.pt.entity.Material;
 import gofish.pt.repository.ItemRepository;
 import org.junit.jupiter.api.BeforeEach;

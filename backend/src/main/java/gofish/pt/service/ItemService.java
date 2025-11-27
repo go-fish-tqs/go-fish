@@ -1,14 +1,20 @@
 package gofish.pt.service;
 
+import gofish.pt.dto.ItemFilter;
+import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
-import gofish.pt.entity.ItemDTO;
+import gofish.pt.dto.ItemDTO;
+import gofish.pt.entity.Material;
+import gofish.pt.repository.ItemRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import gofish.pt.repository.ItemRepository;
 
 import java.util.List;
 import java.util.Optional;
+
+import static gofish.pt.repository.ItemSpecifications.*;
 
 @Service
 @Transactional
@@ -28,19 +34,30 @@ public class ItemService {
         return repository.findAll();
     }
 
-    public List<Item> findAll(Specification<Item> spec) {
-        return repository.findAll(spec);
+    public List<Item> findAll(ItemFilter filter) {
+
+        if (filter == null) return findAll();
+
+        Specification<Item> spec = Specification.allOf(nameContains(filter.name()),
+                categoryIs(filter.category()),
+                materialIs(filter.material()),
+                priceBetween(filter.minPrice(), filter.maxPrice()));
+
+        String sortBy = (filter.sortBy() != null) ? filter.sortBy() : "id";
+        Sort.Direction direction = (filter.direction() != null) ? filter.direction() : Sort.Direction.ASC;
+
+        Sort sort = Sort.by(direction, sortBy);
+
+        return repository.findAll(spec, sort);
     }
 
     public Item save(Item item) {
-        if (item == null)
-            return null;
+        if (item == null) return null;
         return repository.save(item);
     }
 
     public void delete(Item item) {
-        if (item != null)
-            repository.delete(item);
+        if (item != null) repository.delete(item);
     }
 
     public boolean exists(long id) {
