@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 class GoFishApplicationTests {
 
     @Test
-    @Disabled
     void contextLoads() {
     }
 

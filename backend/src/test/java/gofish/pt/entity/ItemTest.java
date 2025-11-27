@@ -7,11 +7,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ItemTest {
 
-    @BeforeEach
-    void setUp() {
-
-    }
-
     @Test
     void testAvailableByDefault() {
         Item i = new Item();
