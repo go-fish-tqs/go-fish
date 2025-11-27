@@ -1,12 +1,14 @@
 package gofish.pt.boundary;
 
 import gofish.pt.entity.Item;
+import gofish.pt.entity.ItemDTO;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import gofish.pt.service.ItemService;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -24,4 +26,16 @@ public class ItemController {
     public List<Item> getItems() {
         return itemService.findAll();
     }
+
+
+
+    @PostMapping
+    public ResponseEntity<Item> createItem(@Valid @RequestBody ItemDTO dto) {
+        Item item = itemService.fromDto(dto);
+        Item saved = itemService.save(item);
+        URI location = URI.create("/api/items/" + saved.getId());
+        return ResponseEntity.created(location).body(saved);
+    }
+
+
 }

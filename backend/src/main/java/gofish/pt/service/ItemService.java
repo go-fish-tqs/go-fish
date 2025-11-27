@@ -1,6 +1,7 @@
 package gofish.pt.service;
 
 import gofish.pt.entity.Item;
+import gofish.pt.entity.ItemDTO;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,4 +46,17 @@ public class ItemService {
     public boolean exists(long id) {
         return repository.existsById(id);
     }
+
+    public Item fromDto(ItemDTO dto) {
+        Item item = new Item();
+        item.setName(dto.getName());
+        item.setDescription(dto.getDescription());
+        item.setPhotoUrls(dto.getPhotoUrls());
+        item.setCategory(dto.getCategory());
+        item.setMaterial(dto.getMaterial());
+        item.setPrice(dto.getPrice());
+        item.setUserId(dto.getUserId());
+        return item;
+    }
+
 }
