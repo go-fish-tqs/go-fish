@@ -1,5 +1,6 @@
 package gofish.pt.repository;
 
+import gofish.pt.dto.ItemFilter;
 import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
 import gofish.pt.entity.Material;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ItemSpecificationsTest {
     private Specification<Item> spec;
     private List<Item> result;
+    private Sort sort;
 
     @Autowired
     private ItemRepository itemRepository;
@@ -91,10 +94,18 @@ class ItemSpecificationsTest {
     }
 
     @Test
-    void nullSpec(){
+    void sortByPrice() {
         spec = null;
-        result = itemRepository.findAll(spec);
-        assertThat(result).isEqualTo(itemRepository.findAll());
+        sort = Sort.by(Sort.Direction.DESC, "price");
+        result = itemRepository.findAll(spec, sort);
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getPrice()).isGreaterThan(result.get(1).getPrice());
+    }
+
+    @Test
+    void findAllWhenNull(){
+        spec = null;
+        assertThat(itemRepository.findAll(spec)).isEqualTo(itemRepository.findAll());
     }
 
 }

@@ -1,12 +1,16 @@
 package gofish.pt.boundary;
 
+import gofish.pt.dto.ItemDTO;
+import gofish.pt.dto.ItemFilter;
+import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
-import gofish.pt.entity.ItemDTO;
+import gofish.pt.entity.Material;
+import gofish.pt.service.ItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import gofish.pt.service.ItemService;
 
 import java.net.URI;
 import java.util.List;
@@ -23,10 +27,9 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<Item> getItems() {
-        return itemService.findAll();
+    public List<Item> getItems(@Valid @RequestBody(required = false) ItemFilter filter) {
+        return itemService.findAll(filter);
     }
-
 
 
     @PostMapping
