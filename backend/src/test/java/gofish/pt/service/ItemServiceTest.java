@@ -7,7 +7,6 @@ import gofish.pt.entity.Material;
 import gofish.pt.repository.ItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -29,7 +28,7 @@ class ItemServiceTest {
         itemRepository = mock(ItemRepository.class);
         itemService = new ItemService(itemRepository);
         i1 = new Item(1L, "simple rod", "very simple", List.of(), Material.BRASS, Category.RODS, 5.0);
-        i2 = new Item(2L, "cool rod", "very cool", List.of(), Material.GRAPHITE, Category.RODS, 5.0);
+        i2 = new Item(2L, "cool rod", "very cool", List.of(), Material.GRAPHITE, Category.RODS, 7.0);
     }
 
     @Test
@@ -43,9 +42,9 @@ class ItemServiceTest {
         when(itemRepository.findById(2L)).thenReturn(Optional.of(i2));
         when(itemRepository.findById(3L)).thenReturn(Optional.empty());
 
-        assertThat(itemService.findById(1L).isPresent()).isTrue();
-        assertThat(itemService.findById(2L).get()).isSameAs(i2);
-        assertThat(itemService.findById(3L).isPresent()).isFalse();
+        assertThat(itemService.findById(1L)).isPresent();
+        assertThat(itemService.findById(2L)).containsSame(i2);
+        assertThat(itemService.findById(3L)).isNotPresent();
     }
 
     @Test
@@ -104,6 +103,11 @@ class ItemServiceTest {
 
         when(itemRepository.findAll(any(Specification.class), eq(Sort.by(Sort.Direction.DESC, "price"))))
                 .thenReturn(mockedResult);
+
+        List<Item> result = itemService.findAll(filter);
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getPrice()).isEqualTo(i1.getPrice());
 
     }
 

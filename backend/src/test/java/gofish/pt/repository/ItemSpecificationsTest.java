@@ -1,6 +1,5 @@
 package gofish.pt.repository;
 
-import gofish.pt.dto.ItemFilter;
 import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
 import gofish.pt.entity.Material;
