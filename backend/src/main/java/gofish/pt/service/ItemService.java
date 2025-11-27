@@ -47,7 +47,7 @@ public class ItemService {
         return repository.existsById(id);
     }
 
-    public Item fromDto(ItemDTO dto) {
+    public Item fromDTO(ItemDTO dto) {
         Item item = new Item();
         item.setName(dto.getName());
         item.setDescription(dto.getDescription());

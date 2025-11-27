@@ -3,20 +3,22 @@ package gofish.pt.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
+import gofish.pt.entity.ItemDTO;
 import gofish.pt.entity.Material;
+import gofish.pt.repository.ItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import gofish.pt.repository.ItemRepository;
 
 import java.util.List;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -56,4 +58,20 @@ public class ItemControllerIT {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].name").value("simple rod"));
     }
+
+    @Test
+    void createItem() throws Exception {
+
+        ItemDTO dto1 = new ItemDTO("simple rod", "very simple", List.of(), Category.RODS, Material.CARBON_FIBER, 5.0, 1L);
+
+        mockMvc.perform(post("/api/items")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto1)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.name").value("simple rod"))
+                .andExpect(header().exists("Location"));
+
+    }
+
 }
