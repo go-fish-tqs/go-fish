@@ -26,7 +26,7 @@ public class ItemController {
         this.itemService = itemService;
     }
 
-    @GetMapping
+    @PostMapping("/filter")
     public List<Item> getItems(@Valid @RequestBody(required = false) ItemFilter filter) {
         return itemService.findAll(filter);
     }

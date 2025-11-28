@@ -29,7 +29,7 @@ export default function RootLayout({
       <body className="bg-blue-100 h-screen max-h-screen flex">
         <Providers>
           <Sidebar />
-          <main className="flex-1 overflow-auto">{children}</main>
+          <main className="flex-1 overflow-auto p-4">{children}</main>
         </Providers>
       </body>
     </html>
