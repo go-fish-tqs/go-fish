@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/items")
@@ -31,6 +32,11 @@ public class ItemController {
         return itemService.findAll(filter);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Item> getItem(@PathVariable Integer id) {
+        return itemService.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
 
     @PostMapping
     public ResponseEntity<Item> createItem(@Valid @RequestBody ItemDTO dto) {
@@ -40,5 +46,14 @@ public class ItemController {
         return ResponseEntity.created(location).body(saved);
     }
 
+    @GetMapping("/categories")
+    public List<Category> getCategories() {
+        return itemService.getCategories();
+    }
+
+    @GetMapping("/materials")
+    public Map<Material.MaterialGroup, List<Material>> getMaterials() {
+        return itemService.getMaterials();
+    }
 
 }

@@ -11,8 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static gofish.pt.repository.ItemSpecifications.*;
 
@@ -74,6 +73,20 @@ public class ItemService {
         item.setPrice(dto.getPrice());
         item.setUserId(dto.getUserId());
         return item;
+    }
+
+    public List<Category> getCategories() {
+        return Arrays.stream(Category.values())
+                .filter(Category::isTopLevel)
+                .toList();
+    }
+
+    public Map<Material.MaterialGroup, List<Material>> getMaterials(){
+        Map<Material.MaterialGroup, List<Material>> materials = new HashMap<>();
+        for (Material.MaterialGroup group : Material.MaterialGroup.values()) {
+            materials.put(group, group.getMaterials());
+        }
+        return materials;
     }
 
 }
