@@ -15,6 +15,8 @@ import java.util.*;
 
 import static gofish.pt.repository.ItemSpecifications.*;
 
+import static gofish.pt.repository.ItemSpecifications.*;
+
 @Service
 @Transactional
 public class ItemService {

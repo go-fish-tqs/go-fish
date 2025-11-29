@@ -27,6 +27,7 @@ public class ItemController {
         this.itemService = itemService;
     }
 
+
     @PostMapping("/filter")
     public List<Item> getItems(@Valid @RequestBody(required = false) ItemFilter filter) {
         return itemService.findAll(filter);
@@ -36,7 +37,6 @@ public class ItemController {
     public ResponseEntity<Item> getItem(@PathVariable Integer id) {
         return itemService.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
-
 
     @PostMapping
     public ResponseEntity<Item> createItem(@Valid @RequestBody ItemDTO dto) {
