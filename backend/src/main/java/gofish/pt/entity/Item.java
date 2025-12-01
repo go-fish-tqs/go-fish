@@ -1,5 +1,7 @@
 package gofish.pt.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -34,6 +36,7 @@ public class Item {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @JsonIgnoreProperties("subCategories")
     private Category category;
 
     @Enumerated(EnumType.STRING)
