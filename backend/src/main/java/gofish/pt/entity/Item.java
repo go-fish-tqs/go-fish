@@ -31,7 +31,7 @@ public class Item {
 
     @ElementCollection
     @CollectionTable(name = "item_photos", joinColumns = @JoinColumn(name = "item_id"))
-    @Column(name = "photo_url")
+    @Column(name = "photo_url", columnDefinition = "CLOB")
     private List<String> photoUrls;
 
     @Enumerated(EnumType.STRING)

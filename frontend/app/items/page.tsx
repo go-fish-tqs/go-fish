@@ -114,24 +114,28 @@ export default function ItemsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8 text-gray-800">Available Gear</h1>
-
-      <ItemsFilterBar
-        searchInput={searchInput}
-        setSearchInput={setSearchInput}
-        onSearch={() => setSearch(searchInput)}
-        material={material}
-        setMaterial={setMaterial}
-        category={category}
-        setCategory={handleCategoryChange}
-        priceRange={priceRange}
-        setPriceRange={setPriceRange}
-        flatCategories={flatCategories}
-        availableMaterials={availableMaterials}
-      />
-
-      <ItemsGrid items={items} isLoading={isLoading} isError={isError} />
+    <div className="max-w-7xl mx-auto p-6 h-full space-y-6">
+      <div className="h-1/14">
+        <h1 className="text-3xl font-bold mb-8 text-gray-800">Available Gear</h1>
+      </div>
+      <div className="h-3/14">
+        <ItemsFilterBar
+          searchInput={searchInput}
+          setSearchInput={setSearchInput}
+          onSearch={() => setSearch(searchInput)}
+          material={material}
+          setMaterial={setMaterial}
+          category={category}
+          setCategory={handleCategoryChange}
+          priceRange={priceRange}
+          setPriceRange={setPriceRange}
+          flatCategories={flatCategories}
+          availableMaterials={availableMaterials}
+        />
+      </div>
+      <div className="h-9/14 overflow-y-auto">
+        <ItemsGrid items={items} isLoading={isLoading} isError={isError} />
+      </div>
     </div>
   );
 }

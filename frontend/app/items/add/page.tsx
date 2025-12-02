@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { FormProvider, useFormContext } from "./FormContext";
 import { useFormValidation } from "./useFormValidation";
 import { Header } from "./Header";
@@ -9,10 +10,12 @@ import { PhotoUrlsField } from "./PhotoUrlsField";
 import { CategoryField } from "./CategoryField";
 import { MaterialField } from "./MaterialField";
 import { PriceField } from "./PriceField";
+import { SuccessModal } from "./SuccessModal";
 
 function ItemForm() {
     const { formData } = useFormContext();
     const { validateForm } = useFormValidation();
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,13 +36,35 @@ function ItemForm() {
 
         console.log("Submitting item:", itemData);
 
-        await fetch('http://localhost:8080/api/items', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(itemData) });
+        try {
+            const response = await fetch('http://localhost:8080/api/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(itemData)
+            });
+
+            if (response.ok) {
+                setShowSuccessModal(true);
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                console.error("Server error:", errorData);
+                alert("Failed to create item. Please check your inputs and try again.");
+            }
+        } catch (error) {
+            console.error("Network error:", error);
+            alert("An error occurred while connecting to the server.");
+        }
+    };
+
+    const handleSuccessClose = () => {
+        setShowSuccessModal(false);
+        window.location.href = "/items";
     };
 
     return (
         <div className="h-full  py-12 px-4 sm:px-6 lg:px-8">
             <div className="h-full mx-auto">
-                <div className="h-full bg-white dark:bg-slate-800 shadow-xl rounded-2xl p-8">
+                <div className="h-full bg-white dark:bg-slate-800 shadow-xl rounded-2xl p-8 overflow-y-auto">
                     <Header />
 
                     <form onSubmit={handleSubmit} className="space-y-3">
@@ -72,6 +97,12 @@ function ItemForm() {
                     </form>
                 </div>
             </div>
+
+            <SuccessModal
+                isOpen={showSuccessModal}
+                onClose={handleSuccessClose}
+                message="Item created successfully!"
+            />
         </div>
     );
 }
