@@ -26,10 +26,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-blue-100 h-screen max-h-screen flex">
+      <body className="bg-blue-100 h-screen flex">
         <Providers>
           <Sidebar />
-          <main className="flex-1 overflow-auto p-4">{children}</main>
+          <main className="flex-1 p-4 h-full">{children}</main>
         </Providers>
       </body>
     </html>

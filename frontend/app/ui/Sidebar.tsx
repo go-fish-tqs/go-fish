@@ -38,6 +38,12 @@ export default function Sidebar() {
         >
           Browse Items
         </Link>
+        <Link
+          href="/items/add"
+          className="hover:text-blue-600 dark:hover:text-blue-400"
+        >
+          Add Item
+        </Link>
       </nav>
     </aside>
   );
