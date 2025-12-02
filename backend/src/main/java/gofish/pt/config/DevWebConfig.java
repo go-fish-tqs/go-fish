@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @Profile("dev")
-public class WebConfig {
+public class DevWebConfig {
 
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {
