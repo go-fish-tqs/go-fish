@@ -2,47 +2,56 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="flex items-center justify-center bg-blue-50 font-sans dark:bg-black h-full">
-      <main className="max-h-fit h-full w-full max-w-3xl flex-col items-center justify-center py-16 px-12 bg-white dark:bg-black sm:items-start">
-        {/* Logo */}
-        <div className="flex items-center gap-3 mb-10">
+    // **Main Page Container:**
+    // Updated: `dark:bg-black` -> `dark:bg-slate-900` (A softer dark gray/blue that is less harsh than pure black)
+    <div className="h-full flex items-center justify-center">
+
+      {/* **Content Wrapper (The Card):** */}
+      <main className="w-full max-w-4xl p-12 bg-white dark:bg-slate-800 shadow-2xl rounded-xl sm:p-16">
+
+        {/* Logo & Header */}
+        <div className="flex items-center gap-4 mb-12">
           <Image
             src="/gofish-logo.png"
             alt="GoFish Logo"
-            width={70}
-            height={70}
-            className="rounded-md"
+            width={60}
+            height={60}
+            className="rounded-lg shadow-md"
           />
-          <h1 className="text-4xl font-bold tracking-tight text-blue-700 dark:text-blue-300">
+          <h1 className="text-4xl font-extrabold tracking-tight text-blue-700 dark:text-blue-300">
             GoFish
           </h1>
         </div>
 
         {/* Hero section */}
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h2 className="max-w-md text-3xl font-semibold leading-10 tracking-tight text-gray-900 dark:text-zinc-50">
-            Book Fishing Gear Easily & Quickly
+        <div className="flex flex-col gap-6">
+          <h2 className="max-w-xl text-5xl font-extrabold leading-tight tracking-tight text-gray-900 dark:text-gray-100">
+            Book Fishing Gear Easily & <span className="text-blue-600 dark:text-blue-400">Quickly</span>
           </h2>
 
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
+          {/* Updated: `dark:text-zinc-300` -> `dark:text-gray-300` (More standard light text color) */}
+          <p className="max-w-2xl text-xl leading-relaxed text-zinc-600 dark:text-gray-300">
             Need a rod, bait, or a full kit? GoFish lets you browse available
             fishing equipment, reserve what you need, and pick it up when you’re
-            ready.
+            ready. Simplify your trip planning now!
           </p>
         </div>
 
-        {/* CTA buttons */}
-        <div className="flex flex-col gap-4 mt-10 text-base font-medium sm:flex-row">
+        {/* CTA buttons (No dark mode changes needed here as they use primary blue/white) */}
+        <div className="flex flex-col gap-5 mt-12 text-lg font-semibold sm:flex-row">
+
+          {/* Primary CTA */}
           <a
             href="/items"
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-5 text-white transition-colors hover:bg-blue-700 md:w-[180px]"
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-8 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 ease-in-out hover:bg-blue-700 hover:shadow-blue-500/70 sm:w-[240px]"
           >
             Browse Equipment
           </a>
 
+          {/* Secondary CTA */}
           <a
             href="/dashboard"
-            className="flex h-12 w-full items-center justify-center rounded-full border border-blue-600 px-5 text-blue-600 transition-colors hover:bg-blue-100 md:w-[180px]"
+            className="flex h-14 w-full items-center justify-center rounded-xl border-2 border-blue-600 px-8 text-blue-600 transition-colors duration-300 ease-in-out hover:bg-blue-50 hover:border-blue-700 sm:w-[240px]"
           >
             Go to Dashboard
           </a>
