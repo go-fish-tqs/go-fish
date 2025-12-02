@@ -1,6 +1,5 @@
 package gofish.pt.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -59,7 +58,8 @@ public class Item {
         available = true;
     }
 
-    public Item(Long userId, String name, String description, List<String> photoUrls, Material material, Category category, Double price) {
+    public Item(Long userId, String name, String description, List<String> photoUrls, Material material,
+            Category category, Double price) {
         this();
         this.userId = userId;
         this.name = name;
