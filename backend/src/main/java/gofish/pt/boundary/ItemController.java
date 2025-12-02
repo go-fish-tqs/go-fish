@@ -1,15 +1,20 @@
 package gofish.pt.boundary;
 
+import gofish.pt.dto.ItemDTO;
+import gofish.pt.dto.ItemFilter;
+import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
-import gofish.pt.entity.ItemDTO;
+import gofish.pt.entity.Material;
+import gofish.pt.service.ItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import gofish.pt.service.ItemService;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/items")
@@ -22,12 +27,16 @@ public class ItemController {
         this.itemService = itemService;
     }
 
-    @GetMapping
-    public List<Item> getItems() {
-        return itemService.findAll();
+
+    @PostMapping("/filter")
+    public List<Item> getItems(@Valid @RequestBody(required = false) ItemFilter filter) {
+        return itemService.findAll(filter);
     }
 
-
+    @GetMapping("/{id}")
+    public ResponseEntity<Item> getItem(@PathVariable Integer id) {
+        return itemService.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
 
     @PostMapping
     public ResponseEntity<Item> createItem(@Valid @RequestBody ItemDTO dto) {
@@ -37,5 +46,14 @@ public class ItemController {
         return ResponseEntity.created(location).body(saved);
     }
 
+    @GetMapping("/categories")
+    public List<Category> getCategories() {
+        return itemService.getCategories();
+    }
+
+    @GetMapping("/materials")
+    public Map<Material.MaterialGroup, List<Material>> getMaterials() {
+        return itemService.getMaterials();
+    }
 
 }

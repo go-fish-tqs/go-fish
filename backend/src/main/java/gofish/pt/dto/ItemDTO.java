@@ -1,5 +1,9 @@
-package gofish.pt.entity;
+package gofish.pt.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import gofish.pt.entity.Category;
+import gofish.pt.entity.Material;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -24,6 +28,8 @@ public class ItemDTO {
     private List<String> photoUrls;
 
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+
     private Category category;
 
     @NotNull

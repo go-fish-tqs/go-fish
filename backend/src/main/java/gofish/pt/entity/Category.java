@@ -1,8 +1,15 @@
 package gofish.pt.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+
 import java.util.Arrays;
 import java.util.List;
 
+@Getter
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Category {
 
     // Top-level
@@ -135,6 +142,7 @@ public enum Category {
     ANCHORS(ADDONS, "Anchors"),
     MOUNTING_SYSTEMS(ADDONS, "Mounting Systems");
 
+    @JsonIgnore
     private final Category parent;
     private final String displayName;
 
@@ -143,6 +151,7 @@ public enum Category {
         this.displayName = displayName;
     }
 
+    @JsonIgnore
     public Category getParent() {
         return parent;
     }
@@ -151,17 +160,14 @@ public enum Category {
         return parent == null;
     }
 
-    public boolean isBottomLevel() {
-        return getChildren().isEmpty();
-    }
-
-    public List<Category> getChildren() {
+    @JsonProperty("subCategories")
+    public List<Category> subCategories() {
         return Arrays.stream(values())
                 .filter(c -> c.parent == this)
                 .toList();
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getId() {
+        return this.name();
     }
 }
