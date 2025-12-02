@@ -1,0 +1,103 @@
+# Development Docker Compose Configuration
+# Usage: docker compose -f deployment/compose.dev.yaml up
+
+services:
+  backend:
+    build:
+      context: ../backend
+      target: dev
+      args:
+        - MAVEN_OPTS=-Dmaven.repo.local=/root/.m2/repository
+    ports:
+      - "8080:8080"
+      - "5005:5005" # Debug port
+    volumes:
+      # Mount source code for hot-reload
+      - ../backend/src:/app/src:ro
+      # Cache Maven dependencies
+      - maven-cache:/root/.m2
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - gofish-dev
+
+  frontend:
+    build:
+      context: ../frontend
+      target: dev
+    ports:
+      - "3000:3000"
+      - "5173:5173" # Vite HMR port (if using Vite)
+    volumes:
+      # Mount source code for hot-reload
+      - ../frontend/src:/usr/src/app/src:cached
+      - ../frontend/public:/usr/src/app/public:cached
+      # Prevent node_modules from being overwritten
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8080
+      - CHOKIDAR_USEPOLLING=true # For file watching in Docker
+    depends_on:
+      - backend
+    networks:
+      - gofish-dev
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432" # Expose for local DB tools
+    volumes:
+      - db-dev-data:/var/lib/postgresql/data
+      - ../backend/src/main/resources/db/init:/docker-entrypoint-initdb.d:ro
+    environment:
+      - POSTGRES_DB=gofish_dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=dev_password
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d gofish_dev" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    networks:
+      - gofish-dev
+
+  # Optional: PgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@gofish.local
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_CONFIG_SERVER_MODE=False
+    volumes:
+      - pgadmin-dev-data:/var/lib/pgadmin
+    depends_on:
+      - db
+    networks:
+      - gofish-dev
+    profiles:
+      - tools # Only start with: docker compose --profile tools up
+
+volumes:
+  db-dev-data:
+    driver: local
+  maven-cache:
+    driver: local
+  pgadmin-dev-data:
+    driver: local
+
+networks:
+  gofish-dev:
+    driver: bridge

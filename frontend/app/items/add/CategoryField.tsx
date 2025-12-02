@@ -38,7 +38,6 @@ export function CategoryField() {
 
     // Flatten the category tree for easier rendering in a select dropdown
     const flatCategories = useMemo(() => {
-
         return flattenCategories(categoryTree);
     }, [categoryTree]);
 
