@@ -21,6 +21,25 @@ RUN --mount=type=cache,target=/root/.npm \
     npm install -g pnpm@${PNPM_VERSION}
 
 ################################################################################
+# Create a development stage with hot-reload capabilities
+FROM base AS dev
+
+# Download all dependencies (including dev dependencies)
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=pnpm-lock.yaml,target=pnpm-lock.yaml \
+    --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
+
+# Copy the rest of the source files
+COPY . .
+
+# Expose the port that the application listens on
+EXPOSE 3000 5173
+
+# Run the development server
+CMD ["pnpm", "run", "dev"]
+
+################################################################################
 # Create a stage for installing production dependecies.
 FROM base AS deps
 
