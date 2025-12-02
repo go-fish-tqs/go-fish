@@ -1,7 +1,6 @@
 "use client";
 
 import { useFormContext } from "./FormContext";
-import { TOP_CATEGORIES } from "./constants";
 import { useQuery } from "@tanstack/react-query";
 import { CategoryNode } from "../types";
 import { useMemo } from "react";
@@ -39,10 +38,6 @@ export function CategoryField() {
 
     // Flatten the category tree for easier rendering in a select dropdown
     const flatCategories = useMemo(() => {
-        if (!categoryTree || categoryTree.length === 0) {
-            // Fallback to constants if API data is not available
-            return TOP_CATEGORIES.map(cat => ({ ...cat, level: 0, displayName: cat.name }));
-        }
         return flattenCategories(categoryTree);
     }, [categoryTree]);
 
