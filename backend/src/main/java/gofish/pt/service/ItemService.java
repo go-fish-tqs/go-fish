@@ -5,7 +5,9 @@ import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
 import gofish.pt.dto.ItemDTO;
 import gofish.pt.entity.Material;
+import gofish.pt.mapper.ItemMapper;
 import gofish.pt.repository.ItemRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -19,13 +21,13 @@ import static gofish.pt.repository.ItemSpecifications.*;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ItemService {
 
     private final ItemRepository repository;
+    private final ItemMapper itemMapper;
 
-    public ItemService(ItemRepository repository) {
-        this.repository = repository;
-    }
+
 
     public Optional<Item> findById(long id) {
         return repository.findById(id);
@@ -52,7 +54,11 @@ public class ItemService {
         return repository.findAll(spec, sort);
     }
 
-    public Item save(Item item) {
+    public Item save(ItemDTO dto) {
+        // Olha só a limpeza! O Mapper trata de tudo, até de ir buscar o User.
+
+        Item item = itemMapper.toEntity(dto);
+
         if (item == null) return null;
         return repository.save(item);
     }
@@ -63,18 +69,6 @@ public class ItemService {
 
     public boolean exists(long id) {
         return repository.existsById(id);
-    }
-
-    public Item fromDTO(ItemDTO dto) {
-        Item item = new Item();
-        item.setName(dto.getName());
-        item.setDescription(dto.getDescription());
-        item.setPhotoUrls(dto.getPhotoUrls());
-        item.setCategory(dto.getCategory());
-        item.setMaterial(dto.getMaterial());
-        item.setPrice(dto.getPrice());
-        item.setUserId(dto.getUserId());
-        return item;
     }
 
     public List<Category> getCategories() {

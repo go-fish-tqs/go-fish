@@ -42,8 +42,8 @@ class ItemControllerIT {
     void setUp() {
         itemRepository.deleteAll();
 
-        Item item1 = new Item(1L, "simple rod", "very simple", List.of(), Material.CARBON_FIBER, Category.RODS, 5.0);
-        Item item2 = new Item(2L, "cool rod", "very cool", List.of(), Material.GRAPHITE, Category.RODS, 5.0);
+        Item item1 = new Item(1L, "simple rod", "very simple", List.of(), Category.RODS, Material.CARBON_FIBER, 5.0, true, null, null);
+        Item item2 = new Item(2L, "cool rod", "very cool", List.of(), Category.RODS, Material.GRAPHITE, 5.0, true, null, null);
 
         itemRepository.save(item1);
         itemRepository.save(item2);

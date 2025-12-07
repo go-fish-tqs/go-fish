@@ -39,8 +39,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity<Item> createItem(@Valid @RequestBody ItemDTO dto) {
-        Item item = itemService.fromDTO(dto);
+    public ResponseEntity<Item> createItem(@Valid @RequestBody ItemDTO item) {
         Item saved = itemService.save(item);
         URI location = URI.create("/api/items/" + saved.getId());
         return ResponseEntity.created(location).body(saved);

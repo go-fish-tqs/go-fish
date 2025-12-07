@@ -3,6 +3,7 @@ package gofish.pt.repository;
 import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
 import gofish.pt.entity.Material;
+import gofish.pt.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,31 +24,53 @@ class ItemSpecificationsTest {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @Autowired
+    private UserRepository userRepository; // <--- 1. PRECISAS DISTO AQUI
+
     private Item rod;
     private Item reel;
 
     @BeforeEach
     void setup() {
         itemRepository.deleteAll();
+        userRepository.deleteAll(); // Limpa a casa toda
 
+        // 2. CRIA UM DONO (USER) PRIMEIRO
+        User zePescador = new User();
+        zePescador.setUsername("Zé do Pipo");
+        zePescador.setEmail("ze@peixe.pt");
+        zePescador.setPassword("segredo123");
+        zePescador.setLocation("Faro");
+        // Preenche os campos obrigatórios do User...
+
+        userRepository.save(zePescador); // <--- O user ganha ID aqui
+
+        // 3. AGORA CRIA OS ITENS ASSOCIADOS AO ZÉ
         rod = new Item(
-                1L,
+                null, // <--- Mete NULL aqui direto! O Hibernate gera o ID.
                 "Fishing Rod",
                 "Strong rod",
                 List.of("img1"),
-                Material.CARBON_FIBER,
                 Category.RODS,
-                19.99
+                Material.CARBON_FIBER,
+                19.99,
+                true,
+                zePescador, // <--- Mete aqui o USER que criaste!
+                null // bookings (pode ser null se a lista for opcional no construtor)
         );
 
         reel = new Item(
-                2L,
+                null, // <--- Mete NULL aqui também
                 "Fishing Reel",
                 "Smooth reel",
                 List.of("img2"),
-                Material.ALUMINUM,
                 Category.REELS,
-                7.99
+                Material.ALUMINUM,
+                7.99,
+                true,
+                zePescador, // <--- O mesmo dono
+                null
         );
 
         itemRepository.saveAll(List.of(rod, reel));
