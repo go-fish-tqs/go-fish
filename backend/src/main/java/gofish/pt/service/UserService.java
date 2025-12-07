@@ -1,4 +1,4 @@
 package gofish.pt.service;
 
-public class UserRepository {
+public class UserService {
 }

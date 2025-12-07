@@ -5,14 +5,18 @@ import gofish.pt.dto.ItemFilter;
 import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
 import gofish.pt.entity.Material;
+import gofish.pt.service.BookingService;
 import gofish.pt.service.ItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -21,10 +25,12 @@ import java.util.Map;
 public class ItemController {
 
     private final ItemService itemService;
+    private final BookingService bookingService;
 
     @Autowired
-    public ItemController(ItemService itemService) {
+    public ItemController(ItemService itemService, BookingService bookingService) {
         this.itemService = itemService;
+        this.bookingService = bookingService;
     }
 
 
@@ -53,6 +59,23 @@ public class ItemController {
     @GetMapping("/materials")
     public Map<Material.MaterialGroup, List<Material>> getMaterials() {
         return itemService.getMaterials();
+    }
+
+    @GetMapping("/{id}/availability")
+    public ResponseEntity<List<LocalDate>> checkAvailability(
+            @PathVariable Long id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+
+        // Converter LocalDate (dia) para LocalDateTime (momento exato)
+        // From: Começa às 00:00
+        LocalDateTime startDateTime = from.atStartOfDay();
+        // To: Acaba às 23:59:59.999999999
+        LocalDateTime endDateTime = to.atTime(23, 59, 59);
+
+        List<LocalDate> blockedDates = bookingService.checkAvailability(id, startDateTime, endDateTime);
+
+        return ResponseEntity.ok(blockedDates);
     }
 
 }

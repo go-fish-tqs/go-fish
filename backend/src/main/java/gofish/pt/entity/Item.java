@@ -58,4 +58,13 @@ public class Item {
     @JoinColumn(name = "item_id")
     private List<Booking> bookings;
 
+    public void addBooking(Booking booking) {
+        bookings.add(booking);
+        booking.setItem(this); // <--- O SEGREDO ESTÁ AQUI!
+    }
+
+    public void removeBooking(Booking booking) {
+        bookings.remove(booking);
+        booking.setItem(null);
+    }
 }
