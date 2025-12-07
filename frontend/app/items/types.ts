@@ -3,9 +3,9 @@ export interface Item {
   id: number;
   name: string;
   description: string;
-  photoUrls: string[]; // No Java é List<String>
-  category: string; // Enum no Java, string aqui
-  material: string; // Enum no Java, string aqui
+  photoUrls: string[]; // In Java, this is List<String>
+  category: string; // Enum in Java, string here
+  material: string; // Enum in Java, string here
   price: number;
   available: boolean;
   userId: number;

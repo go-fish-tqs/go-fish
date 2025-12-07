@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react"; // <--- 1. IMPORTA ISTO
+import { use } from "react"; // <--- 1. IMPORT THIS
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import ItemGallery from "./_components/ItemGallery";
@@ -8,24 +8,24 @@ import ItemInfo from "./_components/ItemInfo";
 import { Item } from "@/app/items/types";
 
 interface PageProps {
-  // 2. AGORA É UMA PROMISE!
+  // 2. NOW IT'S A PROMISE!
   params: Promise<{
     id: string;
   }>;
 }
 
 export default function ItemPage({ params }: PageProps) {
-  // 3. DESEMBRULHA A PROMESSA AQUI
+  // 3. UNWRAP THE PROMISE HERE
   const { id } = use(params);
 
-  // Daqui para baixo é tudo igual, mas usas o 'id' que acabaste de sacar
+  // From here down, everything is the same, but use the 'id' you just extracted
   const {
     data: item,
     isLoading,
     isError,
     error,
   } = useQuery({
-    queryKey: ["item", id], // <--- Usas o id desembrulhado
+    queryKey: ["item", id], // <--- Use the unwrapped id
     queryFn: async () => {
       const res = await fetch(`http://localhost:8080/api/items/${id}`);
       if (!res.ok) throw new Error("Deu barraca no fetch!");

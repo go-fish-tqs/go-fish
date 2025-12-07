@@ -1,5 +1,5 @@
 // app/items/[id]/_components/ItemInfo.tsx
-import { Item } from "@/app/items/types"; // Ajusta o import
+import { Item } from "@/app/items/types";
 
 interface ItemInfoProps {
   item: Item;
@@ -21,17 +21,17 @@ export default function ItemInfo({ item }: ItemInfoProps) {
           </span>
           {!item.available && (
             <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
-              Indisponível
+              Unavailable
             </span>
           )}
         </div>
       </div>
 
-      {/* Características */}
+      {/* Characteristics */}
       <div className="border-t border-b border-gray-200 py-4 overflow-hidden">
         <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
           <div className="min-w-0">
-            <dt className="text-sm font-medium text-gray-500">Categoria</dt>
+            <dt className="text-sm font-medium text-gray-500">Category</dt>
             <dd className="text-sm text-gray-900 truncate">
               {typeof item.category === "object" && item.category !== null
                 ? (item.category as { displayName?: string }).displayName ?? ""
@@ -49,15 +49,15 @@ export default function ItemInfo({ item }: ItemInfoProps) {
         </dl>
       </div>
 
-      {/* Descrição */}
+      {/* Description */}
       <div className="overflow-hidden">
-        <h3 className="text-sm font-medium text-gray-900">Descrição</h3>
+        <h3 className="text-sm font-medium text-gray-900">Description</h3>
         <div className="mt-2 text-base text-gray-600 whitespace-pre-line break-words overflow-wrap-anywhere">
           {item.description}
         </div>
       </div>
 
-      {/* Botão de Ação */}
+      {/* Action Button */}
       <div className="mt-4">
         <button
           disabled={!item.available}

@@ -21,7 +21,7 @@ export default function ItemGallery({ images, name }: ItemGalleryProps) {
 
   return (
     <div className="space-y-4 max-w-full">
-      {/* Imagem Grande */}
+      {/* Main Image */}
       <div className="aspect-square w-full max-h-[400px] overflow-hidden rounded-lg bg-gray-100 relative border border-gray-200">
         <img
           src={selectedImage}
@@ -30,7 +30,7 @@ export default function ItemGallery({ images, name }: ItemGalleryProps) {
         />
       </div>
 
-      {/* Miniaturas (se houver mais que uma) */}
+      {/* Thumbnails (if more than one) */}
       {images.length > 1 && (
         <div className="flex gap-3 overflow-x-auto pb-2">
           {images.map((img, idx) => (
