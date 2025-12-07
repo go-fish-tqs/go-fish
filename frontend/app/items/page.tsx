@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import ItemsFilterBar from "@/app/ui/ItemsFilterBar";
-import ItemsGrid from "@/app/ui/ItemsGrid";
+import ItemsFilterBar from "@/app/items/ItemsFilterBar";
+import ItemsGrid from "@/app/items/ItemsGrid";
 import {
   Item,
   ItemFilter,

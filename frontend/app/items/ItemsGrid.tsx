@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { Item } from "@/app/items/types"; // Adjust import path
 
 interface ItemsGridProps {
@@ -82,9 +83,12 @@ export default function ItemsGrid({
                 ${item.price.toFixed(2)}
               </span>
             )}
-            <button className="text-sm text-blue-600 font-medium hover:underline">
+            <Link
+              href={`/items/${item.id}`}
+              className="text-sm text-blue-600 font-medium hover:underline"
+            >
               View Details
-            </button>
+            </Link>
           </div>
         </div>
       ))}

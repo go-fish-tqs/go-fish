@@ -108,4 +108,19 @@ class ItemControllerIT {
                 .andExpect(jsonPath("$.length()").value(Material.MaterialGroup.values().length));
     }
 
+    @Test
+    void getItemById() throws Exception {
+        mockMvc.perform(get("/api/items/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.name").value("simple rod"));
+    }
+
+    @Test
+    void getItemByIdNotFound() throws Exception {
+        mockMvc.perform(get("/api/items/67"))
+                .andExpect(status().isNotFound());
+
+    }
+
 }

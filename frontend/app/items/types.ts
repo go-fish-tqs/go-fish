@@ -1,12 +1,15 @@
-export type Item = {
-  id: string;
+// types.ts (ou onde tiveres as tuas interfaces)
+export interface Item {
+  id: number;
   name: string;
   description: string;
-  material?: string;
-  category?: string;
-  price?: number;
-  images?: string[];
-};
+  photoUrls: string[]; // No Java é List<String>
+  category: string; // Enum no Java, string aqui
+  material: string; // Enum no Java, string aqui
+  price: number;
+  available: boolean;
+  userId: number;
+}
 
 export type CategoryNode = {
   id: string;
