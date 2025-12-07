@@ -33,7 +33,7 @@ export default function ItemPage({ params }: PageProps) {
     },
   });
 
-  if (isLoading) return <div className="p-10 text-center">A carregar...</div>;
+  if (isLoading) return <div className="p-10 text-center">Loading...</div>;
   if (isError || !item)
     return (
       <div className="p-10 text-center text-red-600">
