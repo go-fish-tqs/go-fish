@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -112,7 +113,9 @@ class ItemServiceTest {
         ItemFilter filter = new ItemFilter("rod", null, null, null, null, null, null);
         List<Item> result = itemService.findAll(filter);
 
-        assertThat(result).isNotEmpty().hasSize(2).extracting(Item::getName).containsExactly(i1.getName(), i2.getName());
+        // then
+        assertThat(result).isNotEmpty().hasSize(2).extracting(Item::getName).containsExactly(i1.getName(),
+                i2.getName());
 
         verify(repository).findAll(any(Specification.class), eq(Sort.by(Sort.Direction.ASC, "id")));
     }
