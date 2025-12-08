@@ -1,0 +1,319 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< gofish.pt:gofish >--------------------------
+[INFO] Building gofish 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.4.1:clean (default-clean) @ gofish ---
+[INFO] Deleting /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/target
+[INFO] 
+[INFO] --- jacoco:0.8.14:prepare-agent (default) @ gofish ---
+[INFO] argLine set to -javaagent:/home/tiago/.m2/repository/org/jacoco/org.jacoco.agent/0.8.14/org.jacoco.agent-0.8.14-runtime.jar=destfile=/home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/target/jacoco.exec
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ gofish ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ gofish ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 23 source files with javac [debug parameters release 17] to target/classes
+[WARNING] /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/src/main/java/gofish/pt/mapper/BookingMapper.java:[20,13] Unmapped target property: "id".
+[WARNING] /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/src/main/java/gofish/pt/mapper/ItemMapper.java:[20,26] Unmapped target properties: "id, available, bookings".
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ gofish ---
+[INFO] skip non existing resourceDirectory /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ gofish ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 9 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/src/test/java/gofish/pt/service/ItemServiceTest.java: /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/src/test/java/gofish/pt/service/ItemServiceTest.java uses unchecked or unsafe operations.
+[INFO] /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/src/test/java/gofish/pt/service/ItemServiceTest.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ gofish ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running gofish.pt.GoFishApplicationTests
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+23:22:27.885 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [gofish.pt.GoFishApplicationTests]: GoFishApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+23:22:28.125 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration gofish.pt.GoFishApplication for test class gofish.pt.GoFishApplicationTests
+23:22:28.431 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.7)
+
+2025-12-07T23:22:29.011Z  INFO 33691 --- [           main] gofish.pt.GoFishApplicationTests         : Starting GoFishApplicationTests using Java 23.0.2 with PID 33691 (started by tiago in /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend)
+2025-12-07T23:22:29.014Z  INFO 33691 --- [           main] gofish.pt.GoFishApplicationTests         : No active profile set, falling back to 1 default profile: "default"
+2025-12-07T23:22:31.735Z  INFO 33691 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-12-07T23:22:31.866Z  INFO 33691 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 98 ms. Found 3 JPA repository interfaces.
+2025-12-07T23:22:32.640Z  INFO 33691 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-12-07T23:22:33.091Z  INFO 33691 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:f75d3af0-3ab3-4c27-bf31-2ac02f745242 user=SA
+2025-12-07T23:22:33.093Z  INFO 33691 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-12-07T23:22:33.172Z  INFO 33691 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-12-07T23:22:33.281Z  INFO 33691 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.33.Final
+2025-12-07T23:22:33.356Z  INFO 33691 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-12-07T23:22:34.157Z  INFO 33691 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-12-07T23:22:34.328Z  INFO 33691 --- [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.4.240
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-12-07T23:22:38.199Z  INFO 33691 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-12-07T23:22:38.316Z  INFO 33691 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-12-07T23:22:39.731Z  INFO 33691 --- [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-12-07T23:22:48.351Z  WARN 33691 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-12-07T23:22:49.670Z  WARN 33691 --- [           main] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2025-12-07T23:22:50.868Z  INFO 33691 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-12-07T23:22:51.059Z  INFO 33691 --- [           main] gofish.pt.GoFishApplicationTests         : Started GoFishApplicationTests in 22.647 seconds (process running for 24.734)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 24.34 s -- in gofish.pt.GoFishApplicationTests
+[INFO] Running gofish.pt.entity.ItemTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.125 s -- in gofish.pt.entity.ItemTest
+[INFO] Running gofish.pt.entity.MaterialTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in gofish.pt.entity.MaterialTest
+[INFO] Running gofish.pt.repository.ItemSpecificationsTest
+2025-12-07T23:22:52.061Z  INFO 33691 --- [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [gofish.pt.repository.ItemSpecificationsTest]: ItemSpecificationsTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-12-07T23:22:52.108Z  INFO 33691 --- [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration gofish.pt.GoFishApplication for test class gofish.pt.repository.ItemSpecificationsTest
+2025-12-07T23:22:52.115Z  INFO 33691 --- [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.7)
+
+2025-12-07T23:22:52.161Z  INFO 33691 --- [           main] g.pt.repository.ItemSpecificationsTest   : Starting ItemSpecificationsTest using Java 23.0.2 with PID 33691 (started by tiago in /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend)
+2025-12-07T23:22:52.162Z  INFO 33691 --- [           main] g.pt.repository.ItemSpecificationsTest   : No active profile set, falling back to 1 default profile: "default"
+2025-12-07T23:22:52.297Z  INFO 33691 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-12-07T23:22:52.317Z  INFO 33691 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 18 ms. Found 3 JPA repository interfaces.
+2025-12-07T23:22:52.339Z  INFO 33691 --- [           main] beddedDataSourceBeanFactoryPostProcessor : Replacing 'dataSource' DataSource bean with embedded version
+2025-12-07T23:22:52.364Z  INFO 33691 --- [           main] o.s.j.d.e.EmbeddedDatabaseFactory        : Starting embedded database: url='jdbc:h2:mem:6f022f6a-d465-4ebc-8d41-c71ee078a7a0;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+2025-12-07T23:22:52.386Z  INFO 33691 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-12-07T23:22:52.388Z  INFO 33691 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-12-07T23:22:52.399Z  INFO 33691 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-12-07T23:22:52.402Z  INFO 33691 --- [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory$EmbeddedDataSourceProxy@79f9b21c']
+	Database driver: undefined/unknown
+	Database version: 2.4.240
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-12-07T23:22:52.489Z  INFO 33691 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: drop table if exists bookings cascade 
+Hibernate: drop table if exists item_photos cascade 
+Hibernate: drop table if exists items cascade 
+Hibernate: drop table if exists users cascade 
+Hibernate: create table bookings (end_date timestamp(6) not null, id bigint generated by default as identity, item_id bigint not null, start_date timestamp(6) not null, user_id bigint not null, status enum ('ACTIVE','CANCELLED','COMPLETED','CONFIRMED','PENDING') not null, primary key (id))
+Hibernate: create table item_photos (item_id bigint not null, photo_url CLOB)
+Hibernate: create table items (available boolean not null, price float(53) not null, id bigint generated by default as identity, owner_id bigint not null, name varchar(64) not null, description varchar(512) not null, category enum ('ACCESSORIES','ADDONS','ADVANCED_FLY_KITS','ANCHORS','APPAREL','BAITCASTING_REELS','BAITCASTING_RODS','BAITCAST_COMBOS','BEGINNER_FLY_KITS','BOATS','CAMERA_SYSTEMS','CANOES','CASTING_COMBOS','CHARTPLOTTERS','CHEST_WADERS','COMBOS','ELECTRONICS','FISH_DETECTION','FISH_FINDERS','FLY_COMBOS','FRESHWATER_FLY_RODS','FRESHWATER_SPINNING_COMBOS','GAFFS','GPS_UNITS','HARD_TACKLE_BOXES','HEAVY_SPINNING_REELS','HEAVY_SPINNING_RODS','HIP_WADERS','ICE_REELS','ICE_RODS','INFLATABLE_BOATS','KAYAKS','LANDING_TOOLS','LIFE_JACKETS','LIGHT_SPINNING_REELS','LIGHT_SPINNING_RODS','MEASURING_BOARDS','MEASURING_TOOLS','MEDIUM_SPINNING_REELS','MEDIUM_SPINNING_RODS','MISC_GEAR','MOUNTING_SYSTEMS','MULTITOOLS','NAVIGATION','NETS','PEDAL_KAYAKS','RAIN_JACKETS','REELS','REELS_CASTING','REELS_FLY','REELS_SPECIALTY','REELS_SPINNING','RODS','RODS_CASTING','RODS_FLY','RODS_SPECIALTY','RODS_SPINNING','ROD_HOLDERS','SAFETY','SALTWATER_FLY_REELS','SALTWATER_FLY_RODS','SALTWATER_SPINNING_COMBOS','SCALES','SIT_ON_TOP_KAYAKS','SMALL_BOATS','SOFT_TACKLE_BAGS','SONAR_SYSTEMS','SPINNING_COMBOS','STORAGE','SURF_CASTING_REELS','SURF_CASTING_RODS','SURF_COMBOS','TRAVEL_RODS','TROLLING_CASTING_RODS','TROLLING_MOTORS','TROLLING_REELS','TROUT_FLY_REELS','UNDERWATER_CAMERAS','WADING','WADING_BOOTS','WATERPROOF_PANTS','WEATHER') not null, material enum ('ALUMINUM','ALUMINUM_BOAT','ALUMINUM_FRAME','ANODIZED_ALUMINUM','BRASS','BREATHABLE_FABRIC','CARBON_COMPOSITE','CARBON_FIBER','CARBON_FRAME','CARBON_STEEL','COMPOSITE','COMPOSITE_HANDLE','CORK','DIE_CAST_ALUMINUM','EVA_FOAM','FIBERGLASS','FIBERGLASS_BOAT','GRAPHITE','HARD_PLASTIC','HYPALON','INFLATABLE_PVC','KNOTLESS_NYLON_MESH','MACHINED_ALUMINUM','MAGNESIUM','NEOPRENE','NYLON','POLYESTER','POLYMER','PVC_COATED_FABRIC','ROTOMOLDED_POLYETHYLENE','RUBBER','RUBBER_MESH','STAINLESS_STEEL','THERMOFORMED_PLASTIC','TITANIUM') not null, primary key (id))
+Hibernate: create table users (balance float(53) not null, id bigint generated by default as identity, username varchar(32) not null, email varchar(64) not null unique, location varchar(255) not null, password varchar(255) not null, primary key (id))
+Hibernate: alter table if exists bookings add constraint FKbtv44e8p4a4pq8hfuakjbtfpc foreign key (item_id) references items
+Hibernate: alter table if exists bookings add constraint FKeyog2oic85xg7hsu2je2lx3s6 foreign key (user_id) references users
+Hibernate: alter table if exists item_photos add constraint FKs9cune7dic5qxop8623m4e6a6 foreign key (item_id) references items
+Hibernate: alter table if exists items add constraint FKe37yi0i6rmaqcqickvb1vty22 foreign key (owner_id) references users
+2025-12-07T23:22:52.511Z  INFO 33691 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-12-07T23:22:52.614Z  INFO 33691 --- [           main] g.pt.repository.ItemSpecificationsTest   : Started ItemSpecificationsTest in 0.499 seconds (process running for 26.289)
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0
+Hibernate: select u1_0.id,u1_0.balance,u1_0.email,u1_0.location,u1_0.password,u1_0.username from users u1_0
+Hibernate: insert into users (balance,email,location,password,username,id) values (?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into item_photos (item_id,photo_url) values (?,?)
+Hibernate: insert into item_photos (item_id,photo_url) values (?,?)
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0 where i1_0.category=?
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0
+Hibernate: select u1_0.id,u1_0.balance,u1_0.email,u1_0.location,u1_0.password,u1_0.username from users u1_0
+Hibernate: insert into users (balance,email,location,password,username,id) values (?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into item_photos (item_id,photo_url) values (?,?)
+Hibernate: insert into item_photos (item_id,photo_url) values (?,?)
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0 where i1_0.material=?
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0
+Hibernate: select u1_0.id,u1_0.balance,u1_0.email,u1_0.location,u1_0.password,u1_0.username from users u1_0
+Hibernate: insert into users (balance,email,location,password,username,id) values (?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into item_photos (item_id,photo_url) values (?,?)
+Hibernate: insert into item_photos (item_id,photo_url) values (?,?)
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0 where lower(i1_0.name) like ? escape '' and i1_0.price between ? and ? and i1_0.available=?
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0
+Hibernate: select u1_0.id,u1_0.balance,u1_0.email,u1_0.location,u1_0.password,u1_0.username from users u1_0
+Hibernate: insert into users (balance,email,location,password,username,id) values (?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into item_photos (item_id,photo_url) values (?,?)
+Hibernate: insert into item_photos (item_id,photo_url) values (?,?)
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0
+Hibernate: select u1_0.id,u1_0.balance,u1_0.email,u1_0.location,u1_0.password,u1_0.username from users u1_0
+Hibernate: insert into users (balance,email,location,password,username,id) values (?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into item_photos (item_id,photo_url) values (?,?)
+Hibernate: insert into item_photos (item_id,photo_url) values (?,?)
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0 order by i1_0.price desc
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0
+Hibernate: select u1_0.id,u1_0.balance,u1_0.email,u1_0.location,u1_0.password,u1_0.username from users u1_0
+Hibernate: insert into users (balance,email,location,password,username,id) values (?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into item_photos (item_id,photo_url) values (?,?)
+Hibernate: insert into item_photos (item_id,photo_url) values (?,?)
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0 where lower(i1_0.name) like ? escape ''
+Hibernate: select i1_0.id,i1_0.available,i1_0.category,i1_0.description,i1_0.material,i1_0.name,i1_0.owner_id,i1_0.price from items i1_0 where lower(i1_0.name) like ? escape ''
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.166 s -- in gofish.pt.repository.ItemSpecificationsTest
+[INFO] Running gofish.pt.repository.BookingRepositoryTest
+2025-12-07T23:22:53.226Z  INFO 33691 --- [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [gofish.pt.repository.BookingRepositoryTest]: BookingRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-12-07T23:22:53.241Z  INFO 33691 --- [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration gofish.pt.GoFishApplication for test class gofish.pt.repository.BookingRepositoryTest
+Hibernate: insert into users (balance,email,location,password,username,id) values (?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into bookings (end_date,item_id,start_date,status,user_id,id) values (?,?,?,?,?,default)
+Hibernate: select case when count(b1_0.id)>0 then true else false end from bookings b1_0 where b1_0.item_id=? and b1_0.status not in ('CANCELLED','PENDING','COMPLETED') and b1_0.start_date<? and b1_0.end_date>?
+Hibernate: insert into users (balance,email,location,password,username,id) values (?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into bookings (end_date,item_id,start_date,status,user_id,id) values (?,?,?,?,?,default)
+Hibernate: insert into bookings (end_date,item_id,start_date,status,user_id,id) values (?,?,?,?,?,default)
+Hibernate: insert into bookings (end_date,item_id,start_date,status,user_id,id) values (?,?,?,?,?,default)
+Hibernate: select b1_0.id,b1_0.end_date,b1_0.item_id,b1_0.start_date,b1_0.status,b1_0.user_id from bookings b1_0 where b1_0.item_id=? and b1_0.status in ('CONFIRMED','ACTIVE') and b1_0.end_date>=? and b1_0.start_date<=?
+Hibernate: insert into users (balance,email,location,password,username,id) values (?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into bookings (end_date,item_id,start_date,status,user_id,id) values (?,?,?,?,?,default)
+Hibernate: select case when count(b1_0.id)>0 then true else false end from bookings b1_0 where b1_0.item_id=? and b1_0.status not in ('CANCELLED','PENDING','COMPLETED') and b1_0.start_date<? and b1_0.end_date>?
+Hibernate: insert into users (balance,email,location,password,username,id) values (?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into bookings (end_date,item_id,start_date,status,user_id,id) values (?,?,?,?,?,default)
+Hibernate: select case when count(b1_0.id)>0 then true else false end from bookings b1_0 where b1_0.item_id=? and b1_0.status not in ('CANCELLED','PENDING','COMPLETED') and b1_0.start_date<? and b1_0.end_date>?
+Hibernate: insert into users (balance,email,location,password,username,id) values (?,?,?,?,?,default)
+Hibernate: insert into items (available,category,description,material,name,owner_id,price,id) values (?,?,?,?,?,?,?,default)
+Hibernate: insert into bookings (end_date,item_id,start_date,status,user_id,id) values (?,?,?,?,?,default)
+Hibernate: select case when count(b1_0.id)>0 then true else false end from bookings b1_0 where b1_0.item_id=? and b1_0.status not in ('CANCELLED','PENDING','COMPLETED') and b1_0.start_date<? and b1_0.end_date>?
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.187 s -- in gofish.pt.repository.BookingRepositoryTest
+[INFO] Running gofish.pt.service.BookingServiceTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.641 s -- in gofish.pt.service.BookingServiceTest
+[INFO] Running gofish.pt.service.ItemServiceTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.172 s -- in gofish.pt.service.ItemServiceTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 30, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jacoco:0.8.14:report (report) @ gofish ---
+[INFO] Loading execution data file /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/target/jacoco.exec
+[INFO] Analyzed bundle 'gofish' with 23 classes
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ gofish ---
+[INFO] Building jar: /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/target/gofish-1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- spring-boot:3.5.7:repackage (repackage) @ gofish ---
+[INFO] Replacing main artifact /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/target/gofish-1.0-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/target/gofish-1.0-SNAPSHOT.jar.original
+[INFO] 
+[INFO] --- spring-boot:3.5.7:repackage (default) @ gofish ---
+[INFO] Replacing main artifact /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/target/gofish-1.0-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend/target/gofish-1.0-SNAPSHOT.jar.original
+[INFO] 
+[INFO] --- failsafe:3.5.4:integration-test (default) @ gofish ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running gofish.pt.integration.ItemControllerIT
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+23:22:58.552 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [gofish.pt.integration.ItemControllerIT]: ItemControllerIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+23:22:58.799 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration gofish.pt.GoFishApplication for test class gofish.pt.integration.ItemControllerIT
+23:22:59.121 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.7)
+
+2025-12-07T23:22:59.732Z  INFO 33799 --- [           main] gofish.pt.integration.ItemControllerIT   : Starting ItemControllerIT using Java 23.0.2 with PID 33799 (started by tiago in /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend)
+2025-12-07T23:22:59.735Z  INFO 33799 --- [           main] gofish.pt.integration.ItemControllerIT   : No active profile set, falling back to 1 default profile: "default"
+2025-12-07T23:23:02.219Z  INFO 33799 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-12-07T23:23:02.308Z  INFO 33799 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 72 ms. Found 3 JPA repository interfaces.
+2025-12-07T23:23:03.057Z  INFO 33799 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-12-07T23:23:03.498Z  INFO 33799 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:a260f1a7-81fb-4de5-b3fd-8848e4448d8b user=SA
+2025-12-07T23:23:03.501Z  INFO 33799 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-12-07T23:23:03.588Z  INFO 33799 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-12-07T23:23:03.675Z  INFO 33799 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.33.Final
+2025-12-07T23:23:03.734Z  INFO 33799 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-12-07T23:23:04.179Z  INFO 33799 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-12-07T23:23:04.299Z  INFO 33799 --- [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.4.240
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-12-07T23:23:05.992Z  INFO 33799 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-12-07T23:23:06.086Z  INFO 33799 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-12-07T23:23:06.478Z  INFO 33799 --- [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-12-07T23:23:08.186Z  WARN 33799 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-12-07T23:23:08.632Z  WARN 33799 --- [           main] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2025-12-07T23:23:09.175Z  INFO 33799 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2025-12-07T23:23:09.175Z  INFO 33799 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-12-07T23:23:09.183Z  INFO 33799 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-12-07T23:23:09.198Z  INFO 33799 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 23 ms
+2025-12-07T23:23:09.303Z  INFO 33799 --- [           main] gofish.pt.integration.ItemControllerIT   : Started ItemControllerIT in 10.205 seconds (process running for 12.492)
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.31 s -- in gofish.pt.integration.ItemControllerIT
+[INFO] Running gofish.pt.integration.BookingControllerIT
+2025-12-07T23:23:10.545Z  INFO 33799 --- [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [gofish.pt.integration.BookingControllerIT]: BookingControllerIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-12-07T23:23:10.564Z  INFO 33799 --- [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration gofish.pt.GoFishApplication for test class gofish.pt.integration.BookingControllerIT
+2025-12-07T23:23:10.569Z  INFO 33799 --- [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.7)
+
+2025-12-07T23:23:10.594Z  INFO 33799 --- [           main] g.pt.integration.BookingControllerIT     : Starting BookingControllerIT using Java 23.0.2 with PID 33799 (started by tiago in /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/backend)
+2025-12-07T23:23:10.594Z  INFO 33799 --- [           main] g.pt.integration.BookingControllerIT     : No active profile set, falling back to 1 default profile: "default"
+2025-12-07T23:23:11.132Z  WARN 33799 --- [           main] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2025-12-07T23:23:11.146Z  INFO 33799 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2025-12-07T23:23:11.146Z  INFO 33799 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-12-07T23:23:11.147Z  INFO 33799 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+2025-12-07T23:23:11.158Z  INFO 33799 --- [           main] g.pt.integration.BookingControllerIT     : Started BookingControllerIT in 0.589 seconds (process running for 14.347)
+2025-12-07T23:23:11.289Z  WARN 33799 --- [           main] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<gofish.pt.dto.BookingResponseDTO> gofish.pt.boundary.BookingController.createBooking(gofish.pt.dto.BookingRequestDTO) with 4 errors: [Field error in object 'bookingRequestDTO' on field 'endDate': rejected value [null]; codes [NotNull.bookingRequestDTO.endDate,NotNull.endDate,NotNull.java.time.LocalDateTime,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [bookingRequestDTO.endDate,endDate]; arguments []; default message [endDate]]; default message [must not be null]] [Field error in object 'bookingRequestDTO' on field 'startDate': rejected value [null]; codes [NotNull.bookingRequestDTO.startDate,NotNull.startDate,NotNull.java.time.LocalDateTime,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [bookingRequestDTO.startDate,startDate]; arguments []; default message [startDate]]; default message [must not be null]] [Field error in object 'bookingRequestDTO' on field 'itemId': rejected value [null]; codes [NotNull.bookingRequestDTO.itemId,NotNull.itemId,NotNull.java.lang.Long,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [bookingRequestDTO.itemId,itemId]; arguments []; default message [itemId]]; default message [Tens de dizer qual é o item, moce!]] [Field error in object 'bookingRequestDTO' on field 'userId': rejected value [null]; codes [NotNull.bookingRequestDTO.userId,NotNull.userId,NotNull.java.lang.Long,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [bookingRequestDTO.userId,userId]; arguments []; default message [userId]]; default message [Quem é que vai pagar isto?]] ]
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.789 s -- in gofish.pt.integration.BookingControllerIT
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- failsafe:3.5.4:verify (default) @ gofish ---
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  51.582 s
+[INFO] Finished at: 2025-12-07T23:23:11Z
+[INFO] ------------------------------------------------------------------------
