@@ -1,5 +1,6 @@
 package gofish.pt.service;
 
+import gofish.pt.dto.ItemDTO;
 import gofish.pt.dto.ItemFilter;
 import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -110,6 +112,107 @@ class ItemServiceTest {
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getPrice()).isEqualTo(i1.getPrice());
 
+    }
+
+    @Test
+    void fromDTO_shouldConvertAllFields() {
+        // given
+        ItemDTO dto = new ItemDTO(
+                "Test Item",
+                "A test description",
+                List.of("http://example.com/photo1.jpg", "http://example.com/photo2.jpg"),
+                Category.RODS,
+                Material.GRAPHITE,
+                25.99,
+                42L);
+
+        // when
+        Item result = itemService.fromDTO(dto);
+
+        // then
+        assertThat(result.getName()).isEqualTo("Test Item");
+        assertThat(result.getDescription()).isEqualTo("A test description");
+        assertThat(result.getPhotoUrls()).containsExactly("http://example.com/photo1.jpg",
+                "http://example.com/photo2.jpg");
+        assertThat(result.getCategory()).isEqualTo(Category.RODS);
+        assertThat(result.getMaterial()).isEqualTo(Material.GRAPHITE);
+        assertThat(result.getPrice()).isEqualTo(25.99);
+        assertThat(result.getUserId()).isEqualTo(42L);
+    }
+
+    @Test
+    void fromDTO_shouldHandleEmptyPhotoUrls() {
+        // given
+        ItemDTO dto = new ItemDTO(
+                "No Photos Item",
+                "Item without photos",
+                List.of(),
+                Category.REELS,
+                Material.ALUMINUM,
+                15.0,
+                1L);
+
+        // when
+        Item result = itemService.fromDTO(dto);
+
+        // then
+        assertThat(result.getPhotoUrls()).isEmpty();
+    }
+
+    @Test
+    void getCategories_shouldReturnOnlyTopLevelCategories() {
+        // when
+        List<Category> categories = itemService.getCategories();
+
+        // then
+        assertThat(categories).isNotEmpty();
+        assertThat(categories).allMatch(Category::isTopLevel);
+        assertThat(categories).contains(
+                Category.RODS,
+                Category.REELS,
+                Category.COMBOS,
+                Category.ELECTRONICS,
+                Category.APPAREL,
+                Category.ACCESSORIES,
+                Category.BOATS);
+        // Verify no subcategories are included
+        assertThat(categories).doesNotContain(
+                Category.RODS_SPINNING,
+                Category.REELS_CASTING,
+                Category.SPINNING_COMBOS);
+    }
+
+    @Test
+    void getMaterials_shouldReturnMaterialsGroupedByMaterialGroup() {
+        // when
+        Map<Material.MaterialGroup, List<Material>> materials = itemService.getMaterials();
+
+        // then
+        assertThat(materials).isNotEmpty();
+        assertThat(materials).containsKey(Material.MaterialGroup.RODS);
+        assertThat(materials).containsKey(Material.MaterialGroup.REELS);
+        assertThat(materials).containsKey(Material.MaterialGroup.BOATS);
+        assertThat(materials).containsKey(Material.MaterialGroup.APPARELS);
+        assertThat(materials).containsKey(Material.MaterialGroup.ACCESSORIES);
+        assertThat(materials).containsKey(Material.MaterialGroup.NETS);
+
+        // Verify ROD materials are correctly grouped
+        List<Material> rodMaterials = materials.get(Material.MaterialGroup.RODS);
+        assertThat(rodMaterials).contains(Material.GRAPHITE, Material.FIBERGLASS, Material.COMPOSITE,
+                Material.CARBON_FIBER);
+
+        // Verify REEL materials are correctly grouped
+        List<Material> reelMaterials = materials.get(Material.MaterialGroup.REELS);
+        assertThat(reelMaterials).contains(Material.ALUMINUM, Material.STAINLESS_STEEL, Material.BRASS);
+    }
+
+    @Test
+    void getMaterials_shouldContainAllMaterialGroups() {
+        // when
+        Map<Material.MaterialGroup, List<Material>> materials = itemService.getMaterials();
+
+        // then
+        assertThat(materials.keySet()).containsExactlyInAnyOrder(Material.MaterialGroup.values());
     }
 
 }
