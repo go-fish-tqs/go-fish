@@ -3,14 +3,16 @@ package gofish.pt.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
-@Entity(name = "items")
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "items")
 public class Item {
 
     // Attributes
@@ -46,28 +48,23 @@ public class Item {
     private Double price;
 
     @Column(nullable = false)
-    private Boolean available;
+    private Boolean available = true;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
-    // Constructors
+    @OneToMany
+    @JoinColumn(name = "item_id")
+    private List<Booking> bookings;
 
-    // item is available by default
-    public Item() {
-        available = true;
+    public void addBooking(Booking booking) {
+        bookings.add(booking);
+        booking.setItem(this); // <--- O SEGREDO ESTÁ AQUI!
     }
 
-    public Item(Long userId, String name, String description, List<String> photoUrls, Material material,
-            Category category, Double price) {
-        this();
-        this.userId = userId;
-        this.name = name;
-        this.description = description;
-        this.photoUrls = photoUrls;
-        this.material = material;
-        this.category = category;
-        this.price = price;
+    public void removeBooking(Booking booking) {
+        bookings.remove(booking);
+        booking.setItem(null);
     }
-
 }
