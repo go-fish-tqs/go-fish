@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormContext } from "./FormContext";
-import { MATERIALS, MaterialGroup } from "./constants";
+import { MaterialGroup } from "./types";
 import { useQuery } from "@tanstack/react-query";
 import { MaterialMap } from "../types";
 import { useMemo } from "react";
@@ -42,8 +42,7 @@ export function MaterialField() {
     // Convert MaterialMap to MaterialGroup[] format for rendering
     const materialGroups: MaterialGroup[] = useMemo(() => {
         if (!materialsMap || Object.keys(materialsMap).length === 0) {
-            // Fallback to constants if API data is not available
-            return MATERIALS;
+            return [];
         }
 
         return Object.entries(materialsMap).map(([groupKey, materialIds]) => ({
