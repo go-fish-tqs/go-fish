@@ -91,7 +91,8 @@ class ItemServiceTest {
         List<Item> result = itemService.findAll(filter);
 
         // then
-        assertThat(result).isNotEmpty().hasSize(2).extracting(Item::getName).containsExactly(i1.getName(), i2.getName());
+        assertThat(result).isNotEmpty().hasSize(2).extracting(Item::getName).containsExactly(i1.getName(),
+                i2.getName());
 
         verify(itemRepository).findAll(any(Specification.class), eq(Sort.by(Sort.Direction.ASC, "id")));
     }
