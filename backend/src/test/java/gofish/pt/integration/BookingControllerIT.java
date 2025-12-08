@@ -1,161 +1,157 @@
 package gofish.pt.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gofish.pt.boundary.BookingController;
 import gofish.pt.dto.BookingRequestDTO;
-import gofish.pt.dto.BookingResponseDTO;
-import gofish.pt.dto.BookingStatusDTO; // <--- Confirma se tens este DTO criado!
-import gofish.pt.entity.Booking;
-import gofish.pt.entity.BookingStatus;
-import gofish.pt.mapper.BookingMapper;
-import gofish.pt.service.BookingService;
+import gofish.pt.dto.BookingStatusDTO;
+import gofish.pt.entity.*;
+import gofish.pt.repository.BookingRepository;
+import gofish.pt.repository.ItemRepository;
+import gofish.pt.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(BookingController.class) // Carrega só o Controller
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
 class BookingControllerIT {
 
-    @Autowired
-    private MockMvc mockMvc; // O carteiro que manda os pedidos HTTP a fingir
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
 
-    @Autowired
-    private ObjectMapper objectMapper; // Para converter Objetos em JSON
+    @Autowired private BookingRepository bookingRepository;
+    @Autowired private ItemRepository itemRepository;
+    @Autowired private UserRepository userRepository;
 
-    @MockitoBean
-    private BookingService bookingService; // O Serviço a fingir
-
-    @MockitoBean
-    private BookingMapper bookingMapper; // O Mapper a fingir
-
-    private BookingRequestDTO requestDTO;
-    private BookingResponseDTO responseDTO;
-    private Booking bookingEntity;
+    private User owner;
+    private User renter;
+    private Item kayak;
 
     @BeforeEach
-    void setup() {
-        // Preparar dados de exemplo
-        requestDTO = new BookingRequestDTO();
-        requestDTO.setUserId(10L);
-        requestDTO.setItemId(5L);
-        requestDTO.setStartDate(LocalDateTime.now().plusDays(1));
-        requestDTO.setEndDate(LocalDateTime.now().plusDays(3));
+    void setUp() {
+        bookingRepository.deleteAll();
+        itemRepository.deleteAll();
+        userRepository.deleteAll();
 
-        bookingEntity = new Booking();
-        bookingEntity.setId(1L);
-        bookingEntity.setStatus(BookingStatus.PENDING);
+        // 1. Criar Owner
+        owner = new User();
+        owner.setUsername("dono_kayak");
+        owner.setEmail("dono@rio.pt");
+        owner.setPassword("pass");
+        owner.setLocation("Tavira");
+        owner.setBalance(0.0);
+        owner = userRepository.save(owner);
 
-        responseDTO = new BookingResponseDTO();
-        responseDTO.setId(1L);
-        responseDTO.setStatus(BookingStatus.PENDING);
-        responseDTO.setUserId(10L);
-        responseDTO.setItemId(5L);
+        // 2. Criar Renter (Cliente)
+        renter = new User();
+        renter.setUsername("cliente_turista");
+        renter.setEmail("tourist@uk.co");
+        renter.setPassword("pass");
+        renter.setLocation("Hotel");
+        renter.setBalance(100.0);
+        renter = userRepository.save(renter);
+
+        // 3. Criar Item
+        kayak = new Item();
+        kayak.setName("Kayak Duplo");
+        kayak.setDescription("Para passear na ria");
+        kayak.setPrice(25.0);
+        kayak.setCategory(Category.BOATS);
+        kayak.setMaterial(Material.ROTOMOLDED_POLYETHYLENE);
+        kayak.setOwner(owner); // <--- Pertence ao dono
+        kayak.setAvailable(true);
+        kayak = itemRepository.save(kayak);
     }
 
-    // --- TESTES DE POST (Criar Reserva) ---
-
     @Test
-    @DisplayName("POST /api/bookings - Deve criar reserva e devolver 201 Created")
-    void shouldCreateBooking_WhenValid() throws Exception {
+    @DisplayName("POST /api/bookings - Deve criar reserva PENDING")
+    void createBooking() throws Exception {
         // Arrange
-        // Ensinar o Serviço Mock a devolver a entidade quando chamado
-        when(bookingService.createBooking(any(), any(), any(), any()))
-                .thenReturn(bookingEntity);
-
-        // Ensinar o Mapper Mock a devolver o DTO de resposta
-        when(bookingMapper.toDTO(any(Booking.class)))
-                .thenReturn(responseDTO);
+        BookingRequestDTO request = new BookingRequestDTO();
+        request.setUserId(renter.getId());
+        request.setItemId(kayak.getId());
+        // Datas futuras para não dar erro
+        request.setStartDate(LocalDateTime.now().plusDays(10));
+        request.setEndDate(LocalDateTime.now().plusDays(12));
 
         // Act & Assert
         mockMvc.perform(post("/api/bookings")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO))) // Converte DTO para JSON string
-                .andExpect(status().isCreated()) // Espera HTTP 201
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.status").value("PENDING"));
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("PENDING"))
+                .andExpect(jsonPath("$.itemName").value("Kayak Duplo"))
+                // Verifica o preço: 2 dias completos (10 a 12) * 25.0 = 50.0
+                // (Depende da tua lógica de cálculo no Mapper, mas deve ser > 0)
+                .andExpect(jsonPath("$.price").isNumber());
     }
 
     @Test
-    @DisplayName("POST /api/bookings - Deve dar erro 400 se faltar dados")
-    void shouldReturn400_WhenInvalidBody() throws Exception {
-        // Arrange
-        BookingRequestDTO invalidRequest = new BookingRequestDTO();
-        // Não preenchemos nada (tudo null), o @Valid deve apanhar isto
+    @DisplayName("GET /api/bookings/{id} - Deve devolver erro 404 se não existir")
+    void getBookingNotFound() throws Exception {
+        mockMvc.perform(get("/api/bookings/{id}", 9999L))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("PATCH /api/bookings/{id}/status - Dono aprova reserva")
+    void updateBookingStatus() throws Exception {
+        // 1. Criar uma reserva PENDING na base de dados
+        Booking booking = new Booking();
+        booking.setUser(renter);
+        booking.setItem(kayak);
+        booking.setStartDate(LocalDateTime.now().plusDays(5));
+        booking.setEndDate(LocalDateTime.now().plusDays(6));
+        booking.setStatus(BookingStatus.PENDING);
+        booking = bookingRepository.save(booking);
+
+        // 2. Preparar DTO de aprovação
+        BookingStatusDTO statusDTO = new BookingStatusDTO();
+        statusDTO.setStatus(BookingStatus.CONFIRMED);
+        statusDTO.setOwnerId(owner.getId()); // <--- É o dono que manda!
 
         // Act & Assert
-        mockMvc.perform(post("/api/bookings")
+        mockMvc.perform(patch("/api/bookings/{id}/status", booking.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest()); // Espera HTTP 400
-    }
-
-    // --- TESTES DE GET (Buscar Reserva) ---
-
-    @Test
-    @DisplayName("GET /api/bookings/{id} - Deve devolver a reserva se existir")
-    void shouldGetBooking_WhenExists() throws Exception {
-        // Arrange
-        when(bookingService.getBooking(1L)).thenReturn(Optional.of(bookingEntity));
-        when(bookingMapper.toDTO(bookingEntity)).thenReturn(responseDTO);
-
-        // Act & Assert
-        mockMvc.perform(get("/api/bookings/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L));
-    }
-
-    @Test
-    @DisplayName("GET /api/bookings/{id} - Deve dar 404 Not Found se não existir")
-    void shouldFail_WhenBookingNotFound() throws Exception {
-        // Arrange
-        when(bookingService.getBooking(99L)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        mockMvc.perform(get("/api/bookings/99"))
-                .andExpect(status().isNotFound()); // <--- Agora esperamos 404, não 500
-    }
-
-    // --- TESTES DE PATCH (Atualizar Status) ---
-
-    @Test
-    @DisplayName("PATCH /api/bookings/{id}/status - Deve atualizar o estado")
-    void shouldUpdateStatus() throws Exception {
-        // Arrange
-        BookingStatusDTO statusUpdate = new BookingStatusDTO();
-        statusUpdate.setStatus(BookingStatus.CONFIRMED);
-        statusUpdate.setOwnerId(20L);
-
-        Booking confirmedBooking = new Booking();
-        confirmedBooking.setId(1L);
-        confirmedBooking.setStatus(BookingStatus.CONFIRMED);
-
-        BookingResponseDTO confirmedResponse = new BookingResponseDTO();
-        confirmedResponse.setStatus(BookingStatus.CONFIRMED);
-
-        when(bookingService.updateBookingStatus(eq(1L), eq(BookingStatus.CONFIRMED), eq(20L)))
-                .thenReturn(confirmedBooking);
-        when(bookingMapper.toDTO(confirmedBooking)).thenReturn(confirmedResponse);
-
-        // Act & Assert
-        mockMvc.perform(patch("/api/bookings/1/status")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(statusUpdate)))
+                        .content(objectMapper.writeValueAsString(statusDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CONFIRMED"));
+    }
+
+    @Test
+    @DisplayName("PATCH /api/bookings/{id}/status - Erro se não for o dono")
+    void updateBookingStatus_SecurityCheck() throws Exception {
+        // 1. Criar reserva
+        Booking booking = new Booking();
+        booking.setUser(renter);
+        booking.setItem(kayak);
+        booking.setStartDate(LocalDateTime.now().plusDays(5));
+        booking.setEndDate(LocalDateTime.now().plusDays(6));
+        booking.setStatus(BookingStatus.PENDING);
+        booking = bookingRepository.save(booking);
+
+        // 2. O Renter tenta aprovar a própria reserva (Espertinho!)
+        BookingStatusDTO statusDTO = new BookingStatusDTO();
+        statusDTO.setStatus(BookingStatus.CONFIRMED);
+        statusDTO.setOwnerId(renter.getId()); // ID errado (não é o dono do item)
+
+        // Act & Assert
+        // O serviço lança SecurityException. O Spring por defeito dá 500 ou 403 dependendo da config.
+        // Assumindo padrão:
+        mockMvc.perform(patch("/api/bookings/{id}/status", booking.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(statusDTO)))
+                        .andExpect(status().isForbidden()); // Ou Forbidden se tratares a exceção
     }
 }

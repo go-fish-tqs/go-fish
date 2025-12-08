@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -141,7 +142,7 @@ class BookingServiceTest {
 
         // Act & Assert (O Zé (renter) tenta confirmar a reserva dele próprio -> PROIBIDO!)
         assertThatThrownBy(() -> bookingService.updateBookingStatus(booking.getId(), BookingStatus.CONFIRMED, renter.getId()))
-                .isInstanceOf(SecurityException.class);
+                .isInstanceOf(ResponseStatusException.class);
     }
 
     @Test

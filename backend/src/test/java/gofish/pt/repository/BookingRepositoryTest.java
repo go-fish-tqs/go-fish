@@ -155,6 +155,13 @@ class BookingRepositoryTest {
         b.setStartDate(start);
         b.setEndDate(end);
         b.setStatus(status);
+        b.setPrice(calculatePrice(start, end, fishingRod.getPrice()));
         return bookingRepository.save(b);
+    }
+
+    private Double calculatePrice(LocalDateTime start, LocalDateTime end, Double price){
+        long days = java.time.temporal.ChronoUnit.DAYS.between(start, end);
+        if (days == 0) days = 1;
+        return days * price;
     }
 }

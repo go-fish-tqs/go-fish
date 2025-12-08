@@ -1,6 +1,7 @@
 package gofish.pt.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,6 +33,10 @@ public class Booking {
     @Column(nullable = false)
     private BookingStatus status;
 
+    @Column
+    @Positive
+    private Double price;
+
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
@@ -39,11 +44,6 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    public Double getTotalPrice() {
-        long days = java.time.Duration.between(startDate, endDate).toDays();
-        return days * item.getPrice();
-    }
 
 
 }

@@ -6,8 +6,10 @@ import gofish.pt.repository.BookingRepository;
 import gofish.pt.repository.ItemRepository;
 import gofish.pt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -74,8 +76,7 @@ public class BookingService {
 
         // SEGURANÇA: Só o dono do item é que pode mexer nisto!
         if (!booking.getItem().getOwner().getId().equals(ownerId)) {
-            throw new SecurityException("Eh lá! Tás a tentar mexer no negócio dos outros?");
-        }
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Eh lá! Tás a tentar mexer no negócio dos outros?");        }
 
         // Regra: Só podes mexer se ainda estiver PENDENTE
         if (booking.getStatus() != BookingStatus.PENDING) {

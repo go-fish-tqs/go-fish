@@ -12,7 +12,7 @@ public class BookingResponseDTO {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private BookingStatus status;
-    private Double totalPrice; // Vamos calcular isto na hora de converter!
+    private Double price; // Vamos calcular isto na hora de converter!
 
     // Nã mandes o Item todo, manda só o essencial para mostrar no ecrã
     private Long itemId;
