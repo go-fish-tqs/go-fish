@@ -67,4 +67,17 @@ public class Item {
         bookings.remove(booking);
         booking.setItem(null);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return getId() != null && getId().equals(item.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

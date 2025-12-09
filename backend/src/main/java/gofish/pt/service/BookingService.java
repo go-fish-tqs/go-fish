@@ -1,7 +1,9 @@
 package gofish.pt.service;
 
+import gofish.pt.entity.BlockedDate;
 import gofish.pt.entity.Booking;
 import gofish.pt.entity.BookingStatus;
+import gofish.pt.repository.BlockedDateRepository;
 import gofish.pt.repository.BookingRepository;
 import gofish.pt.repository.ItemRepository;
 import gofish.pt.repository.UserRepository;
@@ -24,6 +26,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final BlockedDateRepository blockedDateRepository;
 
     // GET methods
 
@@ -96,11 +99,13 @@ public class BookingService {
         // 1. Validar a entrada
         validateDateRange(start, end);
 
-        // 2. Ir à pesca das reservas
+        // 2. Ir à pesca das reservas e dos bloqueios
         List<Booking> existingBookings = getConflictingBookings(itemId, start, end);
+        List<BlockedDate> blockedDates = blockedDateRepository.findBlockedDatesInRange(itemId, start.toLocalDate(), end.toLocalDate());
+
 
         // 3. Calcular os dias queimados
-        return calculateUnavailableDates(start.toLocalDate(), end.toLocalDate(), existingBookings);
+        return calculateUnavailableDates(start.toLocalDate(), end.toLocalDate(), existingBookings, blockedDates);
     }
 
     private void validateDateRange(LocalDateTime start, LocalDateTime end) {
@@ -114,17 +119,17 @@ public class BookingService {
         return bookingRepository.findBookingsInRange(itemId, start, end);
     }
 
-    private List<LocalDate> calculateUnavailableDates(LocalDate startDate, LocalDate endDate, List<Booking> bookings) {
+    private List<LocalDate> calculateUnavailableDates(LocalDate startDate, LocalDate endDate, List<Booking> bookings, List<BlockedDate> blockedDates) {
         // Cria um stream de dias desde o início até ao fim
         return startDate.datesUntil(endDate.plusDays(1)) // plusDays(1) porque o método é exclusivo no fim
-                .filter(date -> isDateUnavailable(date, bookings))
+                .filter(date -> isDateUnavailable(date, bookings, blockedDates))
                 .sorted()
                 .toList();
     }
 
 
-    private boolean isDateUnavailable(LocalDate date, List<Booking> bookings) {
-        return isPastDate(date) || isDateBooked(date, bookings);
+    private boolean isDateUnavailable(LocalDate date, List<Booking> bookings, List<BlockedDate> blockedDates) {
+        return isPastDate(date) || isDateBooked(date, bookings) || isDateBlocked(date, blockedDates);
     }
 
 
@@ -143,6 +148,17 @@ public class BookingService {
         LocalDate bEnd = booking.getEndDate().toLocalDate();
 
         // Lógica: !(date < start) && !(date > end) -> está no meio ou nas pontas
+        return !date.isBefore(bStart) && !date.isAfter(bEnd);
+    }
+
+    private boolean isDateBlocked(LocalDate date, List<BlockedDate> blockedDates) {
+        return blockedDates.stream().anyMatch(blockedDate -> isDateInBlockedRange(date, blockedDate));
+    }
+
+    private boolean isDateInBlockedRange(LocalDate date, BlockedDate blockedDate) {
+        LocalDate bStart = blockedDate.getStartDate();
+        LocalDate bEnd = blockedDate.getEndDate();
+
         return !date.isBefore(bStart) && !date.isAfter(bEnd);
     }
 
