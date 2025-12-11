@@ -1,0 +1,25 @@
+name: CD-pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create .env file
+        working-directory: ./deployment 
+        run: |
+          echo "${{ secrets.ENV }}" > .env.prod
+
+      - name: Deploy with Docker Compose
+        working-directory: ./deployment 
+        run: |
+          docker-compose -f compose.prod.yaml --env-file .env.prod up -d --build
+
+      - name: Cleanup docker
+        run: |
+          docker system prune -f

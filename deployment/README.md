@@ -102,11 +102,7 @@ Development uses volume mounts for instant code updates:
 - Log rotation (max 10MB, 3 files)
 - Startup probes with grace periods
 
-### Optional Nginx Reverse Proxy
-```bash
-# Start with Nginx proxy
-docker compose -f compose.prod.yaml --profile proxy up -d
-```
+
 
 ## 🔑 Environment Variables
 
@@ -137,7 +133,6 @@ Required variables:
 |---------|------|-------------|
 | Frontend | 3000 | React application |
 | Backend | 8080 | Spring Boot API |
-| Nginx | 80/443 | Reverse proxy (optional) |
 
 ## 🛠️ Common Tasks
 
