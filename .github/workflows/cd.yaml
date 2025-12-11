@@ -15,6 +15,11 @@ jobs:
         run: |
           echo "${{ secrets.ENV }}" > .env.prod
 
+      - name: Check Docker
+        run: |
+          docker info
+          docker-compose version
+
       - name: Deploy with Docker Compose
         working-directory: ./deployment 
         env:
