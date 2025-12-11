@@ -39,12 +39,10 @@ services:
       args:
         - BUILD_DATE=${BUILD_DATE:-unknown}
         - VERSION=${VERSION:-latest}
+        - API_URL=${API_URL:-http://localhost:8080}
     restart: always
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - VITE_API_URL=${API_URL:-http://backend:8080}
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000" ]
       interval: 30s

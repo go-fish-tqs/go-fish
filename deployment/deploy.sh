@@ -99,7 +99,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --rebuild)
-            BUILD="--build --no-cache"
+            BUILD="--build"
             shift
             ;;
         --help|-h)
