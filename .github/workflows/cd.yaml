@@ -17,6 +17,8 @@ jobs:
 
       - name: Deploy with Docker Compose
         working-directory: ./deployment 
+        env:
+          DOCKER_BUILDKIT: 1
         run: |
           docker-compose -f compose.prod.yaml --env-file .env.prod up -d --build
 
