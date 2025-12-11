@@ -21,7 +21,7 @@ function BookingForm() {
   } = useQuery({
     queryKey: ["item", itemId],
     queryFn: async () => {
-      const res = await fetch(`http://localhost:8080/api/items/${itemId}`);
+      const res = await fetch(`${process.env.API_URL}/api/items/${itemId}`);
       if (!res.ok) throw new Error("Failed to fetch item");
       return res.json() as Promise<Item>;
     },
@@ -43,7 +43,7 @@ function BookingForm() {
 
       console.log("Creating booking:", bookingData);
 
-      // const response = await fetch('http://localhost:8080/api/bookings', {
+      // const response = await fetch(`${process.env.API_URL}/api/bookings`, {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify(bookingData)
