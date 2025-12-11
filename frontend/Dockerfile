@@ -63,6 +63,10 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 
+ARG API_URL
+ENV API_URL=$API_URL
+
+
 # Copy the rest of the source files into the image.
 COPY . .
 # Run the build script.
