@@ -19,8 +19,13 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // Keep CSRF enabled to satisfy security scanners (SonarCloud).
+        // For API endpoints that are stateless / intended for non-browser clients,
+        // exclude them from CSRF protection explicitly rather than disabling CSRF globally.
         http
-            .csrf().disable()
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/**")
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
