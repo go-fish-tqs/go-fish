@@ -71,8 +71,8 @@ public class User {
     }
 
     public void removeBooking(Booking booking) {
-        bookings.add(booking);
-        booking.setUser(this);
+        bookings.remove(booking);
+        booking.setUser(null);
     }
 
     public List<Booking> getOwnedBookings() {
