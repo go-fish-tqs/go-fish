@@ -1,6 +1,7 @@
 package gofish.pt.service;
 
 import gofish.pt.entity.*;
+import gofish.pt.repository.BlockedDateRepository;
 import gofish.pt.repository.BookingRepository;
 import gofish.pt.repository.ItemRepository;
 import gofish.pt.repository.UserRepository;
@@ -31,6 +32,9 @@ class BookingServiceTest {
     private BookingRepository bookingRepository;
 
     @Mock
+    private BlockedDateRepository blockedDateRepository;
+
+    @Mock
     private ItemRepository itemRepository;
 
     @Mock
@@ -47,6 +51,7 @@ class BookingServiceTest {
 
     @BeforeEach
     void setup() {
+        bookingService = new BookingService(bookingRepository, itemRepository, userRepository, blockedDateRepository);
         renter = new User();
         renter.setId(10L);
         renter.setUsername("ze_aluga");
@@ -177,6 +182,9 @@ class BookingServiceTest {
         when(bookingRepository.findBookingsInRange(eq(fishingRod.getId()), any(), any()))
                 .thenReturn(List.of(existing));
 
+        when(blockedDateRepository.findBlockedDatesInRange(eq(fishingRod.getId()), any(), any()))
+                .thenReturn(Collections.emptyList());
+
         // Act
         List<LocalDate> blockedDates = bookingService.checkAvailability(fishingRod.getId(), queryStart, queryEnd);
 
@@ -201,5 +209,4 @@ class BookingServiceTest {
 
         assertThatThrownBy(() -> bookingService.checkAvailability(1L, start, end))
                 .isInstanceOf(IllegalArgumentException.class);
-    }
-}
+    }}

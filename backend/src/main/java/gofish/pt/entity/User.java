@@ -81,4 +81,19 @@ public class User {
                 .toList();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        // Se ambos tiverem ID, compara IDs. Se não, compara referências.
+        return getId() != null && getId().equals(user.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        // Retorna um valor constante ou baseado na classe para evitar problemas com HashSets
+        return getClass().hashCode();
+    }
+
 }

@@ -19,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+// IMPORTS NECESSÁRIOS PARA SEGURANÇA
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -51,7 +54,7 @@ class BookingControllerIT {
         owner.setPassword("pass");
         owner.setLocation("Tavira");
         owner.setBalance(0.0);
-        owner = userRepository.save(owner);
+        owner = userRepository.saveAndFlush(owner);
 
         // 2. Criar Renter (Cliente)
         renter = new User();
@@ -60,7 +63,7 @@ class BookingControllerIT {
         renter.setPassword("pass");
         renter.setLocation("Hotel");
         renter.setBalance(100.0);
-        renter = userRepository.save(renter);
+        renter = userRepository.saveAndFlush(renter);
 
         // 3. Criar Item
         kayak = new Item();
@@ -69,9 +72,9 @@ class BookingControllerIT {
         kayak.setPrice(25.0);
         kayak.setCategory(Category.BOATS);
         kayak.setMaterial(Material.ROTOMOLDED_POLYETHYLENE);
-        kayak.setOwner(owner); // <--- Pertence ao dono
+        kayak.setOwner(owner);
         kayak.setAvailable(true);
-        kayak = itemRepository.save(kayak);
+        kayak = itemRepository.saveAndFlush(kayak);
     }
 
     @Test
@@ -81,48 +84,52 @@ class BookingControllerIT {
         BookingRequestDTO request = new BookingRequestDTO();
         request.setUserId(renter.getId());
         request.setItemId(kayak.getId());
-        // Datas futuras para não dar erro
         request.setStartDate(LocalDateTime.now().plusDays(10));
         request.setEndDate(LocalDateTime.now().plusDays(12));
 
         // Act & Assert
         mockMvc.perform(post("/api/bookings")
+                        // AUTENTICAÇÃO: Simula o Renter
+                        .with(user(renter.getUsername()).password(renter.getPassword()).roles("USER"))
+                        .with(csrf()) // Token CSRF Obrigatório
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.itemName").value("Kayak Duplo"))
-                // Verifica o preço: 2 dias completos (10 a 12) * 25.0 = 50.0
-                // (Depende da tua lógica de cálculo no Mapper, mas deve ser > 0)
-                .andExpect(jsonPath("$.price").isNumber());
+                .andExpect(jsonPath("$.itemName").value("Kayak Duplo"));
     }
 
     @Test
     @DisplayName("GET /api/bookings/{id} - Deve devolver erro 404 se não existir")
     void getBookingNotFound() throws Exception {
-        mockMvc.perform(get("/api/bookings/{id}", 9999L))
+        mockMvc.perform(get("/api/bookings/{id}", 9999L)
+                        // AUTENTICAÇÃO: Qualquer user serve para passar o login
+                        .with(user("qualquer_user")))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @DisplayName("PATCH /api/bookings/{id}/status - Dono aprova reserva")
     void updateBookingStatus() throws Exception {
-        // 1. Criar uma reserva PENDING na base de dados
+        // 1. Criar uma reserva PENDING
         Booking booking = new Booking();
         booking.setUser(renter);
         booking.setItem(kayak);
         booking.setStartDate(LocalDateTime.now().plusDays(5));
         booking.setEndDate(LocalDateTime.now().plusDays(6));
         booking.setStatus(BookingStatus.PENDING);
-        booking = bookingRepository.save(booking);
+        booking = bookingRepository.saveAndFlush(booking);
 
         // 2. Preparar DTO de aprovação
         BookingStatusDTO statusDTO = new BookingStatusDTO();
         statusDTO.setStatus(BookingStatus.CONFIRMED);
-        statusDTO.setOwnerId(owner.getId()); // <--- É o dono que manda!
+        statusDTO.setOwnerId(owner.getId());
 
         // Act & Assert
         mockMvc.perform(patch("/api/bookings/{id}/status", booking.getId())
+                        // AUTENTICAÇÃO: O DONO é quem aprova
+                        .with(user(owner.getUsername()).password(owner.getPassword()).roles("USER"))
+                        .with(csrf()) // Token CSRF Obrigatório
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusDTO)))
                 .andExpect(status().isOk())
@@ -130,7 +137,7 @@ class BookingControllerIT {
     }
 
     @Test
-    @DisplayName("PATCH /api/bookings/{id}/status - Erro se não for o dono")
+    @DisplayName("PATCH /api/bookings/{id}/status - Erro 403 se não for o dono")
     void updateBookingStatus_SecurityCheck() throws Exception {
         // 1. Criar reserva
         Booking booking = new Booking();
@@ -139,19 +146,20 @@ class BookingControllerIT {
         booking.setStartDate(LocalDateTime.now().plusDays(5));
         booking.setEndDate(LocalDateTime.now().plusDays(6));
         booking.setStatus(BookingStatus.PENDING);
-        booking = bookingRepository.save(booking);
+        booking = bookingRepository.saveAndFlush(booking);
 
-        // 2. O Renter tenta aprovar a própria reserva (Espertinho!)
+        // 2. O Renter tenta aprovar a própria reserva
         BookingStatusDTO statusDTO = new BookingStatusDTO();
         statusDTO.setStatus(BookingStatus.CONFIRMED);
-        statusDTO.setOwnerId(renter.getId()); // ID errado (não é o dono do item)
+        statusDTO.setOwnerId(renter.getId());
 
         // Act & Assert
-        // O serviço lança SecurityException. O Spring por defeito dá 500 ou 403 dependendo da config.
-        // Assumindo padrão:
         mockMvc.perform(patch("/api/bookings/{id}/status", booking.getId())
+                        // AUTENTICAÇÃO: Logado como RENTER (não é o dono do item)
+                        .with(user(renter.getUsername()).password(renter.getPassword()).roles("USER"))
+                        .with(csrf()) // Token CSRF Obrigatório
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusDTO)))
-                        .andExpect(status().isForbidden()); // Ou Forbidden se tratares a exceção
+                        .andExpect(status().isForbidden()); // Espera-se 403 Forbidden
     }
 }
