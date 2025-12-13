@@ -1,6 +1,6 @@
 package gofish.pt.dto;
 
-import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -18,10 +18,10 @@ public class BookingRequestDTO {
     private Long userId;
 
     @NotNull
-    @Future(message = "A data de início tem de ser no futuro!")
+    @FutureOrPresent(message = "A data de início tem de ser hoje ou no futuro!")
     private LocalDateTime startDate;
 
     @NotNull
-    @Future(message = "A data de fim tem de ser no futuro!")
+    @FutureOrPresent(message = "A data de fim tem de ser hoje ou no futuro!")
     private LocalDateTime endDate;
 }

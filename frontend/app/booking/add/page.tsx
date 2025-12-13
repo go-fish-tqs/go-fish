@@ -1,8 +1,9 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, Suspense } from "react";
+import toast from "react-hot-toast";
 import { Item } from "@/app/items/types";
 import {
   BackButton,
@@ -12,15 +13,24 @@ import {
   BookingError,
   BookingCalendar,
   ItemReviews,
+  PaymentModal,
 } from "../components";
+
+interface BookingResponse {
+  id: number;
+  status: string;
+}
 
 function BookingFormContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const itemId = searchParams.get("itemId");
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingId, setBookingId] = useState<number | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const {
     data: item,
@@ -29,33 +39,81 @@ function BookingFormContent() {
   } = useQuery({
     queryKey: ["item", itemId],
     queryFn: async () => {
-      const res = await fetch(`${process.env.API_URL}/api/items/${itemId}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/items/${itemId}`);
       if (!res.ok) throw new Error("Failed to fetch item");
       return res.json() as Promise<Item>;
     },
     enabled: !!itemId,
   });
 
+  // Create booking mutation
+  const createBookingMutation = useMutation({
+    mutationFn: async (data: { userId: number; itemId: string; startDate: string; endDate: string }) => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/bookings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: data.userId,
+          itemId: Number(data.itemId),
+          startDate: new Date(data.startDate).toISOString(),
+          endDate: new Date(data.endDate).toISOString(),
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || "Failed to create booking");
+      }
+
+      return response.json() as Promise<BookingResponse>;
+    },
+    onSuccess: (data) => {
+      setBookingId(data.id);
+      setShowPaymentModal(true);
+      toast.success("Booking created! Please complete payment.");
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Failed to create booking");
+      setIsSubmitting(false);
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!startDate || !endDate) {
+      toast.error("Please select start and end dates");
+      return;
+    }
+
+    if (new Date(startDate) >= new Date(endDate)) {
+      toast.error("End date must be after start date");
+      return;
+    }
+
     setIsSubmitting(true);
 
-    try {
-      const bookingData = {
-        itemId,
-        startDate,
-        endDate,
-        userId: 1,
-      };
+    createBookingMutation.mutate({
+      userId: 1, // TODO: Get from auth context
+      itemId: itemId!,
+      startDate,
+      endDate,
+    });
+  };
 
-      console.log("Creating booking:", bookingData);
-      alert("Booking functionality coming soon!");
-    } catch (error) {
-      console.error("Error creating booking:", error);
-      alert("Failed to create booking");
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handlePaymentSuccess = () => {
+    setShowPaymentModal(false);
+    toast.success("Payment successful! Your booking is confirmed.");
+    router.push("/dashboard");
+  };
+
+  const handlePaymentClose = () => {
+    setShowPaymentModal(false);
+    setIsSubmitting(false);
+    // Booking remains in PENDING status
+    toast("Booking saved. You can complete payment later.", { icon: "📝" });
   };
 
   if (!itemId) {
@@ -127,6 +185,19 @@ function BookingFormContent() {
           </div>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      {item && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={handlePaymentClose}
+          onSuccess={handlePaymentSuccess}
+          item={item}
+          startDate={startDate}
+          endDate={endDate}
+          bookingId={bookingId}
+        />
+      )}
     </div>
   );
 }
