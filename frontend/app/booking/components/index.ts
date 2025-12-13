@@ -7,3 +7,4 @@ export { default as BookingCalendar } from './BookingCalendar';
 export { default as ItemReviews } from './ItemReviews';
 export { default as PaymentForm } from './PaymentForm';
 export { default as PaymentModal } from './PaymentModal';
+export { default as ImageCarousel } from './ImageCarousel';
