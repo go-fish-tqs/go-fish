@@ -6,6 +6,18 @@
 .env.prod
 .env.*.local
 
+
+node_modules/
+**/node_modules/
+
+# Package manager files
+npm-debug.log*
+pnpm-debug.log*
+
+# Build artifacts
+dist/
+build/
+
 # Deployment
 deployment/.env
 deployment/.env.prod

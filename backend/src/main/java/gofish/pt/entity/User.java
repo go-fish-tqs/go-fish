@@ -81,4 +81,9 @@ public class User {
                 .toList();
     }
 
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private java.util.List<Review> reviews = new ArrayList<>();
+
 }
