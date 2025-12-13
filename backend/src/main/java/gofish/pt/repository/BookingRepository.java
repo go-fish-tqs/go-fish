@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -22,8 +23,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                         "AND b.startDate < :endDate " +
                         "AND b.endDate > :startDate")
         boolean existsOverlappingBooking(@Param("itemId") Long itemId,
-                        @Param("startDate") LocalDateTime startDate,
-                        @Param("endDate") LocalDateTime endDate);
+                        @Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
 
         @Query("SELECT b FROM Booking b " +
                         "WHERE b.item.id = :itemId " +
@@ -32,8 +33,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                         "AND b.endDate >= :start " +
                         "AND b.startDate <= :end")
         List<Booking> findBookingsInRange(@Param("itemId") Long itemId,
-                        @Param("start") LocalDateTime start,
-                        @Param("end") LocalDateTime end);
+                        @Param("start") LocalDate start,
+                        @Param("end") LocalDate end);
 
         List<Booking> findAllByUserId(Long userId);
 
@@ -46,7 +47,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                         "AND b.startDate <= :end " +
                         "ORDER BY b.startDate ASC")
         List<Booking> findByItemIdAndDateRange(@Param("itemId") Long itemId,
-                        @Param("start") LocalDateTime start,
-                        @Param("end") LocalDateTime end);
+                        @Param("start") LocalDate start,
+                        @Param("end") LocalDate end);
 
 }

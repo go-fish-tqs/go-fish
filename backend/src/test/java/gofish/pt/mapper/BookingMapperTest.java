@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,8 +40,8 @@ class BookingMapperTest {
         booking.setUser(user);
         booking.setItem(item);
         // De dia 1 a dia 5 = 4 dias de intervalo (no ChronoUnit.DAYS)
-        booking.setStartDate(LocalDateTime.of(2025, 1, 1, 10, 0));
-        booking.setEndDate(LocalDateTime.of(2025, 1, 5, 10, 0));
+        booking.setStartDate(LocalDate.of(2025, 1, 1));
+        booking.setEndDate(LocalDate.of(2025, 1, 5));
 
         // Act
         BookingResponseDTO dto = mapper.toDTO(booking);
@@ -68,8 +68,8 @@ class BookingMapperTest {
         booking.setItem(item);
 
         // Entra às 10h e sai às 15h do mesmo dia (0 dias completos)
-        booking.setStartDate(LocalDateTime.of(2025, 1, 1, 10, 0));
-        booking.setEndDate(LocalDateTime.of(2025, 1, 1, 15, 0));
+        booking.setStartDate(LocalDate.of(2025, 1, 1));
+        booking.setEndDate(LocalDate.of(2025, 1, 1));
 
         // Act
         Double price = mapper.calculatePrice(booking); // Testar o método default diretamente
@@ -86,8 +86,8 @@ class BookingMapperTest {
         BookingRequestDTO request = new BookingRequestDTO();
         request.setUserId(99L); // Nota: O mapper ignora isto no toEntity, quem trata é o service
         request.setItemId(88L); // Idem
-        request.setStartDate(LocalDateTime.now());
-        request.setEndDate(LocalDateTime.now().plusDays(1));
+        request.setStartDate(LocalDate.now());
+        request.setEndDate(LocalDate.now().plusDays(1));
 
         // Act
         Booking entity = mapper.toEntity(request);

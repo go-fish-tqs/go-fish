@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,13 +53,13 @@ class BookingRepositoryTest {
     @DisplayName("Deve detetar conflito quando as datas são exatamente iguais")
     void shouldFindOverlap_WhenDatesAreExact() {
         // Arrange: Já existe uma reserva de dia 10 a 12
-        createBooking(LocalDateTime.of(2025, 1, 10, 10, 0), LocalDateTime.of(2025, 1, 12, 10, 0), BookingStatus.CONFIRMED);
+        createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 12), BookingStatus.CONFIRMED);
 
         // Act: Tento reservar nas mesmas datas
         boolean exists = bookingRepository.existsOverlappingBooking(
                 fishingRod.getId(),
-                LocalDateTime.of(2025, 1, 10, 10, 0),
-                LocalDateTime.of(2025, 1, 12, 10, 0)
+                LocalDate.of(2025, 1, 10),
+                LocalDate.of(2025, 1, 12)
         );
 
         // Assert
@@ -70,13 +70,13 @@ class BookingRepositoryTest {
     @DisplayName("Deve detetar conflito quando a nova reserva está DENTRO da existente")
     void shouldFindOverlap_WhenNewIsInsideExisting() {
         // Arrange: Reserva de 10 a 20
-        createBooking(LocalDateTime.of(2025, 1, 10, 10, 0), LocalDateTime.of(2025, 1, 20, 10, 0), BookingStatus.CONFIRMED);
+        createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 20), BookingStatus.CONFIRMED);
 
         // Act: Tento reservar de 12 a 15 (está no meio)
         boolean exists = bookingRepository.existsOverlappingBooking(
                 fishingRod.getId(),
-                LocalDateTime.of(2025, 1, 12, 10, 0),
-                LocalDateTime.of(2025, 1, 15, 10, 0)
+                LocalDate.of(2025, 1, 12),
+                LocalDate.of(2025, 1, 15)
         );
 
         // Assert
@@ -87,13 +87,13 @@ class BookingRepositoryTest {
     @DisplayName("NÃO deve detetar conflito se a reserva existente estiver CANCELADA")
     void shouldNotFindOverlap_WhenExistingIsCancelled() {
         // Arrange: Reserva de 10 a 12, mas CANCELADA
-        createBooking(LocalDateTime.of(2025, 1, 10, 10, 0), LocalDateTime.of(2025, 1, 12, 10, 0), BookingStatus.CANCELLED);
+        createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 12), BookingStatus.CANCELLED);
 
         // Act: Tento reservar nas mesmas datas
         boolean exists = bookingRepository.existsOverlappingBooking(
                 fishingRod.getId(),
-                LocalDateTime.of(2025, 1, 10, 10, 0),
-                LocalDateTime.of(2025, 1, 12, 10, 0)
+                LocalDate.of(2025, 1, 10),
+                LocalDate.of(2025, 1, 12)
         );
 
         // Assert
@@ -104,13 +104,13 @@ class BookingRepositoryTest {
     @DisplayName("NÃO deve detetar conflito se as datas apenas se tocam (Fim = Início)")
     void shouldNotFindOverlap_WhenDatesTouch() {
         // Arrange: Reserva acaba dia 10 às 12:00
-        createBooking(LocalDateTime.of(2025, 1, 1, 10, 0), LocalDateTime.of(2025, 1, 10, 12, 0), BookingStatus.CONFIRMED);
+        createBooking(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 10), BookingStatus.CONFIRMED);
 
         // Act: Nova reserva começa dia 10 às 12:00
         boolean exists = bookingRepository.existsOverlappingBooking(
                 fishingRod.getId(),
-                LocalDateTime.of(2025, 1, 10, 12, 0),
-                LocalDateTime.of(2025, 1, 15, 12, 0)
+                LocalDate.of(2025, 1, 10),
+                LocalDate.of(2025, 1, 15)
         );
 
         // Assert
@@ -124,17 +124,17 @@ class BookingRepositoryTest {
     void shouldFindBookingsInRange() {
         // Arrange
         // Reserva 1: Dia 5 a 10 (CONFIRMADA)
-        createBooking(LocalDateTime.of(2025, 1, 5, 10, 0), LocalDateTime.of(2025, 1, 10, 10, 0), BookingStatus.CONFIRMED);
+        createBooking(LocalDate.of(2025, 1, 5), LocalDate.of(2025, 1, 10), BookingStatus.CONFIRMED);
         // Reserva 2: Dia 20 a 25 (PENDENTE - Depende da tua query se queres mostrar ou nã)
-        createBooking(LocalDateTime.of(2025, 1, 20, 10, 0), LocalDateTime.of(2025, 1, 25, 10, 0), BookingStatus.PENDING);
+        createBooking(LocalDate.of(2025, 1, 20), LocalDate.of(2025, 1, 25), BookingStatus.PENDING);
         // Reserva 3: Dia 1 a 2 (Fora do range que vamos pedir)
-        createBooking(LocalDateTime.of(2025, 1, 1, 10, 0), LocalDateTime.of(2025, 1, 2, 10, 0), BookingStatus.CONFIRMED);
+        createBooking(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 2), BookingStatus.CONFIRMED);
 
         // Act: Pedir reservas para Janeiro todo (Dia 1 a 31)
         List<Booking> found = bookingRepository.findBookingsInRange(
                 fishingRod.getId(),
-                LocalDateTime.of(2025, 1, 1, 0, 0),
-                LocalDateTime.of(2025, 1, 31, 23, 59)
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 31)
         );
 
         // Assert
@@ -148,7 +148,7 @@ class BookingRepositoryTest {
     }
 
     // --- Helper Method pra nã repetir código ---
-    private Booking createBooking(LocalDateTime start, LocalDateTime end, BookingStatus status) {
+    private Booking createBooking(LocalDate start, LocalDate end, BookingStatus status) {
         Booking b = new Booking();
         b.setItem(fishingRod);
         b.setUser(zePescador);
@@ -159,7 +159,7 @@ class BookingRepositoryTest {
         return bookingRepository.save(b);
     }
 
-    private Double calculatePrice(LocalDateTime start, LocalDateTime end, Double price){
+    private Double calculatePrice(LocalDate start, LocalDate end, Double price){
         long days = java.time.temporal.ChronoUnit.DAYS.between(start, end);
         if (days == 0) days = 1;
         return days * price;

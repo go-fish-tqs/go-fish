@@ -14,8 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,8 +63,8 @@ class BookingServiceTest {
         booking.setUser(renter);
         booking.setItem(fishingRod);
         booking.setStatus(BookingStatus.PENDING);
-        booking.setStartDate(LocalDateTime.now().plusDays(1));
-        booking.setEndDate(LocalDateTime.now().plusDays(3));
+        booking.setStartDate(LocalDate.now().plusDays(1));
+        booking.setEndDate(LocalDate.now().plusDays(3));
     }
 
     // --- TESTES DE CRIAR RESERVA (createBooking) ---
@@ -75,8 +73,8 @@ class BookingServiceTest {
     @DisplayName("Deve criar reserva com sucesso quando tudo está livre")
     void shouldCreateBooking_WhenAvailable() {
         // Arrange (Preparar o terreno)
-        LocalDateTime start = LocalDateTime.now().plusDays(5);
-        LocalDateTime end = LocalDateTime.now().plusDays(7);
+        LocalDate start = LocalDate.now().plusDays(5);
+        LocalDate end = LocalDate.now().plusDays(7);
 
         when(userRepository.findById(renter.getId())).thenReturn(Optional.of(renter));
         when(itemRepository.findById(fishingRod.getId())).thenReturn(Optional.of(fishingRod));
@@ -100,8 +98,8 @@ class BookingServiceTest {
     @Test
     @DisplayName("Deve lançar erro se o item já estiver ocupado")
     void shouldThrowError_WhenItemIsOccupied() {
-        LocalDateTime start = LocalDateTime.now().plusDays(5);
-        LocalDateTime end = LocalDateTime.now().plusDays(7);
+        LocalDate start = LocalDate.now().plusDays(5);
+        LocalDate end = LocalDate.now().plusDays(7);
 
         when(userRepository.findById(renter.getId())).thenReturn(Optional.of(renter));
         when(itemRepository.findById(fishingRod.getId())).thenReturn(Optional.of(fishingRod));
@@ -165,20 +163,20 @@ class BookingServiceTest {
     void shouldReturnUnavailableDates() {
         // Arrange
         LocalDate today = LocalDate.now();
-        LocalDateTime queryStart = today.minusDays(1).atStartOfDay(); // Ontem (Passado)
-        LocalDateTime queryEnd = today.plusDays(5).atTime(23, 59);
+        LocalDate queryStart = today.minusDays(1); // Ontem (Passado)
+        LocalDate queryEnd = today.plusDays(5);
 
         // Simular uma reserva existente para daqui a 2 dias
         Booking existing = new Booking();
-        existing.setStartDate(today.plusDays(2).atStartOfDay());
-        existing.setEndDate(today.plusDays(2).atTime(23, 59)); // Reserva de 1 dia
+        existing.setStartDate(today.plusDays(2));
+        existing.setEndDate(today.plusDays(2)); // Reserva de 1 dia
         existing.setStatus(BookingStatus.CONFIRMED);
 
         when(bookingRepository.findBookingsInRange(eq(fishingRod.getId()), any(), any()))
                 .thenReturn(List.of(existing));
 
         // Act
-        List<LocalDate> blockedDates = bookingService.checkAvailability(fishingRod.getId(), queryStart, queryEnd);
+        List<LocalDate> blockedDates = bookingService.getUnavailableDates(fishingRod.getId(), queryStart, queryEnd);
 
         // Assert
         // Esperamos:
@@ -196,10 +194,10 @@ class BookingServiceTest {
     @Test
     @DisplayName("Deve lançar erro se data de fim for antes da de início")
     void shouldThrowError_WhenDatesAreInverted() {
-        LocalDateTime start = LocalDateTime.now().plusDays(5);
-        LocalDateTime end = LocalDateTime.now().plusDays(2); // Fim antes do início
+        LocalDate start = LocalDate.now().plusDays(5);
+        LocalDate end = LocalDate.now().plusDays(2); // Fim antes do início
 
-        assertThatThrownBy(() -> bookingService.checkAvailability(1L, start, end))
+        assertThatThrownBy(() -> bookingService.getUnavailableDates(1L, start, end))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

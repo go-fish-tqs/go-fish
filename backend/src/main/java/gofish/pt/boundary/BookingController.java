@@ -28,17 +28,21 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<BookingResponseDTO> createBooking(@Valid @RequestBody BookingRequestDTO request) {
 
-        // 1. Chamas o serviço passando os dados do DTO
-        Booking booking = bookingService.createBooking(
-                request.getUserId(),
-                request.getItemId(),
-                request.getStartDate(),
-                request.getEndDate());
+        try{
+            // 1. Chamas o serviço passando os dados do DTO
+            Booking booking = bookingService.createBooking(
+                    request.getUserId(),
+                    request.getItemId(),
+                    request.getStartDate(),
+                    request.getEndDate());
 
-        // 2. Convertes o resultado para DTO de resposta
-        BookingResponseDTO response = bookingMapper.toDTO(booking);
+            // 2. Convertes o resultado para DTO de resposta
+            BookingResponseDTO response = bookingMapper.toDTO(booking);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        }catch (IllegalArgumentException e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
