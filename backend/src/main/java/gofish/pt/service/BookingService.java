@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,16 +32,29 @@ public class BookingService {
         return bookingRepository.findById(id);
     }
 
-    public List<Booking> getBookings(){
+    public List<Booking> getBookings() {
         return bookingRepository.findAll();
     }
 
-    public List<Booking> getBookingsByUserId(Long userId){
+    public List<Booking> getBookingsByUserId(Long userId) {
         return bookingRepository.findAllByUserId(userId);
     }
 
-    public List<Booking> getBookingsByItemId(Long itemId){
+    public List<Booking> getBookingsByItemId(Long itemId) {
         return bookingRepository.findAllByItemId(itemId);
+    }
+
+    public List<Booking> getBookingsByItemAndMonth(Long itemId, int year, int month) {
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDateTime start = yearMonth.atDay(1).atStartOfDay();
+        LocalDateTime end = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+        return bookingRepository.findByItemIdAndDateRange(itemId, start, end);
+    }
+
+    public List<Booking> getBookingsByItemAndWeek(Long itemId, LocalDate weekStart) {
+        LocalDateTime start = weekStart.atStartOfDay();
+        LocalDateTime end = weekStart.plusDays(6).atTime(23, 59, 59);
+        return bookingRepository.findByItemIdAndDateRange(itemId, start, end);
     }
 
     // POST method
@@ -48,8 +62,10 @@ public class BookingService {
     public Booking createBooking(Long userId, Long itemId, LocalDateTime startDate, LocalDateTime endDate) {
         // Lógica para criar uma reserva (omiti detalhes para focar na disponibilidade)
         // 1. Validar utilizador e item
-        var user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Utilizador não encontrado"));
-        var item = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Utilizador não encontrado"));
+        var item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
 
         // 2. Validar disponibilidade
         boolean isAvailable = !bookingRepository.existsOverlappingBooking(itemId, startDate, endDate);
@@ -76,7 +92,8 @@ public class BookingService {
 
         // SEGURANÇA: Só o dono do item é que pode mexer nisto!
         if (!booking.getItem().getOwner().getId().equals(ownerId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Eh lá! Tás a tentar mexer no negócio dos outros?");        }
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Eh lá! Tás a tentar mexer no negócio dos outros?");
+        }
 
         // Regra: Só podes mexer se ainda estiver PENDENTE
         if (booking.getStatus() != BookingStatus.PENDING) {
@@ -122,21 +139,17 @@ public class BookingService {
                 .toList();
     }
 
-
     private boolean isDateUnavailable(LocalDate date, List<Booking> bookings) {
         return isPastDate(date) || isDateBooked(date, bookings);
     }
-
 
     private boolean isPastDate(LocalDate date) {
         return date.isBefore(LocalDate.now());
     }
 
-
     private boolean isDateBooked(LocalDate date, List<Booking> bookings) {
         return bookings.stream().anyMatch(booking -> isDateInBookingRange(date, booking));
     }
-
 
     private boolean isDateInBookingRange(LocalDate date, Booking booking) {
         LocalDate bStart = booking.getStartDate().toLocalDate();
@@ -145,6 +158,5 @@ public class BookingService {
         // Lógica: !(date < start) && !(date > end) -> está no meio ou nas pontas
         return !date.isBefore(bStart) && !date.isAfter(bEnd);
     }
-
 
 }
