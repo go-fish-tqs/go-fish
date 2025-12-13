@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -120,8 +119,8 @@ class ItemControllerIT {
         Booking booking = new Booking();
         booking.setItem(rod);
         booking.setUser(owner); // O próprio dono reservou (só para teste)
-        booking.setStartDate(LocalDateTime.now().plusDays(2).withHour(0).withMinute(0)); // Daqui a 2 dias
-        booking.setEndDate(LocalDateTime.now().plusDays(3).withHour(23).withMinute(59)); // Até daqui a 3 dias
+        booking.setStartDate(LocalDate.now().plusDays(2)); // Daqui a 2 dias
+        booking.setEndDate(LocalDate.now().plusDays(3)); // Até daqui a 3 dias
         booking.setStatus(BookingStatus.CONFIRMED);
         bookingRepository.save(booking);
 

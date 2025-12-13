@@ -75,6 +75,7 @@ public class User {
         booking.setUser(this);
     }
 
+    @JsonIgnore
     public List<Booking> getOwnedBookings() {
         return items.stream().map(Item::getBookings)
                 .flatMap(List::stream)

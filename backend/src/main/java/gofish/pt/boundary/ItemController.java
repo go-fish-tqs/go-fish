@@ -9,14 +9,12 @@ import gofish.pt.service.BookingService;
 import gofish.pt.service.ItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -61,21 +59,16 @@ public class ItemController {
         return itemService.getMaterials();
     }
 
-    @GetMapping("/{id}/availability")
+    @GetMapping("/{id}/unavailability")
     public ResponseEntity<List<LocalDate>> checkAvailability(
             @PathVariable Long id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
 
-        // Converter LocalDate (dia) para LocalDateTime (momento exato)
-        // From: Começa às 00:00
-        LocalDateTime startDateTime = from.atStartOfDay();
-        // To: Acaba às 23:59:59.999999999
-        LocalDateTime endDateTime = to.atTime(23, 59, 59);
-
-        List<LocalDate> blockedDates = bookingService.checkAvailability(id, startDateTime, endDateTime);
+        List<LocalDate> blockedDates = bookingService.getUnavailableDates(id, from, to);
 
         return ResponseEntity.ok(blockedDates);
     }
+
 
 }
