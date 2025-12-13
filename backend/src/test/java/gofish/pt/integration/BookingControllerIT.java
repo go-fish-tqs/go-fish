@@ -82,8 +82,8 @@ class BookingControllerIT {
         request.setUserId(renter.getId());
         request.setItemId(kayak.getId());
         // Datas futuras para não dar erro
-        request.setStartDate(LocalDate.now());
-        request.setEndDate(LocalDate.now());
+        request.setStartDate(LocalDate.now().plusDays(1));
+        request.setEndDate(LocalDate.now().plusDays(2));
 
         // Act & Assert
         mockMvc.perform(post("/api/bookings")

@@ -125,11 +125,11 @@ class ItemControllerIT {
         bookingRepository.save(booking);
 
         // 2. Pedir disponibilidade para a próxima semana
-        LocalDate from = LocalDate.now();
+        LocalDate from = LocalDate.now().plusDays(1);
         LocalDate to = LocalDate.now().plusDays(5);
 
         // Act & Assert
-        mockMvc.perform(get("/api/items/{id}/availability", rod.getId())
+        mockMvc.perform(get("/api/items/{id}/unavailability", rod.getId())
                 .param("from", from.toString()) // 2025-XX-XX
                 .param("to", to.toString()))
                 .andExpect(status().isOk())
