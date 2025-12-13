@@ -16,7 +16,6 @@ interface Booking {
     startDate: string;
     endDate: string;
     status: string;
-    userName?: string;
 }
 
 export default function BookingCalendar({
@@ -48,7 +47,7 @@ export default function BookingCalendar({
     const firstDayOfMonth = new Date(year, month - 1, 1).getDay();
 
     const days = useMemo(() => {
-        const result = [];
+        const result: (number | null)[] = [];
         for (let i = 0; i < firstDayOfMonth; i++) {
             result.push(null);
         }
@@ -77,23 +76,13 @@ export default function BookingCalendar({
 
     const isToday = (day: number) => {
         const today = new Date();
-        return (
-            day === today.getDate() &&
-            month === today.getMonth() + 1 &&
-            year === today.getFullYear()
-        );
+        return day === today.getDate() && month === today.getMonth() + 1 && year === today.getFullYear();
     };
 
     const isPast = (day: number) => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const dateToCheck = new Date(year, month - 1, day);
-        return dateToCheck < today;
-    };
-
-    const isSelected = (day: number) => {
-        const dateStr = formatDate(day);
-        return dateStr === startDate || dateStr === endDate;
+        return new Date(year, month - 1, day) < today;
     };
 
     const isInRange = (day: number) => {
@@ -107,18 +96,13 @@ export default function BookingCalendar({
 
     const handleDayClick = (day: number) => {
         if (isPast(day) || isBooked(day)) return;
-
         const dateStr = formatDate(day);
 
         if (selectionMode === 'start') {
             onStartDateChange?.(dateStr);
-            // If new start is after current end, clear end
-            if (endDate && dateStr > endDate) {
-                onEndDateChange?.('');
-            }
+            if (endDate && dateStr > endDate) onEndDateChange?.('');
             setSelectionMode('end');
         } else {
-            // If clicked date is before start, make it the new start
             if (startDate && dateStr < startDate) {
                 onStartDateChange?.(dateStr);
             } else {
@@ -128,44 +112,39 @@ export default function BookingCalendar({
         }
     };
 
-    const prevMonth = () => {
-        setCurrentDate(new Date(year, month - 2, 1));
-    };
-
-    const nextMonth = () => {
-        setCurrentDate(new Date(year, month, 1));
-    };
+    const prevMonth = () => setCurrentDate(new Date(year, month - 2, 1));
+    const nextMonth = () => setCurrentDate(new Date(year, month, 1));
 
     const monthName = currentDate.toLocaleString("default", { month: "long" });
     const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     return (
-        <div className="backdrop-blur-xl bg-white/60 border border-white/40 rounded-2xl p-6 shadow-xl">
+        <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-md w-full h-full flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-2">
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-800">Select Dates</h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                        {selectionMode === 'start' ? 'Click to select start date' : 'Click to select end date'}
+                    <h3 className="text-sm font-semibold text-gray-800">Select Dates</h3>
+                    <p className="text-xs text-gray-600">
+                        {selectionMode === 'start' ? 'Select start date' : 'Select end date'}
                     </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                     <button
                         onClick={prevMonth}
-                        className="p-2 rounded-xl backdrop-blur bg-white/60 border border-gray-200/50 hover:bg-white/80 transition-all"
+                        className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-all"
                     >
-                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
-                    <span className="px-4 py-2 font-medium text-gray-700 min-w-[140px] text-center">
+                    <span className="px-2 py-0.5 text-xs font-semibold text-gray-800 min-w-[90px] text-center">
                         {monthName} {year}
                     </span>
                     <button
                         onClick={nextMonth}
-                        className="p-2 rounded-xl backdrop-blur bg-white/60 border border-gray-200/50 hover:bg-white/80 transition-all"
+                        className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-all"
                     >
-                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                     </button>
@@ -173,76 +152,76 @@ export default function BookingCalendar({
             </div>
 
             {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-1">
-                {weekDays.map((day) => (
-                    <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+            <div className="grid grid-cols-7 gap-0.5 flex-1">
+                {/* Weekday Headers */}
+                {weekDays.map((day, i) => (
+                    <div key={i} className="text-center text-[10px] font-semibold text-gray-700 py-1">
                         {day}
                     </div>
                 ))}
 
+                {/* Day Cells */}
                 {days.map((day, index) => {
                     if (day === null) {
-                        return <div key={index} />;
+                        return <div key={index} className="aspect-square" />;
                     }
 
                     const past = isPast(day);
                     const booked = isBooked(day);
                     const today = isToday(day);
-                    const selected = isSelected(day);
                     const inRange = isInRange(day);
                     const isStart = isStartDate(day);
                     const isEnd = isEndDate(day);
                     const clickable = !past && !booked && (onStartDateChange || onEndDateChange);
+
+                    let cellClass = "aspect-square flex items-center justify-center text-xs font-medium rounded transition-all ";
+
+                    if (isStart) {
+                        cellClass += "bg-blue-600 text-white";
+                    } else if (isEnd) {
+                        cellClass += "bg-indigo-600 text-white";
+                    } else if (inRange) {
+                        cellClass += "bg-blue-100 text-blue-800";
+                    } else if (booked) {
+                        cellClass += "bg-red-500 text-white cursor-not-allowed";
+                    } else if (past) {
+                        cellClass += "text-gray-400 cursor-not-allowed";
+                    } else {
+                        cellClass += "text-gray-800 bg-gray-50 hover:bg-blue-50 cursor-pointer";
+                    }
+
+                    if (today) {
+                        cellClass += " ring-1 ring-blue-500 ring-offset-1";
+                    }
 
                     return (
                         <button
                             key={index}
                             onClick={() => handleDayClick(day)}
                             disabled={past || booked || !clickable}
-                            className={`
-                aspect-square flex items-center justify-center text-sm rounded-xl transition-all relative
-                ${today ? "ring-2 ring-blue-400 ring-offset-1" : ""}
-                ${past ? "text-gray-300 cursor-not-allowed" : ""}
-                ${booked ? "bg-gradient-to-br from-orange-400 to-red-500 text-white font-medium shadow-sm cursor-not-allowed" : ""}
-                ${!past && !booked && !selected && !inRange ? "bg-gradient-to-br from-green-50 to-emerald-50 text-gray-700 hover:from-green-100 hover:to-emerald-100 cursor-pointer" : ""}
-                ${isStart ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold shadow-lg" : ""}
-                ${isEnd ? "bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-semibold shadow-lg" : ""}
-                ${inRange ? "bg-blue-100 text-blue-700" : ""}
-              `}
+                            className={cellClass}
                         >
                             {day}
-                            {isStart && (
-                                <span className="absolute -bottom-1 text-[8px] font-medium text-blue-600">START</span>
-                            )}
-                            {isEnd && (
-                                <span className="absolute -bottom-1 text-[8px] font-medium text-purple-600">END</span>
-                            )}
                         </button>
                     );
                 })}
             </div>
 
             {/* Legend */}
-            <div className="flex flex-wrap items-center gap-4 mt-6 pt-4 border-t border-gray-200/50 text-xs">
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200"></div>
-                    <span className="text-gray-600">Available</span>
+            <div className="flex items-center gap-3 mt-2 pt-2 border-t border-gray-200 text-[10px]">
+                <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded bg-red-500"></div>
+                    <span className="text-gray-700">Booked</span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded bg-gradient-to-br from-orange-400 to-red-500"></div>
-                    <span className="text-gray-600">Booked</span>
+                <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded bg-blue-600"></div>
+                    <span className="text-gray-700">Start</span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded bg-gradient-to-br from-blue-500 to-blue-600"></div>
-                    <span className="text-gray-600">Start</span>
+                <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded bg-indigo-600"></div>
+                    <span className="text-gray-700">End</span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded bg-gradient-to-br from-indigo-500 to-purple-600"></div>
-                    <span className="text-gray-600">End</span>
-                </div>
-                {isLoading && (
-                    <span className="ml-auto text-gray-400">Loading...</span>
-                )}
+                {isLoading && <span className="ml-auto text-gray-500">Loading...</span>}
             </div>
         </div>
     );

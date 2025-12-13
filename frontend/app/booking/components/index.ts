@@ -4,3 +4,4 @@ export { default as BookingDateForm } from './BookingDateForm';
 export { default as BookingSkeleton } from './BookingSkeleton';
 export { default as BookingError } from './BookingError';
 export { default as BookingCalendar } from './BookingCalendar';
+export { default as ItemReviews } from './ItemReviews';

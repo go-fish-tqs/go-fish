@@ -11,6 +11,7 @@ import {
   BookingSkeleton,
   BookingError,
   BookingCalendar,
+  ItemReviews,
 } from "../components";
 
 function BookingFormContent() {
@@ -75,7 +76,7 @@ function BookingFormContent() {
   }
 
   return (
-    <div className="h-full w-full scrollbar-blue overflow-y-auto">
+    <div className="h-full w-full overflow-y-auto scrollbar-hide">
       {/* Glass background layer */}
       <div className="min-h-full p-6 lg:p-10">
         <div className="max-w-6xl mx-auto animate-fade-in space-y-6">
@@ -109,14 +110,21 @@ function BookingFormContent() {
             </div>
           </div>
 
-          {/* Calendar Section */}
-          <BookingCalendar
-            itemId={itemId}
-            startDate={startDate}
-            endDate={endDate}
-            onStartDateChange={setStartDate}
-            onEndDateChange={setEndDate}
-          />
+          {/* Calendar and Reviews Row */}
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="lg:flex-1">
+              <BookingCalendar
+                itemId={itemId}
+                startDate={startDate}
+                endDate={endDate}
+                onStartDateChange={setStartDate}
+                onEndDateChange={setEndDate}
+              />
+            </div>
+            <div className="lg:w-80">
+              <ItemReviews itemId={itemId} />
+            </div>
+          </div>
         </div>
       </div>
     </div>
