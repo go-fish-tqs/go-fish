@@ -26,7 +26,6 @@ public class ItemService {
 
     private final ItemRepository repository;
     private final ItemMapper itemMapper;
-    private final FileStorageService fileStorageService;
 
     public Optional<Item> findById(long id) {
         return repository.findById(id);
@@ -55,11 +54,6 @@ public class ItemService {
     }
 
     public Item save(ItemDTO dto) {
-        // Process base64 images and convert to URLs
-        if (dto.getPhotoUrls() != null && !dto.getPhotoUrls().isEmpty()) {
-            dto.setPhotoUrls(fileStorageService.processPhotoUrls(dto.getPhotoUrls()));
-        }
-
         Item item = itemMapper.toEntity(dto);
 
         if (item == null)
