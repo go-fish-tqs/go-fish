@@ -8,10 +8,14 @@ import gofish.pt.mapper.BookingMapper;
 import gofish.pt.service.BookingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -29,8 +33,7 @@ public class BookingController {
                 request.getUserId(),
                 request.getItemId(),
                 request.getStartDate(),
-                request.getEndDate()
-        );
+                request.getEndDate());
 
         // 2. Convertes o resultado para DTO de resposta
         BookingResponseDTO response = bookingMapper.toDTO(booking);
@@ -53,9 +56,31 @@ public class BookingController {
         Booking booking = bookingService.updateBookingStatus(
                 id,
                 statusDto.getStatus(),
-                statusDto.getOwnerId()
-        );
+                statusDto.getOwnerId());
 
         return ResponseEntity.ok(bookingMapper.toDTO(booking));
+    }
+
+    @GetMapping("/item/{itemId}/month")
+    public ResponseEntity<List<BookingResponseDTO>> getBookingsByMonth(
+            @PathVariable Long itemId,
+            @RequestParam int year,
+            @RequestParam int month) {
+        List<Booking> bookings = bookingService.getBookingsByItemAndMonth(itemId, year, month);
+        List<BookingResponseDTO> response = bookings.stream()
+                .map(bookingMapper::toDTO)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/item/{itemId}/week")
+    public ResponseEntity<List<BookingResponseDTO>> getBookingsByWeek(
+            @PathVariable Long itemId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start) {
+        List<Booking> bookings = bookingService.getBookingsByItemAndWeek(itemId, start);
+        List<BookingResponseDTO> response = bookings.stream()
+                .map(bookingMapper::toDTO)
+                .toList();
+        return ResponseEntity.ok(response);
     }
 }

@@ -5,7 +5,7 @@ export type Item = {
   material?: string;
   category?: string;
   price?: number;
-  images?: string[];
+  photoUrls?: string[];
 };
 
 export type CategoryNode = {

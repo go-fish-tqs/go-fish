@@ -30,7 +30,7 @@ ENVIRONMENT:
     prod        Start production environment
 
 OPTIONS:
-    --tools     Start with additional tools (PgAdmin for dev, Nginx for prod)
+    --tools     Start with additional tools (PgAdmin for dev only)
     --down      Stop and remove containers
     --logs      View logs
     --rebuild   Force rebuild images
@@ -40,7 +40,6 @@ EXAMPLES:
     ./deploy.sh dev                 # Start dev environment
     ./deploy.sh dev --tools         # Start dev with PgAdmin
     ./deploy.sh prod                # Start prod environment
-    ./deploy.sh prod --tools        # Start prod with Nginx
     ./deploy.sh dev --down          # Stop dev environment
     ./deploy.sh prod --logs         # View prod logs
 
@@ -87,7 +86,7 @@ while [[ $# -gt 0 ]]; do
             if [ "$ENV" = "dev" ]; then
                 PROFILE="--profile tools"
             else
-                PROFILE="--profile proxy"
+                echo -e "${YELLOW}Warning: --tools flag is only available for dev environment${NC}"
             fi
             shift
             ;;
@@ -100,7 +99,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --rebuild)
-            BUILD="--build --no-cache"
+            BUILD="--build"
             shift
             ;;
         --help|-h)
@@ -159,9 +158,6 @@ case "$ACTION" in
             echo "Service URLs:"
             echo "  Frontend:  http://localhost:3000"
             echo "  Backend:   http://localhost:8080"
-            if [ -n "$PROFILE" ]; then
-                echo "  Nginx:     http://localhost:80"
-            fi
         fi
         
         echo ""

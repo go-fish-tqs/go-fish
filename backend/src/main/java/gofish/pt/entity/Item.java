@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -32,8 +33,8 @@ public class Item {
 
     @ElementCollection
     @CollectionTable(name = "item_photos", joinColumns = @JoinColumn(name = "item_id"))
-    @Column(name = "photo_url", columnDefinition = "CLOB")
-    private List<String> photoUrls;
+    @Column(name = "photo_url", columnDefinition = "TEXT")
+    private List<String> photoUrls = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -56,7 +57,7 @@ public class Item {
 
     @OneToMany
     @JoinColumn(name = "item_id")
-    private List<Booking> bookings;
+    private List<Booking> bookings = new ArrayList<>();
 
     public void addBooking(Booking booking) {
         bookings.add(booking);

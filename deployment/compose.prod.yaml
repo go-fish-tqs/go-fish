@@ -1,6 +1,3 @@
-# Production Docker Compose Configuration
-# Usage: docker compose -f deployment/compose.prod.yaml up -d
-
 services:
   backend:
     build:
@@ -42,12 +39,10 @@ services:
       args:
         - BUILD_DATE=${BUILD_DATE:-unknown}
         - VERSION=${VERSION:-latest}
+        - API_URL=${API_URL:-http://localhost:8080}
     restart: always
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - VITE_API_URL=${API_URL:-http://backend:8080}
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000" ]
       interval: 30s
@@ -74,7 +69,7 @@ services:
     environment:
       - POSTGRES_DB=${POSTGRES_DB:-gofish_prod}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-gofish_prod}
       - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-gofish_prod}" ]
@@ -84,33 +79,6 @@ services:
       start_period: 10s
     networks:
       - gofish-prod
-    # Security: Don't expose DB port in production
-    expose:
-      - 5432
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # Optional: Nginx reverse proxy for production
-  nginx:
-    image: nginx:alpine
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-      - nginx-cache:/var/cache/nginx
-    depends_on:
-      - frontend
-      - backend
-    networks:
-      - gofish-prod
-    profiles:
-      - proxy # Only start with: docker compose --profile proxy up
     logging:
       driver: "json-file"
       options:
@@ -120,9 +88,10 @@ services:
 volumes:
   db-prod-data:
     driver: local
-  nginx-cache:
-    driver: local
 
 networks:
   gofish-prod:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 10.11.0.0/24

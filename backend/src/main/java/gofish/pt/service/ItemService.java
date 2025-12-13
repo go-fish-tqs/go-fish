@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-
 import java.time.LocalDate;
 import java.util.*;
 
@@ -32,8 +31,6 @@ public class ItemService {
     private final BookingRepository bookingRepository;
     private final ItemMapper itemMapper;
 
-
-
     public Optional<Item> findById(long id) {
         return itemRepository.findById(id);
     }
@@ -44,7 +41,8 @@ public class ItemService {
 
     public List<Item> findAll(ItemFilter filter) {
 
-        if (filter == null) return findAll();
+        if (filter == null)
+            return findAll();
 
         Specification<Item> spec = Specification.allOf(nameContains(filter.name()),
                 categoryIs(filter.category()),
@@ -60,16 +58,16 @@ public class ItemService {
     }
 
     public Item save(ItemDTO dto) {
-        // Olha só a limpeza! O Mapper trata de tudo, até de ir buscar o User.
-
         Item item = itemMapper.toEntity(dto);
 
-        if (item == null) return null;
+        if (item == null)
+            return null;
         return itemRepository.save(item);
     }
 
     public void delete(Item item) {
-        if (item != null) itemRepository.delete(item);
+        if (item != null)
+            itemRepository.delete(item);
     }
 
     public boolean exists(long id) {
@@ -82,7 +80,7 @@ public class ItemService {
                 .toList();
     }
 
-    public Map<Material.MaterialGroup, List<Material>> getMaterials(){
+    public Map<Material.MaterialGroup, List<Material>> getMaterials() {
         Map<Material.MaterialGroup, List<Material>> materials = new HashMap<>();
         for (Material.MaterialGroup group : Material.MaterialGroup.values()) {
             materials.put(group, group.getMaterials());
@@ -111,11 +109,11 @@ public class ItemService {
         boolean hasConflict = bookingRepository.existsOverlappingBooking(
                 itemId,
                 startDate.atStartOfDay(),
-                endDate.atTime(23, 59, 59)
-        );
+                endDate.atTime(23, 59, 59));
 
         if (hasConflict) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "The requested date range conflicts with an existing confirmed booking");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "The requested date range conflicts with an existing confirmed booking");
         }
 
         BlockedDate blockedDate = new BlockedDate(startDate, endDate, request.getReason(), item);
@@ -126,9 +124,11 @@ public class ItemService {
         BlockedDate blockedDate = blockedDateRepository.findById(blockedDateId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Blocked date period not found"));
 
-        // Authorization: Check if the user is the owner of the item associated with the blocked date
+        // Authorization: Check if the user is the owner of the item associated with the
+        // blocked date
         if (blockedDate.getItem().getOwner() == null || !blockedDate.getItem().getOwner().getId().equals(ownerId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the item owner can remove a blocked date period");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Only the item owner can remove a blocked date period");
         }
 
         blockedDateRepository.delete(blockedDate);
