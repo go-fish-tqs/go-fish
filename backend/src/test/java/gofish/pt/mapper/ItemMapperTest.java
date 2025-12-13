@@ -6,6 +6,7 @@ import gofish.pt.entity.Item;
 import gofish.pt.entity.Material;
 import gofish.pt.entity.User;
 import gofish.pt.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class) // <--- Liga o Mockito para injetar coisas
@@ -94,40 +96,36 @@ class ItemMapperTest {
     }
 
     @Test
-    @DisplayName("Deve deixar o owner null se o userId não existir na BD")
-    void shouldMapToEntity_WithNullOwner_WhenUserNotFound() {
+    @DisplayName("Deve lançar EntityNotFoundException se o userId não existir na BD")
+    void shouldThrowException_WhenUserNotFound() {
         // Arrange
         Long nonExistentId = 999L;
         ItemDTO dto = new ItemDTO();
-        dto.setUserId(nonExistentId); // ID que nã existe
-        // Preencher o resto pra nã dar null pointer noutros lados se for preciso
+        dto.setUserId(nonExistentId);
         dto.setName("Coisa");
 
         // O repositório diz que não há ninguém
         when(userRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
-        // Act
-        Item item = itemMapper.toEntity(dto);
-
-        // Assert
-        assertThat(item).isNotNull();
-        // Como fizeste .orElse(null) no mapper, o owner deve ser null
-        assertThat(item.getOwner()).isNull();
+        // Act & Assert
+        assertThatThrownBy(() -> itemMapper.toEntity(dto))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("User not found with id: 999");
     }
 
     @Test
-    @DisplayName("Não deve chamar o repositório se o userId for null no DTO")
-    void shouldNotCallRepo_WhenUserIdIsNull() {
+    @DisplayName("Deve lançar EntityNotFoundException se o userId for null no DTO")
+    void shouldThrowException_WhenUserIdIsNull() {
         // Arrange
         ItemDTO dto = new ItemDTO();
         dto.setUserId(null); // Sem ID
         dto.setName("Item Orfão");
 
-        // Act
-        Item item = itemMapper.toEntity(dto);
+        // Act & Assert
+        assertThatThrownBy(() -> itemMapper.toEntity(dto))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("userId is required to create an item");
 
-        // Assert
-        assertThat(item.getOwner()).isNull();
         // Garante que nem sequer foi incomodar a base de dados
         verify(userRepository, never()).findById(any());
     }

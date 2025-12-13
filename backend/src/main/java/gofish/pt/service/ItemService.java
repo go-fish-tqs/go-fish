@@ -32,8 +32,6 @@ public class ItemService {
     private final BookingRepository bookingRepository;
     private final ItemMapper itemMapper;
 
-
-
     public Optional<Item> findById(long id) {
         return itemRepository.findById(id);
     }
@@ -44,7 +42,8 @@ public class ItemService {
 
     public List<Item> findAll(ItemFilter filter) {
 
-        if (filter == null) return findAll();
+        if (filter == null)
+            return findAll();
 
         Specification<Item> spec = Specification.allOf(nameContains(filter.name()),
                 categoryIs(filter.category()),
@@ -60,16 +59,16 @@ public class ItemService {
     }
 
     public Item save(ItemDTO dto) {
-        // Olha só a limpeza! O Mapper trata de tudo, até de ir buscar o User.
-
         Item item = itemMapper.toEntity(dto);
 
-        if (item == null) return null;
-        return itemRepository.save(item);
+        if (item == null)
+            return null;
+        return repository.save(item);
     }
 
     public void delete(Item item) {
-        if (item != null) itemRepository.delete(item);
+        if (item != null)
+            repository.delete(item);
     }
 
     public boolean exists(long id) {
@@ -82,7 +81,7 @@ public class ItemService {
                 .toList();
     }
 
-    public Map<Material.MaterialGroup, List<Material>> getMaterials(){
+    public Map<Material.MaterialGroup, List<Material>> getMaterials() {
         Map<Material.MaterialGroup, List<Material>> materials = new HashMap<>();
         for (Material.MaterialGroup group : Material.MaterialGroup.values()) {
             materials.put(group, group.getMaterials());

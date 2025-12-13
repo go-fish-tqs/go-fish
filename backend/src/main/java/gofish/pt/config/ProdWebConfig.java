@@ -18,7 +18,7 @@ public class ProdWebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry
                         .addMapping("/**")
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("http://tqs-deti-03.ua.pt")
                         .allowedMethods("PUT", "POST", "GET", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(true)

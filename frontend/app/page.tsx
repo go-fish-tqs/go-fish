@@ -1,62 +1,70 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    // **Main Page Container:**
-    // Updated: `dark:bg-black` -> `dark:bg-slate-900` (A softer dark gray/blue that is less harsh than pure black)
-    <div className="h-full flex items-center justify-center">
+    <div className="relative h-full w-full overflow-hidden rounded-4xl">
+      {/* Animated Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950" />
 
-      {/* **Content Wrapper (The Card):** */}
-      <main className="w-full max-w-4xl p-12 bg-white dark:bg-slate-800 shadow-2xl rounded-xl sm:p-16">
+      {/* Animated Gradient Orbs */}
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-blue-400/30 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-indigo-400/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-blue-200/20 via-indigo-200/10 to-transparent rounded-full blur-3xl" />
 
-        {/* Logo & Header */}
-        <div className="flex items-center gap-4 mb-12">
-          <Image
-            src="/gofish-logo.png"
-            alt="GoFish Logo"
-            width={60}
-            height={60}
-            className="rounded-lg shadow-md"
-          />
-          <h1 className="text-4xl font-extrabold tracking-tight text-blue-700 dark:text-blue-300">
+      {/* Edge Gradient Masks - smooth transitions on borders */}
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-slate-100/80 via-slate-50/40 to-transparent dark:from-slate-950/80 dark:via-slate-900/40 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-indigo-100/80 via-blue-50/40 to-transparent dark:from-indigo-950/80 dark:via-slate-900/40 pointer-events-none" />
+      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-slate-100/60 via-slate-50/30 to-transparent dark:from-slate-950/60 dark:via-slate-900/30 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-indigo-100/60 via-blue-50/30 to-transparent dark:from-indigo-950/60 dark:via-slate-900/30 pointer-events-none" />
+
+      {/* Content */}
+      <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
+        {/* Logo Badge - blended */}
+        <div className="inline-flex items-center gap-3 px-5 py-2.5 mb-8 rounded-full bg-gradient-to-r from-blue-100/40 to-indigo-100/40 dark:from-blue-900/30 dark:to-indigo-900/30 backdrop-blur-sm">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/80 to-indigo-600/80 flex items-center justify-center">
+            <svg className="w-5 h-5 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12a8 8 0 01-8 8m8-8a8 8 0 00-8-8m8 8h-8m0 8a8 8 0 01-8-8m8 8v-8m-8 0a8 8 0 018-8m-8 8h8m0-8v8" />
+            </svg>
+          </div>
+          <span className="text-sm font-semibold text-blue-700/80 dark:text-blue-300/80">
             GoFish
-          </h1>
+          </span>
         </div>
 
-        {/* Hero section */}
-        <div className="flex flex-col gap-6">
-          <h2 className="max-w-xl text-5xl font-extrabold leading-tight tracking-tight text-gray-900 dark:text-gray-100">
-            Book Fishing Gear Easily & <span className="text-blue-600 dark:text-blue-400">Quickly</span>
-          </h2>
+        {/* Main Headline - softer colors */}
+        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 text-center">
+          <span className="text-gray-800/90 dark:text-white/90">Book Fishing Gear</span>
+          <br />
+          <span className="bg-gradient-to-r from-blue-500/90 via-indigo-500/90 to-purple-500/90 bg-clip-text text-transparent">
+            Easily & Quickly
+          </span>
+        </h1>
 
-          {/* Updated: `dark:text-zinc-300` -> `dark:text-gray-300` (More standard light text color) */}
-          <p className="max-w-2xl text-xl leading-relaxed text-zinc-600 dark:text-gray-300">
-            Need a rod, bait, or a full kit? GoFish lets you browse available
-            fishing equipment, reserve what you need, and pick it up when you’re
-            ready. Simplify your trip planning now!
-          </p>
-        </div>
+        {/* Subtitle */}
+        <p className="max-w-lg text-center text-lg text-gray-600/80 dark:text-gray-300/80 leading-relaxed mb-10">
+          Browse equipment, reserve what you need, and pick it up when you&apos;re ready.
+        </p>
 
-        {/* CTA buttons (No dark mode changes needed here as they use primary blue/white) */}
-        <div className="flex flex-col gap-5 mt-12 text-lg font-semibold sm:flex-row">
-
-          {/* Primary CTA */}
-          <a
+        {/* CTA Buttons - blended */}
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <Link
             href="/items"
-            className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-8 text-white shadow-lg shadow-blue-500/50 transition-all duration-300 ease-in-out hover:bg-blue-700 hover:shadow-blue-500/70 sm:w-[240px]"
+            className="group flex h-14 items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-blue-500/90 to-indigo-500/90 px-8 text-white/95 font-semibold shadow-lg shadow-blue-500/20 transition-all duration-300 hover:from-blue-600 hover:to-indigo-600 hover:shadow-xl hover:shadow-blue-500/30"
           >
             Browse Equipment
-          </a>
+            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
 
-          {/* Secondary CTA */}
-          <a
+          <Link
             href="/dashboard"
-            className="flex h-14 w-full items-center justify-center rounded-xl border-2 border-blue-600 px-8 text-blue-600 transition-colors duration-300 ease-in-out hover:bg-blue-50 hover:border-blue-700 sm:w-[240px]"
+            className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-white/30 to-blue-50/30 dark:from-slate-800/30 dark:to-indigo-900/30 backdrop-blur-sm px-8 text-gray-700/90 dark:text-gray-200/90 font-semibold transition-all duration-300 hover:from-white/50 hover:to-blue-100/50 dark:hover:from-slate-800/50 dark:hover:to-indigo-900/50"
           >
-            Go to Dashboard
-          </a>
+            Dashboard
+          </Link>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

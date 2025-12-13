@@ -4,6 +4,7 @@ import gofish.pt.dto.ItemDTO;
 import gofish.pt.entity.Item;
 import gofish.pt.entity.User;
 import gofish.pt.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,10 @@ public abstract class ItemMapper {
     // O método artesanal que vai buscar o User à base de dados
     @org.mapstruct.Named("idToUser")
     protected User mapUser(Long id) {
-        if (id == null) return null;
-        // Aqui vais à peixaria buscar o user. Se nã houver, ou lanças erro ou devolves null.
-        return userRepository.findById(id).orElse(null);
+        if (id == null) {
+            throw new EntityNotFoundException("userId is required to create an item");
+        }
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
     }
 }

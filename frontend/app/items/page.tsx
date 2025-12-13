@@ -42,7 +42,7 @@ export default function ItemsPage() {
     queryKey: ["materials"],
     queryFn: async () => {
       // UPDATED PATH: /api/items/materials
-      const res = await fetch("http://localhost:8080/api/items/materials");
+      const res = await fetch(`${process.env.API_URL}/api/items/materials`);
       if (!res.ok) throw new Error("Failed");
       return res.json() as Promise<MaterialMap>;
     },
@@ -53,7 +53,7 @@ export default function ItemsPage() {
     queryKey: ["categories"],
     queryFn: async () => {
       // UPDATED PATH: /api/items/categories
-      const res = await fetch("http://localhost:8080/api/items/categories");
+      const res = await fetch(`${process.env.API_URL}/api/items/categories`);
       if (!res.ok) throw new Error("Failed");
       return res.json() as Promise<CategoryNode[]>;
     },
@@ -75,7 +75,7 @@ export default function ItemsPage() {
         maxPrice: priceRange[1],
       };
 
-      const res = await fetch("http://localhost:8080/api/items/filter", {
+      const res = await fetch(`${process.env.API_URL}/api/items/filter`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(filter),
@@ -114,13 +114,13 @@ export default function ItemsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 h-full flex flex-col gap-6">
+    <div className="max-w-7xl mx-auto p-6 h-full flex flex-col gap-6 space-y-6">
       <div className="h-1/16">
         <h1 className="text-3xl font-bold mb-8 text-gray-800">
           Available Gear
         </h1>
       </div>
-      <div className="h-4/16">
+      <div className="h-2/16">
         <ItemsFilterBar
           searchInput={searchInput}
           setSearchInput={setSearchInput}
@@ -135,7 +135,7 @@ export default function ItemsPage() {
           availableMaterials={availableMaterials}
         />
       </div>
-      <div className="h-full grow">
+      <div className="h-11/16">
         <ItemsGrid items={items} isLoading={isLoading} isError={isError} />
       </div>
     </div>

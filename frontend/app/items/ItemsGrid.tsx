@@ -15,7 +15,7 @@ export default function ItemsGrid({
 }: ItemsGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+      <div className="h-fullgrid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse space-y-10">
         {[...Array(6)].map((_, i) => (
           <div key={i} className="h-64 bg-gray-200 rounded-xl"></div>
         ))}
@@ -40,9 +40,9 @@ export default function ItemsGrid({
   }
 
   return (
-    <div className="h-full overflow-y-auto gap-6">
-      {items.map((item) => (
-        <ItemCard key={item.id} item={item} />
+    <div className="h-full overflow-y-auto gap-6 grid grid-cols-3 sm:grid-cols-1 lg:grid-cols-3 scrollbar-blue p-2" >
+      {items.map((item, index) => (
+        <ItemCard key={item.id} item={item} index={index} />
       ))}
     </div>
   );
