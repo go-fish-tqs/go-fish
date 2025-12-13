@@ -3,12 +3,10 @@ export interface Item {
   id: number;
   name: string;
   description: string;
-  photoUrls: string[]; // In Java, this is List<String>
-  category: string; // Enum in Java, string here
-  material: string; // Enum in Java, string here
-  price: number;
-  available: boolean;
-  userId: number;
+  material?: string;
+  category?: string;
+  price?: number;
+  images?: string[];
 }
 
 export type CategoryNode = {

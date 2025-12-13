@@ -25,8 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="bg-blue-100 h-screen flex overflow-hidden">
+    <html lang="en" className="h-full">
+      <body className="bg-blue-100 h-full flex overflow-hidden">
         <Providers>
           <Sidebar />
           <main className="flex-1 p-4 h-full overflow-y-auto">{children}</main>
