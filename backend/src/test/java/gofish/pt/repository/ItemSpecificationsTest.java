@@ -57,7 +57,8 @@ class ItemSpecificationsTest {
                 19.99,
                 true,
                 zePescador, // <--- Mete aqui o USER que criaste!
-                null // bookings (pode ser null se a lista for opcional no construtor)
+                null, // bookings (pode ser null se a lista for opcional no construtor)
+                null // reviews
         );
 
         reel = new Item(
@@ -70,7 +71,8 @@ class ItemSpecificationsTest {
                 7.99,
                 true,
                 zePescador, // <--- O mesmo dono
-                null
+                null, // bookings
+                null // reviews
         );
 
         itemRepository.saveAll(List.of(rod, reel));
@@ -125,7 +127,7 @@ class ItemSpecificationsTest {
     }
 
     @Test
-    void findAllWhenNull(){
+    void findAllWhenNull() {
         spec = null;
         assertThat(itemRepository.findAll(spec)).isEqualTo(itemRepository.findAll());
     }
