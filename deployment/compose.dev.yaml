@@ -36,14 +36,15 @@ services:
       - "5173:5173" # Vite HMR port (if using Vite)
     volumes:
       # Mount source code for hot-reload
+      - ../frontend/app:/usr/src/app/app:cached
       - ../frontend/src:/usr/src/app/src:cached
       - ../frontend/public:/usr/src/app/public:cached
       # Prevent node_modules from being overwritten
       - /usr/src/app/node_modules
     environment:
       - NODE_ENV=development
-      - VITE_API_URL=http://localhost:8080
-      - CHOKIDAR_USEPOLLING=true # For file watching in Docker
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - WATCHPACK_POLLING=true # For file watching in Docker (Next.js)
     depends_on:
       - backend
     networks:
@@ -63,7 +64,7 @@ services:
       - POSTGRES_PASSWORD=dev_password
       - POSTGRES_HOST_AUTH_METHOD=trust
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d gofish_dev" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gofish_dev"]
       interval: 5s
       timeout: 3s
       retries: 5
