@@ -87,6 +87,11 @@ export default function LoginPage() {
           username: data.name,
           email: data.email
         });
+        // Store auth data in localStorage
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userId", data.userId.toString());
+        localStorage.setItem("userName", data.name);
+        localStorage.setItem("userEmail", data.email);
         
         // Redirect to dashboard
         router.push("/dashboard");

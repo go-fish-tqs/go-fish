@@ -43,8 +43,9 @@ jobs:
           password: ${{ secrets.XRAY_CLIENT_SECRET }}
           testFormat: "junit"
           projectKey: "GF"
-          paths: "backend/target/surefire-reports/*.xml"
+          testPaths: "backend/target/surefire-reports/*.xml"
           testEnvironments: "CI"
+          responseTimeout: 180000
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4

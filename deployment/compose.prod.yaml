@@ -99,8 +99,61 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    restart: always
+    ports:
+      - "9190:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-prod-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.enable-lifecycle"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - gofish-prod
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    ports:
+      - "3030:3000"
+    volumes:
+      - grafana-prod-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=${GF_SERVER_ROOT_URL:-http://localhost:3030}
+    depends_on:
+      - prometheus
+    networks:
+      - gofish-prod
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   db-prod-data:
+    driver: local
+  prometheus-prod-data:
+    driver: local
+  grafana-prod-data:
     driver: local
 
 networks:
