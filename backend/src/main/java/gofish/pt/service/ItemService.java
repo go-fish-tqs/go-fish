@@ -108,8 +108,8 @@ public class ItemService {
         // Conflict Check: Cannot block dates with existing confirmed bookings
         boolean hasConflict = bookingRepository.existsOverlappingBooking(
                 itemId,
-                startDate.atStartOfDay(),
-                endDate.atTime(23, 59, 59));
+                startDate,
+                endDate);
 
         if (hasConflict) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,

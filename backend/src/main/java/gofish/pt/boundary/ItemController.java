@@ -19,6 +19,8 @@ import org.springframework.web.server.ResponseStatusException; // Importar
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -75,10 +77,7 @@ public class ItemController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
 
-        LocalDateTime startDateTime = from.atStartOfDay();
-        LocalDateTime endDateTime = to.atTime(23, 59, 59);
-
-        List<LocalDate> blockedDates = bookingService.checkAvailability(id, startDateTime, endDateTime);
+        List<LocalDate> blockedDates = bookingService.getUnavailableDates(id, from, to);
 
         return ResponseEntity.ok(blockedDates);
     }

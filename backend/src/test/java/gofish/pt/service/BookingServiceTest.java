@@ -181,7 +181,7 @@ class BookingServiceTest {
                 .thenReturn(List.of(existing));
 
         when(blockedDateRepository.findBlockedDatesInRange(eq(fishingRod.getId()), any(), any()))
-                .thenReturn(Collections.emptyList());
+                .thenReturn(List.of());
 
         // Act
         List<LocalDate> blockedDates = bookingService.getUnavailableDates(fishingRod.getId(), queryStart, queryEnd);

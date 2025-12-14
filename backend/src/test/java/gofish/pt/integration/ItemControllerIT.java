@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -141,8 +142,8 @@ class ItemControllerIT {
         Booking booking = new Booking();
         booking.setItem(rod);
         booking.setUser(owner);
-        booking.setStartDate(LocalDateTime.now().plusDays(2).withHour(0).withMinute(0));
-        booking.setEndDate(LocalDateTime.now().plusDays(3).withHour(23).withMinute(59));
+        booking.setStartDate(LocalDate.now().plusDays(2));
+        booking.setEndDate(LocalDate.now().plusDays(3));
         booking.setStatus(BookingStatus.CONFIRMED);
         bookingRepository.saveAndFlush(booking);
 
@@ -215,8 +216,8 @@ class ItemControllerIT {
             booking.setUser(nonOwner);
             LocalDate startDate = LocalDate.now().plusDays(5);
             LocalDate endDate = LocalDate.now().plusDays(7);
-            booking.setStartDate(startDate.atStartOfDay());
-            booking.setEndDate(endDate.atTime(23, 59));
+            booking.setStartDate(startDate);
+            booking.setEndDate(endDate);
             booking.setStatus(BookingStatus.CONFIRMED);
             bookingRepository.saveAndFlush(booking);
 
@@ -293,19 +294,18 @@ class ItemControllerIT {
                     .andExpect(status().isForbidden());
         }
 
-        @Test
-        @DisplayName("GET /availability - Should include manually blocked dates")
-        void checkAvailability_includesBlockedDates() throws Exception {
-            LocalDate blockedDate = LocalDate.now().plusDays(4);
-            BlockedDate period = new BlockedDate(blockedDate, blockedDate, "maintenance", rod);
-            blockedDateRepository.saveAndFlush(period);
+    @Test
+    @DisplayName("GET /availability - Should include manually blocked dates")
+    void checkAvailability_includesBlockedDates() throws Exception {
+        LocalDate blockedDate = LocalDate.now().plusDays(4);
+        BlockedDate period = new BlockedDate(blockedDate, blockedDate, "maintenance", rod);
+        blockedDateRepository.saveAndFlush(period);
 
-            mockMvc.perform(get("/api/items/{id}/availability", rod.getId())
-                            .with(user("qualquer_user")) // Autenticação
-                            .param("from", LocalDate.now().toString())
-                            .param("to", LocalDate.now().plusDays(5).toString()))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.[?(@ == '%s')]", blockedDate.toString()).exists());
-        }
+        mockMvc.perform(get("/api/items/{id}/availability", rod.getId())
+                        .with(user("qualquer_user")) // Autenticação
+                        .param("from", LocalDate.now().toString())
+                        .param("to", LocalDate.now().plusDays(5).toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[?(@ == '%s')]", blockedDate.toString()).exists());
     }
 }

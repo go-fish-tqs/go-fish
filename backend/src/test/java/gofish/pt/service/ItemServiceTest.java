@@ -55,9 +55,14 @@ class ItemServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        i1 = new Item(1L, "simple rod", "very simple", List.of(), Category.RODS, Material.BRASS, 5.0, true, null, null,
+        owner = new User();
+        owner.setId(1L);
+        owner.setUsername("owner");
+        owner.setEmail("owner@test.com");
+        
+        i1 = new Item(1L, "simple rod", "very simple", List.of(), Category.RODS, Material.BRASS, 5.0, true, owner, null,
                 null);
-        i2 = new Item(2L, "cool rod", "very cool", List.of(), Category.RODS, Material.GRAPHITE, 7.0, true, null, null,
+        i2 = new Item(2L, "cool rod", "very cool", List.of(), Category.RODS, Material.GRAPHITE, 7.0, true, owner, null,
                 null);
         dto1 = new ItemDTO("simple rod", "very simple", List.of(), Category.RODS, Material.BRASS, 5.0, 1L);
         dto2 = new ItemDTO("cool rod", "very cool", List.of(), Category.RODS, Material.GRAPHITE, 7.0, 1L);

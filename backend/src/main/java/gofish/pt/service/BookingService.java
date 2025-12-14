@@ -116,11 +116,11 @@ public class BookingService {
 
         // 2. Ir à pesca das reservas e dos bloqueios
         List<Booking> existingBookings = getConflictingBookings(itemId, start, end);
-        List<BlockedDate> blockedDates = blockedDateRepository.findBlockedDatesInRange(itemId, start.toLocalDate(),
-                end.toLocalDate());
+        List<BlockedDate> blockedDates = blockedDateRepository.findBlockedDatesInRange(itemId, start,
+                end);
 
         // 3. Calcular os dias queimados
-        return calculateUnavailableDates(start.toLocalDate(), end.toLocalDate(), existingBookings, blockedDates);
+        return calculateUnavailableDates(start, end, existingBookings, blockedDates);
     }
 
     private void validateDateRange(LocalDate start, LocalDate end) {
