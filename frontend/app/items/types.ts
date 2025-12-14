@@ -7,6 +7,8 @@ export interface Item {
   category?: string;
   price?: number;
   images?: string[];
+  photoUrls?: string[];
+  available?: boolean;
 }
 
 export type CategoryNode = {

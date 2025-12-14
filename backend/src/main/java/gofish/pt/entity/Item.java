@@ -54,7 +54,7 @@ public class Item {
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
-    @JsonIgnoreProperties({"email", "password",  "location", "balance"})
+    @JsonIgnoreProperties({ "email", "password", "location", "balance" })
     private User owner;
 
     @OneToMany

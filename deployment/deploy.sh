@@ -135,12 +135,7 @@ case "$ACTION" in
     up)
         echo -e "${GREEN}Starting $ENV environment...${NC}"
         
-        # Load environment file if it exists
-        if [ -f "$ENV_FILE" ]; then
-            export $(grep -v '^#' "$ENV_FILE" | xargs)
-        fi
-        
-        docker compose -f "$COMPOSE_FILE" $PROFILE up $DETACHED $BUILD
+        docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" $PROFILE up $DETACHED $BUILD
         
         echo ""
         echo -e "${GREEN}$ENV environment started!${NC}"

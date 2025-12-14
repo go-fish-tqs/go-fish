@@ -21,9 +21,11 @@ build/
 # Deployment
 deployment/.env
 deployment/.env.prod
+deployment/.env.dev
 deployment/backups/
 deployment/nginx/ssl/
 
 # Docker
 .dockerignore
 docker-compose.override.yml
+

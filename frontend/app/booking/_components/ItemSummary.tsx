@@ -21,6 +21,16 @@ export default function ItemSummary({ item }: ItemSummaryProps) {
         }
     };
 
+    const getImageUrl = (url: string) => {
+        if (!url) return "";
+        if (url.startsWith("http")) return url;
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "";
+        const path = url.startsWith("/") ? url : `/${url}`;
+        return `${baseUrl}${path}`;
+    };
+
+    const carouselImages = item.photoUrls?.map(getImageUrl) || [];
+
     return (
         <div className="flex-1 flex flex-col">
             {/* Large Hero Image */}
@@ -31,7 +41,7 @@ export default function ItemSummary({ item }: ItemSummaryProps) {
                 {hasImages ? (
                     <>
                         <img
-                            src={item.photoUrls![0]}
+                            src={getImageUrl(item.photoUrls![0])}
                             alt={item.name}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
@@ -104,13 +114,13 @@ export default function ItemSummary({ item }: ItemSummaryProps) {
             {/* Image Carousel Modal */}
             {hasImages && (
                 <ImageCarousel
-                    images={item.photoUrls!}
+                    images={carouselImages}
                     initialIndex={carouselStartIndex}
                     isOpen={isCarouselOpen}
                     onClose={() => setIsCarouselOpen(false)}
                     itemName={item.name}
                 />
             )}
-        </div>
+        </div >
     );
 }

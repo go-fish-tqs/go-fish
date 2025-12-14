@@ -112,7 +112,7 @@ export default function BookingCalendar({
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-md w-full h-full flex flex-col">
+    <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-md w-[90%] h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div>

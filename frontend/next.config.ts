@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    env: {
-        API_URL: process.env.NEXT_PUBLIC_API_URL,
-    },
+    // NEXT_PUBLIC_* variables are automatically exposed to the browser
 };
 
 export default nextConfig;
