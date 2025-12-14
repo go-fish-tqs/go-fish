@@ -52,8 +52,8 @@ COPY ./src src/
 # Expose application and debug ports
 EXPOSE 8080 5005
 
-# Use spring-boot:run for hot-reload in development
-CMD ["mvn", "spring-boot:run"]
+# Build the application skipping tests, then run it
+CMD ["sh", "-c", "mvn clean package -DskipTests && mvn spring-boot:run -DskipTests"]
 
 ################################################################################
 

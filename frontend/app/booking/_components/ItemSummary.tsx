@@ -106,7 +106,11 @@ export default function ItemSummary({ item }: ItemSummaryProps) {
                 {item.category && (
                     <div className="mt-4 pt-4 border-t border-gray-200/50">
                         <span className="text-xs uppercase tracking-wide text-gray-500">Category</span>
-                        <p className="text-gray-700 font-medium mt-1">{String(item.category).replace(/_/g, " ")}</p>
+                        <p className="text-gray-700 font-medium mt-1">
+                            {typeof item.category === "object" && item.category !== null
+                                ? (item.category as { displayName?: string }).displayName ?? ""
+                                : String(item.category).replace(/_/g, " ")}
+                        </p>
                     </div>
                 )}
             </div>

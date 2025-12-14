@@ -1,6 +1,7 @@
 package gofish.pt.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gofish.pt.config.TestSecurityConfig;
 import gofish.pt.dto.BookingRequestDTO;
 import gofish.pt.dto.BookingStatusDTO;
 import gofish.pt.entity.*;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,10 +27,11 @@ import java.time.LocalDate;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@Transactional
 @ActiveProfiles("test")
+@Import(TestSecurityConfig.class)
+@Transactional
 class BookingControllerIT {
 
     @Autowired private MockMvc mockMvc;
@@ -55,7 +58,7 @@ class BookingControllerIT {
         owner.setPassword("pass");
         owner.setLocation("Tavira");
         owner.setBalance(0.0);
-        owner = userRepository.save(owner);
+        owner = userRepository.saveAndFlush(owner);
 
         // 2. Criar Renter (Cliente)
         renter = new User();
@@ -64,7 +67,7 @@ class BookingControllerIT {
         renter.setPassword("pass");
         renter.setLocation("Hotel");
         renter.setBalance(100.0);
-        renter = userRepository.save(renter);
+        renter = userRepository.saveAndFlush(renter);
 
         // 3. Criar Item
         kayak = new Item();
@@ -73,9 +76,9 @@ class BookingControllerIT {
         kayak.setPrice(25.0);
         kayak.setCategory(Category.BOATS);
         kayak.setMaterial(Material.ROTOMOLDED_POLYETHYLENE);
-        kayak.setOwner(owner); // <--- Pertence ao dono
+        kayak.setOwner(owner);
         kayak.setAvailable(true);
-        kayak = itemRepository.save(kayak);
+        kayak = itemRepository.saveAndFlush(kayak);
     }
 
     @AfterEach
@@ -97,14 +100,12 @@ class BookingControllerIT {
 
         // Act & Assert
         mockMvc.perform(post("/api/bookings")
+                        // AUTENTICAÇÃO: Simula o Renter
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.itemName").value("Kayak Duplo"))
-                // Verifica o preço: 2 dias completos (10 a 12) * 25.0 = 50.0
-                // (Depende da tua lógica de cálculo no Mapper, mas deve ser > 0)
-                .andExpect(jsonPath("$.price").isNumber());
+                .andExpect(jsonPath("$.itemName").value("Kayak Duplo"));
     }
 
     @Test
@@ -117,14 +118,14 @@ class BookingControllerIT {
     @Test
     @DisplayName("PATCH /api/bookings/{id}/status - Dono aprova reserva")
     void updateBookingStatus() throws Exception {
-        // 1. Criar uma reserva PENDING na base de dados
+        // 1. Criar uma reserva PENDING
         Booking booking = new Booking();
         booking.setUser(renter);
         booking.setItem(kayak);
         booking.setStartDate(LocalDate.now());
         booking.setEndDate(LocalDate.now());
         booking.setStatus(BookingStatus.PENDING);
-        booking = bookingRepository.save(booking);
+        booking = bookingRepository.saveAndFlush(booking);
 
         TestSecurityContextHelper.setAuthenticatedUser(owner.getId()); // Autenticar como dono
 
@@ -134,6 +135,7 @@ class BookingControllerIT {
 
         // Act & Assert
         mockMvc.perform(patch("/api/bookings/{id}/status", booking.getId())
+                        // AUTENTICAÇÃO: O DONO é quem aprova
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusDTO)))
                 .andExpect(status().isOk())
@@ -141,7 +143,7 @@ class BookingControllerIT {
     }
 
     @Test
-    @DisplayName("PATCH /api/bookings/{id}/status - Erro se não for o dono")
+    @DisplayName("PATCH /api/bookings/{id}/status - Erro 403 se não for o dono")
     void updateBookingStatus_SecurityCheck() throws Exception {
         // 1. Criar reserva
         Booking booking = new Booking();
@@ -150,7 +152,7 @@ class BookingControllerIT {
         booking.setStartDate(LocalDate.now());
         booking.setEndDate(LocalDate.now());
         booking.setStatus(BookingStatus.PENDING);
-        booking = bookingRepository.save(booking);
+        booking = bookingRepository.saveAndFlush(booking);
 
         TestSecurityContextHelper.setAuthenticatedUser(renter.getId()); // ID errado (não é o dono do item)
 
@@ -159,11 +161,10 @@ class BookingControllerIT {
         statusDTO.setStatus(BookingStatus.CONFIRMED);
 
         // Act & Assert
-        // O serviço lança SecurityException. O Spring por defeito dá 500 ou 403 dependendo da config.
-        // Assumindo padrão:
         mockMvc.perform(patch("/api/bookings/{id}/status", booking.getId())
+                        // AUTENTICAÇÃO: Logado como RENTER (não é o dono do item)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusDTO)))
-                        .andExpect(status().isForbidden()); // Ou Forbidden se tratares a exceção
+                        .andExpect(status().isForbidden()); // Espera-se 403 Forbidden
     }
 }

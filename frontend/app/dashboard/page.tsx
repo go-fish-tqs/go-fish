@@ -4,64 +4,23 @@ import FeaturedItemCarousel from "./components/FeaturedItemCarousel";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Link from "next/link";
 import { logout } from "../lib/auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function DashboardPage() {
-  const [userName] = useState<string>(
-    typeof window !== 'undefined' ? localStorage.getItem("userName") || "" : ""
-  );
+  const [userName, setUserName] = useState<string>("");
+
+  useEffect(() => {
+    const name = localStorage.getItem("userName");
+    if (name) {
+      setUserName(name);
+    }
+  }, []);
 
   const handleLogout = () => {
     toast.success("Logged out successfully");
     logout();
   };
-
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-
-export default function DashboardPage() {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userName, setUserName] = useState<string>("");
-
-  useEffect(() => {
-    // Check authentication
-    const token = localStorage.getItem("token");
-    const name = localStorage.getItem("userName");
-
-    if (!token) {
-      toast.error("Please log in to access the dashboard");
-      router.push("/login");
-      return;
-    }
-
-    setIsAuthenticated(true);
-    if (name) {
-      setUserName(name);
-    }
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userEmail");
-    toast.success("Logged out successfully");
-    router.push("/");
-  };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Checking authentication...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <ProtectedRoute>
@@ -266,3 +225,4 @@ export default function DashboardPage() {
     </ProtectedRoute> 
   );
 }
+

@@ -1,11 +1,37 @@
 // app/items/[id]/_components/ItemInfo.tsx
+"use client";
+
 import { Item } from "@/app/items/types";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface ItemInfoProps {
   item: Item;
 }
 
 export default function ItemInfo({ item }: ItemInfoProps) {
+  const [isOwner, setIsOwner] = useState(false);
+
+  useEffect(() => {
+    // Check if current user is the owner
+    const userId = localStorage.getItem("userId");
+    
+    console.log("Debug ownership check:", {
+      userId,
+      itemOwnerId: item.owner?.id,
+      itemOwner: item.owner,
+      fullItem: item
+    });
+    
+    if (userId && item.owner?.id) {
+      const ownershipMatch = parseInt(userId) === item.owner.id;
+      console.log("Is owner?", ownershipMatch);
+      setIsOwner(ownershipMatch);
+    } else {
+      setIsOwner(false);
+    }
+  }, [item.owner?.id, item]);
+
   return (
     <div className="flex flex-col gap-4 overflow-hidden">
       <div className="overflow-hidden">
@@ -57,18 +83,34 @@ export default function ItemInfo({ item }: ItemInfoProps) {
         </div>
       </div>
 
-      {/* Action Button */}
-      <div className="mt-4">
-        <button
-          disabled={!item.available}
-          className={`w-full flex items-center justify-center rounded-md px-8 py-3 text-base font-medium text-white 
-            ${item.available
-              ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
-              : "bg-gray-400 cursor-not-allowed"
-            }`}
-        >
-          {item.available ? "Request booking" : "Unavailable"}
-        </button>
+      {/* Action Buttons */}
+      <div className="mt-4 space-y-3">
+        {/* Manage Availability Button - Only for owner */}
+        {isOwner && (
+          <Link
+            href={`/items/${item.id}/manage-availability`}
+            className="w-full flex items-center justify-center gap-2 rounded-lg px-8 py-3 text-base font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 hover:border-blue-300 transition-all"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Manage Availability
+          </Link>
+        )}
+
+        {/* Booking Button - Only for non-owners */}
+        {!isOwner && (
+          <Link
+            href={`/booking/add?itemId=${item.id}`}
+            className={`w-full flex items-center justify-center rounded-lg px-8 py-3 text-base font-medium text-white 
+              ${item.available
+                ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
+                : "bg-gray-400 cursor-not-allowed pointer-events-none"
+              }`}
+          >
+            {item.available ? "Request booking" : "Unavailable"}
+          </Link>
+        )}
       </div>
     </div>
   );
