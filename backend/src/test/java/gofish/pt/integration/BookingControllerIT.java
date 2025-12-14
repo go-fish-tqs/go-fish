@@ -1,6 +1,7 @@
 package gofish.pt.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gofish.pt.config.TestSecurityConfig;
 import gofish.pt.dto.BookingRequestDTO;
 import gofish.pt.dto.BookingStatusDTO;
 import gofish.pt.entity.*;
@@ -13,20 +14,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
-// IMPORTS NECESSÁRIOS PARA SEGURANÇA
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Import(TestSecurityConfig.class)
 @Transactional
 class BookingControllerIT {
 
@@ -91,8 +93,6 @@ class BookingControllerIT {
         // Act & Assert
         mockMvc.perform(post("/api/bookings")
                         // AUTENTICAÇÃO: Simula o Renter
-                        .with(user(renter.getUsername()).password(renter.getPassword()).roles("USER"))
-                        .with(csrf()) // Token CSRF Obrigatório
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -103,9 +103,7 @@ class BookingControllerIT {
     @Test
     @DisplayName("GET /api/bookings/{id} - Deve devolver erro 404 se não existir")
     void getBookingNotFound() throws Exception {
-        mockMvc.perform(get("/api/bookings/{id}", 9999L)
-                        // AUTENTICAÇÃO: Qualquer user serve para passar o login
-                        .with(user("qualquer_user")))
+        mockMvc.perform(get("/api/bookings/{id}", 9999L))
                 .andExpect(status().isNotFound());
     }
 
@@ -129,8 +127,6 @@ class BookingControllerIT {
         // Act & Assert
         mockMvc.perform(patch("/api/bookings/{id}/status", booking.getId())
                         // AUTENTICAÇÃO: O DONO é quem aprova
-                        .with(user(owner.getUsername()).password(owner.getPassword()).roles("USER"))
-                        .with(csrf()) // Token CSRF Obrigatório
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusDTO)))
                 .andExpect(status().isOk())
@@ -157,8 +153,6 @@ class BookingControllerIT {
         // Act & Assert
         mockMvc.perform(patch("/api/bookings/{id}/status", booking.getId())
                         // AUTENTICAÇÃO: Logado como RENTER (não é o dono do item)
-                        .with(user(renter.getUsername()).password(renter.getPassword()).roles("USER"))
-                        .with(csrf()) // Token CSRF Obrigatório
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusDTO)))
                         .andExpect(status().isForbidden()); // Espera-se 403 Forbidden

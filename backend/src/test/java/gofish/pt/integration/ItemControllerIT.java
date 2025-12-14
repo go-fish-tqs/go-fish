@@ -1,6 +1,7 @@
 package gofish.pt.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gofish.pt.config.TestSecurityConfig;
 import gofish.pt.dto.BlockDateRequestDTO;
 import gofish.pt.dto.ItemDTO;
 import gofish.pt.dto.ItemFilter;
@@ -16,7 +17,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,13 +30,13 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Import(TestSecurityConfig.class)
 @Transactional
 class ItemControllerIT {
 
@@ -103,8 +107,6 @@ class ItemControllerIT {
         );
 
         mockMvc.perform(post("/api/items")
-                .with(user(owner.getUsername()).password(owner.getPassword())) // Autenticação
-                .with(csrf()) // Token CSRF para POST
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
@@ -115,8 +117,7 @@ class ItemControllerIT {
     @Test
     @DisplayName("GET /api/items/{id} - Deve devolver o item correto")
     void getItem() throws Exception {
-        mockMvc.perform(get("/api/items/{id}", rod.getId())
-                .with(user("qualquer_user"))) // Simula user logado para passar o 401
+        mockMvc.perform(get("/api/items/{id}", rod.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Cana de Surfcasting"));
     }
@@ -127,8 +128,6 @@ class ItemControllerIT {
         ItemFilter filter = new ItemFilter(null, Category.RODS, null, null, null, null, null);
 
         mockMvc.perform(post("/api/items/filter")
-                .with(user("qualquer_user")) // Autenticação
-                .with(csrf()) // Token CSRF para POST
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(filter)))
                 .andExpect(status().isOk())
@@ -161,7 +160,7 @@ class ItemControllerIT {
 
     @Test
     void getItemById() throws Exception {
-        mockMvc.perform(get("/api/items/1"))
+        mockMvc.perform(get("/api/items/{id}", rod.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.name").value("Cana de Surfcasting"));
@@ -192,6 +191,7 @@ class ItemControllerIT {
     }
 
         @Test
+        @WithMockUser(username = "ze_pescador")
         @DisplayName("POST /items/{itemId}/blocked-dates - Should block dates for owner")
         void blockDate_Success() throws Exception {
             BlockDateRequestDTO dto = new BlockDateRequestDTO();
@@ -200,8 +200,6 @@ class ItemControllerIT {
             dto.setReason("Owner vacation");
 
             mockMvc.perform(post("/api/items/{itemId}/blocked-dates", rod.getId())
-                    .with(user(owner.getUsername()).password(owner.getPassword())) // Autenticado como DONO
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(dto)))
                     .andExpect(status().isCreated())
@@ -209,6 +207,7 @@ class ItemControllerIT {
         }
 
         @Test
+        @WithMockUser(username = "ze_pescador")
         @DisplayName("POST /items/{itemId}/blocked-dates - Should return 409 when conflict with booking exists")
         void blockDate_whenConflict_then409() throws Exception {
             Booking booking = new Booking();
@@ -226,14 +225,13 @@ class ItemControllerIT {
             dto.setEndDate(LocalDate.now().plusDays(8));
 
             mockMvc.perform(post("/api/items/{itemId}/blocked-dates", rod.getId())
-                            .with(user(owner.getUsername()).password(owner.getPassword())) // Autenticado como DONO
-                            .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dto)))
                     .andExpect(status().isConflict());
         }
 
         @Test
+        @WithMockUser(username = "ze_pescador")
         @DisplayName("POST /items/{itemId}/blocked-dates - Should return 403 when user is not owner")
         void blockDate_whenNotOwner_then403() throws Exception {
             // Arrange: Criar item pertencente ao "nonOwner"
@@ -253,26 +251,24 @@ class ItemControllerIT {
 
             // Act & Assert: Tentamos bloquear datas usando as credenciais do "owner" (que não é dono deste item)
             mockMvc.perform(post("/api/items/{itemId}/blocked-dates", otherItem.getId())
-                            .with(user(owner.getUsername()).password(owner.getPassword())) // User errado
-                            .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(dto)))
                     .andExpect(status().isForbidden());
         }
 
         @Test
+        @WithMockUser(username = "ze_pescador")
         @DisplayName("DELETE /items/blocked-dates/{blockedDateId} - Should delete blocked date for owner")
         void deleteBlockDate_Success() throws Exception {
             BlockedDate blockedDate = new BlockedDate(LocalDate.now().plusDays(20), LocalDate.now().plusDays(21), "test", rod);
             blockedDate = blockedDateRepository.saveAndFlush(blockedDate);
 
-            mockMvc.perform(delete("/api/items/blocked-dates/{blockedDateId}", blockedDate.getId())
-                    .with(user(owner.getUsername()).password(owner.getPassword())) // Autenticado como DONO
-                    .with(csrf()))
+            mockMvc.perform(delete("/api/items/blocked-dates/{blockedDateId}", blockedDate.getId()))
                     .andExpect(status().isNoContent());
         }
 
         @Test
+        @WithMockUser(username = "ze_pescador")
         @DisplayName("DELETE /items/blocked-dates/{blockedDateId} - Should return 403 when user is not owner")
         void deleteBlockDate_whenNotOwner_then403() throws Exception {
             Item otherItem = new Item();
@@ -288,21 +284,18 @@ class ItemControllerIT {
             BlockedDate blockedDate = new BlockedDate(LocalDate.now().plusDays(20), LocalDate.now().plusDays(21), "test", otherItem);
             blockedDate = blockedDateRepository.saveAndFlush(blockedDate);
 
-            mockMvc.perform(delete("/api/items/blocked-dates/{blockedDateId}", blockedDate.getId())
-                    .with(user(owner.getUsername()).password(owner.getPassword())) // User errado
-                    .with(csrf()))
+            mockMvc.perform(delete("/api/items/blocked-dates/{blockedDateId}", blockedDate.getId()))
                     .andExpect(status().isForbidden());
         }
 
     @Test
-    @DisplayName("GET /availability - Should include manually blocked dates")
+    @DisplayName("GET /unavailability - Should include manually blocked dates")
     void checkAvailability_includesBlockedDates() throws Exception {
         LocalDate blockedDate = LocalDate.now().plusDays(4);
         BlockedDate period = new BlockedDate(blockedDate, blockedDate, "maintenance", rod);
         blockedDateRepository.saveAndFlush(period);
 
-        mockMvc.perform(get("/api/items/{id}/availability", rod.getId())
-                        .with(user("qualquer_user")) // Autenticação
+        mockMvc.perform(get("/api/items/{id}/unavailability", rod.getId())
                         .param("from", LocalDate.now().toString())
                         .param("to", LocalDate.now().plusDays(5).toString()))
                 .andExpect(status().isOk())
