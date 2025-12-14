@@ -15,6 +15,7 @@ public class TestSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            .csrf(csrf -> csrf.disable()) // NOSONAR - CSRF protection disabled for integration tests only
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll()
             );
