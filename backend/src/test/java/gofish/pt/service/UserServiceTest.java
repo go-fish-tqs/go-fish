@@ -1,6 +1,8 @@
 package gofish.pt.service;
 
 import gofish.pt.dto.UserRegistrationDTO;
+import gofish.pt.entity.Booking;
+import gofish.pt.entity.Item;
 import gofish.pt.entity.User;
 import gofish.pt.exception.DuplicateEmailException;
 import gofish.pt.repository.UserRepository;
@@ -13,6 +15,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -41,7 +47,7 @@ class UserServiceTest {
     @DisplayName("Should register user with hashed password")
     void registerUser_withValidData_shouldHashPassword() {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        
+
         User savedUser = new User();
         savedUser.setId(1L);
         savedUser.setUsername("John Doe");
@@ -49,17 +55,17 @@ class UserServiceTest {
         savedUser.setPassword("$2a$10$hashedPassword");
         savedUser.setLocation("Lisboa");
         savedUser.setBalance(0.0);
-        
+
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         User result = userService.registerUser(registrationDTO);
 
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
-        
+
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userCaptor.capture());
-        
+
         User capturedUser = userCaptor.getValue();
         assertThat(capturedUser.getUsername()).isEqualTo("John Doe");
         assertThat(capturedUser.getEmail()).isEqualTo("john.doe@example.com");
@@ -86,18 +92,18 @@ class UserServiceTest {
     @DisplayName("Should set balance to 0.0 for new user")
     void registerUser_shouldSetDefaultBalance() {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        
+
         User savedUser = new User();
         savedUser.setId(1L);
         savedUser.setBalance(0.0);
-        
+
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         userService.registerUser(registrationDTO);
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userCaptor.capture());
-        
+
         assertThat(userCaptor.getValue().getBalance()).isEqualTo(0.0);
     }
 
@@ -112,5 +118,83 @@ class UserServiceTest {
         var inOrder = inOrder(userRepository);
         inOrder.verify(userRepository).existsByEmail("john.doe@example.com");
         inOrder.verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void getUserBookings_returnsBookings() {
+        Long userId = 1L;
+        User user = mock(User.class);
+        Booking booking = mock(Booking.class);
+        List<Booking> bookings = List.of(booking);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(user.getBookings()).thenReturn(bookings);
+
+        List<Booking> result = userService.getUserBookings(userId);
+
+        assertSame(bookings, result);
+        verify(userRepository).findById(userId);
+        verify(user).getBookings();
+    }
+
+    @Test
+    void getUserBookings_userNotFound_throws() {
+        Long userId = 2L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> userService.getUserBookings(userId));
+        assertTrue(ex.getMessage().contains("User not found"));
+        verify(userRepository).findById(userId);
+    }
+
+    @Test
+    void getUserOwnedBookings_returnsOwnedBookings() {
+        Long userId = 3L;
+        User user = mock(User.class);
+        Item item1 = mock(Item.class);
+        Item item2 = mock(Item.class);
+        Booking b1 = mock(Booking.class);
+        Booking b2 = mock(Booking.class);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(user.getItems()).thenReturn(List.of(item1, item2));
+        when(item1.getBookings()).thenReturn(List.of(b1));
+        when(item2.getBookings()).thenReturn(List.of(b2));
+
+        List<Booking> result = userService.getUserOwnedBookings(userId);
+
+        assertEquals(2, result.size());
+        assertTrue(result.contains(b1));
+        assertTrue(result.contains(b2));
+        verify(userRepository).findById(userId);
+        verify(user).getItems();
+        verify(item1).getBookings();
+        verify(item2).getBookings();
+    }
+
+    @Test
+    void getUserOwnedItems_returnsItems() {
+        Long userId = 4L;
+        User user = mock(User.class);
+        Item item = mock(Item.class);
+        List<Item> items = List.of(item);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(user.getItems()).thenReturn(items);
+
+        List<Item> result = userService.getUserOwnedItems(userId);
+
+        assertSame(items, result);
+        verify(userRepository).findById(userId);
+        verify(user).getItems();
+    }
+
+    @Test
+    void getUserOwnedItems_userNotFound_throws() {
+        Long userId = 5L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> userService.getUserOwnedItems(userId));
+        verify(userRepository).findById(userId);
     }
 }
