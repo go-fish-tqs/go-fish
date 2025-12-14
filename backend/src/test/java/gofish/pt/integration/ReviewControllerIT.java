@@ -8,6 +8,8 @@ import gofish.pt.entity.*;
 import gofish.pt.repository.ItemRepository;
 import gofish.pt.repository.ReviewRepository;
 import gofish.pt.repository.UserRepository;
+import gofish.pt.security.TestSecurityContextHelper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("test")
 class ReviewControllerIT {
 
     @Autowired
@@ -79,11 +83,17 @@ class ReviewControllerIT {
         fishingRod = itemRepository.save(fishingRod);
     }
 
+    @AfterEach
+    void tearDown() {
+        TestSecurityContextHelper.clearContext();
+    }
+
     @Test
     @DisplayName("POST /api/reviews - Should create review with status 201")
     void createReview() throws Exception {
+        TestSecurityContextHelper.setAuthenticatedUser(reviewer.getId());
+
         ReviewRequestDTO request = new ReviewRequestDTO();
-        request.setUserId(reviewer.getId());
         request.setItemId(fishingRod.getId());
         request.setRating(5);
         request.setComment("Amazing fishing rod!");
@@ -110,8 +120,9 @@ class ReviewControllerIT {
         reviewRepository.save(existing);
 
         // Try to create another
+        TestSecurityContextHelper.setAuthenticatedUser(reviewer.getId());
+
         ReviewRequestDTO request = new ReviewRequestDTO();
-        request.setUserId(reviewer.getId());
         request.setItemId(fishingRod.getId());
         request.setRating(5);
         request.setComment("Changed my mind!");
@@ -125,8 +136,9 @@ class ReviewControllerIT {
     @Test
     @DisplayName("POST /api/reviews - Should return 400 for invalid rating")
     void createReview_InvalidRating() throws Exception {
+        TestSecurityContextHelper.setAuthenticatedUser(reviewer.getId());
+
         ReviewRequestDTO request = new ReviewRequestDTO();
-        request.setUserId(reviewer.getId());
         request.setItemId(fishingRod.getId());
         request.setRating(10); // Invalid - above 5
         request.setComment("Too high score");
@@ -235,8 +247,9 @@ class ReviewControllerIT {
         review.setComment("Initial review");
         review = reviewRepository.save(review);
 
+        TestSecurityContextHelper.setAuthenticatedUser(reviewer.getId());
+
         ReviewUpdateDTO updateDTO = new ReviewUpdateDTO();
-        updateDTO.setUserId(reviewer.getId());
         updateDTO.setRating(5);
         updateDTO.setComment("Updated - much better now!");
 
@@ -258,8 +271,9 @@ class ReviewControllerIT {
         review.setComment("Initial review");
         review = reviewRepository.save(review);
 
+        TestSecurityContextHelper.setAuthenticatedUser(otherUser.getId()); // Wrong user!
+
         ReviewUpdateDTO updateDTO = new ReviewUpdateDTO();
-        updateDTO.setUserId(otherUser.getId()); // Wrong user!
         updateDTO.setRating(1);
         updateDTO.setComment("Trying to sabotage");
 
@@ -279,12 +293,9 @@ class ReviewControllerIT {
         review.setComment("To be deleted");
         review = reviewRepository.save(review);
 
-        ReviewDeleteDTO deleteDTO = new ReviewDeleteDTO();
-        deleteDTO.setUserId(reviewer.getId());
+        TestSecurityContextHelper.setAuthenticatedUser(reviewer.getId());
 
-        mockMvc.perform(delete("/api/reviews/{id}", review.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(deleteDTO)))
+        mockMvc.perform(delete("/api/reviews/{id}", review.getId()))
                 .andExpect(status().isNoContent());
     }
 
@@ -298,12 +309,9 @@ class ReviewControllerIT {
         review.setComment("Cannot be deleted by others");
         review = reviewRepository.save(review);
 
-        ReviewDeleteDTO deleteDTO = new ReviewDeleteDTO();
-        deleteDTO.setUserId(otherUser.getId()); // Wrong user!
+        TestSecurityContextHelper.setAuthenticatedUser(otherUser.getId()); // Wrong user!
 
-        mockMvc.perform(delete("/api/reviews/{id}", review.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(deleteDTO)))
+        mockMvc.perform(delete("/api/reviews/{id}", review.getId()))
                 .andExpect(status().isForbidden());
     }
 }

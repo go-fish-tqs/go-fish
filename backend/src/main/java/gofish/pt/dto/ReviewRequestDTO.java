@@ -14,9 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ReviewRequestDTO {
 
-    @NotNull(message = "User ID is required")
-    private Long userId;
-
     @NotNull(message = "Item ID is required")
     private Long itemId;
 

@@ -9,16 +9,20 @@ import gofish.pt.entity.Item;
 import gofish.pt.entity.Review;
 import gofish.pt.entity.User;
 import gofish.pt.mapper.ReviewMapper;
+import gofish.pt.security.TestSecurityContextHelper;
 import gofish.pt.service.ReviewService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -34,6 +38,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ReviewController.class)
+@AutoConfigureMockMvc(addFilters = false)  // Disable security filters for unit tests
+@ActiveProfiles("test")  // Activate test profile to exclude production security config
 class ReviewControllerTest {
 
     @Autowired
@@ -81,10 +87,17 @@ class ReviewControllerTest {
         testResponseDTO.setItemName("Test Item");
     }
 
+    @AfterEach
+    void tearDown() {
+        TestSecurityContextHelper.clearContext();
+    }
+
     @Test
     @DisplayName("POST /api/reviews - Should create review and return 201")
     void createReview_withValidRequest_returnsCreated() throws Exception {
-        ReviewRequestDTO request = new ReviewRequestDTO(1L, 1L, 5, "Great product!");
+        TestSecurityContextHelper.setAuthenticatedUser(1L);
+
+        ReviewRequestDTO request = new ReviewRequestDTO(1L, 5, "Great product!");
 
         when(reviewService.createReview(1L, 1L, 5, "Great product!")).thenReturn(testReview);
         when(reviewMapper.toDTO(testReview)).thenReturn(testResponseDTO);
@@ -104,7 +117,9 @@ class ReviewControllerTest {
     @Test
     @DisplayName("POST /api/reviews - Should return 400 for invalid rating")
     void createReview_withInvalidRating_returnsBadRequest() throws Exception {
-        ReviewRequestDTO request = new ReviewRequestDTO(1L, 1L, 10, "Invalid rating");
+        TestSecurityContextHelper.setAuthenticatedUser(1L);
+
+        ReviewRequestDTO request = new ReviewRequestDTO(1L, 10, "Invalid rating");
 
         mockMvc.perform(post("/api/reviews")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -198,7 +213,9 @@ class ReviewControllerTest {
     @Test
     @DisplayName("PUT /api/reviews/{id} - Should update review")
     void updateReview_withValidRequest_returnsUpdatedReview() throws Exception {
-        ReviewUpdateDTO request = new ReviewUpdateDTO(1L, 4, "Updated comment");
+        TestSecurityContextHelper.setAuthenticatedUser(1L);
+
+        ReviewUpdateDTO request = new ReviewUpdateDTO(4, "Updated comment");
 
         testReview.setRating(4);
         testReview.setComment("Updated comment");
@@ -221,13 +238,11 @@ class ReviewControllerTest {
     @Test
     @DisplayName("DELETE /api/reviews/{id} - Should delete review and return 204")
     void deleteReview_returnsNoContent() throws Exception {
-        ReviewDeleteDTO request = new ReviewDeleteDTO(1L);
+        TestSecurityContextHelper.setAuthenticatedUser(1L);
 
         doNothing().when(reviewService).deleteReview(1L, 1L);
 
-        mockMvc.perform(delete("/api/reviews/{id}", 1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(delete("/api/reviews/{id}", 1))
                 .andExpect(status().isNoContent());
 
         verify(reviewService).deleteReview(1L, 1L);

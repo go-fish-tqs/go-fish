@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ItemsFilterBar from "@/app/items/_components/ItemsFilterBar";
 import ItemsGrid from "@/app/items/_components/ItemsGrid";
+import ProtectedRoute from "../components/ProtectedRoute";
 import {
   Item,
   ItemFilter,
@@ -114,30 +115,32 @@ export default function ItemsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 h-full flex flex-col ">
-      <div className="">
-        <h1 className="text-3xl font-bold mb-8 text-gray-800">
-          Available Gear
-        </h1>
+    <ProtectedRoute>
+      <div className="max-w-7xl mx-auto p-6 h-full flex flex-col ">
+        <div className="">
+          <h1 className="text-3xl font-bold mb-8 text-gray-800">
+            Available Gear
+          </h1>
+        </div>
+        <div className="">
+          <ItemsFilterBar
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
+            onSearch={() => setSearch(searchInput)}
+            material={material}
+            setMaterial={setMaterial}
+            category={category}
+            setCategory={handleCategoryChange}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            flatCategories={flatCategories}
+            availableMaterials={availableMaterials}
+          />
+        </div>
+        <div className="">
+          <ItemsGrid items={items} isLoading={isLoading} isError={isError} />
+        </div>
       </div>
-      <div className="">
-        <ItemsFilterBar
-          searchInput={searchInput}
-          setSearchInput={setSearchInput}
-          onSearch={() => setSearch(searchInput)}
-          material={material}
-          setMaterial={setMaterial}
-          category={category}
-          setCategory={handleCategoryChange}
-          priceRange={priceRange}
-          setPriceRange={setPriceRange}
-          flatCategories={flatCategories}
-          availableMaterials={availableMaterials}
-        />
-      </div>
-      <div className="">
-        <ItemsGrid items={items} isLoading={isLoading} isError={isError} />
-      </div>
-    </div>
+    </ProtectedRoute>
   );
 }
