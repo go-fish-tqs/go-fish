@@ -140,7 +140,7 @@ class ItemControllerIT {
 
     @Test
     void getItemById() throws Exception {
-        mockMvc.perform(get("/api/items/1"))
+        mockMvc.perform(get("/api/items/" + rod.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.name").value("Cana de Surfcasting"));
