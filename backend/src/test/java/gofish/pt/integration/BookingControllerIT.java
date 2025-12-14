@@ -17,7 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 // IMPORTS NECESSÁRIOS PARA SEGURANÇA
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -84,8 +84,9 @@ class BookingControllerIT {
         BookingRequestDTO request = new BookingRequestDTO();
         request.setUserId(renter.getId());
         request.setItemId(kayak.getId());
-        request.setStartDate(LocalDateTime.now().plusDays(10));
-        request.setEndDate(LocalDateTime.now().plusDays(12));
+        // Datas futuras para não dar erro
+        request.setStartDate(LocalDate.now().plusDays(1));
+        request.setEndDate(LocalDate.now().plusDays(2));
 
         // Act & Assert
         mockMvc.perform(post("/api/bookings")
@@ -115,8 +116,8 @@ class BookingControllerIT {
         Booking booking = new Booking();
         booking.setUser(renter);
         booking.setItem(kayak);
-        booking.setStartDate(LocalDateTime.now().plusDays(5));
-        booking.setEndDate(LocalDateTime.now().plusDays(6));
+        booking.setStartDate(LocalDate.now());
+        booking.setEndDate(LocalDate.now());
         booking.setStatus(BookingStatus.PENDING);
         booking = bookingRepository.saveAndFlush(booking);
 
@@ -143,8 +144,8 @@ class BookingControllerIT {
         Booking booking = new Booking();
         booking.setUser(renter);
         booking.setItem(kayak);
-        booking.setStartDate(LocalDateTime.now().plusDays(5));
-        booking.setEndDate(LocalDateTime.now().plusDays(6));
+        booking.setStartDate(LocalDate.now());
+        booking.setEndDate(LocalDate.now());
         booking.setStatus(BookingStatus.PENDING);
         booking = bookingRepository.saveAndFlush(booking);
 

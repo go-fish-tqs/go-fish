@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data // O Lombok faz os getters, setters, etc.
 public class BookingRequestDTO {
@@ -19,9 +19,9 @@ public class BookingRequestDTO {
 
     @NotNull
     @Future(message = "A data de início tem de ser no futuro!")
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @NotNull
     @Future(message = "A data de fim tem de ser no futuro!")
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 }

@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import Link from "next/link";
 import { Item } from "@/app/items/types";
+import { ItemSummary } from "../_components";
 
 export default function BookingPage() {
     const params = useParams();
@@ -21,7 +22,7 @@ export default function BookingPage() {
     } = useQuery({
         queryKey: ["item", itemId],
         queryFn: async () => {
-            const res = await fetch(`${process.env.API_URL}/api/items/${itemId}`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items/${itemId}`);
             if (!res.ok) throw new Error("Failed to fetch item");
             return res.json() as Promise<Item>;
         },
@@ -120,30 +121,7 @@ export default function BookingPage() {
                 <h1 className="text-2xl font-bold text-gray-900 mb-6">Book Item</h1>
 
                 {/* Item Summary */}
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 mb-6">
-                    <div className="flex gap-4">
-                        {item.photoUrls && item.photoUrls.length > 0 ? (
-                            <img
-                                src={item.photoUrls[0]}
-                                alt={item.name}
-                                className="w-24 h-24 object-cover rounded-lg shadow-md"
-                            />
-                        ) : (
-                            <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
-                                <span className="text-gray-400 text-xs">No Image</span>
-                            </div>
-                        )}
-                        <div className="flex-1">
-                            <h2 className="font-semibold text-gray-900">{item.name}</h2>
-                            <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>
-                            {item.price !== undefined && (
-                                <p className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mt-2">
-                                    ${item.price.toFixed(2)} / day
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                <ItemSummary item={item} />
 
                 {/* Booking Form */}
                 <form onSubmit={handleSubmit} className="space-y-6">

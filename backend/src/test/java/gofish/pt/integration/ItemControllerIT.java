@@ -21,7 +21,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -36,10 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class ItemControllerIT {
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
 
     @Autowired
     private ItemRepository itemRepository;
@@ -149,20 +146,49 @@ class ItemControllerIT {
         booking.setStatus(BookingStatus.CONFIRMED);
         bookingRepository.saveAndFlush(booking);
 
-        LocalDate from = LocalDate.now();
+        // 2. Pedir disponibilidade para a próxima semana
+        LocalDate from = LocalDate.now().plusDays(1);
         LocalDate to = LocalDate.now().plusDays(5);
 
-        mockMvc.perform(get("/api/items/{id}/availability", rod.getId())
-                .with(user("qualquer_user")) // Autenticação
-                .param("from", from.toString())
+        // Act & Assert
+        mockMvc.perform(get("/api/items/{id}/unavailability", rod.getId())
+                .param("from", from.toString()) // 2025-XX-XX
                 .param("to", to.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").isNotEmpty());
     }
 
-    @Nested
-    @DisplayName("API Tests for Managing Item Availability")
-    class ManageAvailabilityIT {
+    @Test
+    void getItemById() throws Exception {
+        mockMvc.perform(get("/api/items/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.name").value("Cana de Surfcasting"));
+    }
+
+    @Test
+    void getItemByIdNotFound() throws Exception {
+        mockMvc.perform(get("/api/items/67"))
+                .andExpect(status().isNotFound());
+
+    }
+
+
+    @Test
+    @DisplayName("GET /api/items/categories - Deve devolver apenas categorias de topo")
+    void getCategories() throws Exception {
+        mockMvc.perform(get("/api/items/categories"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", hasSize(7))) // 7 top-level categories
+                .andExpect(jsonPath("$[?(@.id == 'RODS')]").exists())
+                .andExpect(jsonPath("$[?(@.id == 'REELS')]").exists())
+                .andExpect(jsonPath("$[?(@.id == 'COMBOS')]").exists())
+                .andExpect(jsonPath("$[?(@.id == 'ELECTRONICS')]").exists())
+                .andExpect(jsonPath("$[?(@.id == 'APPAREL')]").exists())
+                .andExpect(jsonPath("$[?(@.id == 'ACCESSORIES')]").exists())
+                .andExpect(jsonPath("$[?(@.id == 'BOATS')]").exists());
+    }
 
         @Test
         @DisplayName("POST /items/{itemId}/blocked-dates - Should block dates for owner")

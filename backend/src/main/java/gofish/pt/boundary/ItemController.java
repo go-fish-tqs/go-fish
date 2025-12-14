@@ -19,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException; // Importar
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -70,7 +69,7 @@ public class ItemController {
         return itemService.getMaterials();
     }
 
-    @GetMapping("/{id}/availability")
+    @GetMapping("/{id}/unavailability")
     public ResponseEntity<List<LocalDate>> checkAvailability(
             @PathVariable Long id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,

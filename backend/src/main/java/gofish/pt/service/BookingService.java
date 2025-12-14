@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -49,20 +48,19 @@ public class BookingService {
 
     public List<Booking> getBookingsByItemAndMonth(Long itemId, int year, int month) {
         YearMonth yearMonth = YearMonth.of(year, month);
-        LocalDateTime start = yearMonth.atDay(1).atStartOfDay();
-        LocalDateTime end = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+        LocalDate start = yearMonth.atDay(1);
+        LocalDate end = yearMonth.atEndOfMonth();
         return bookingRepository.findByItemIdAndDateRange(itemId, start, end);
     }
 
     public List<Booking> getBookingsByItemAndWeek(Long itemId, LocalDate weekStart) {
-        LocalDateTime start = weekStart.atStartOfDay();
-        LocalDateTime end = weekStart.plusDays(6).atTime(23, 59, 59);
-        return bookingRepository.findByItemIdAndDateRange(itemId, start, end);
+        LocalDate end = weekStart.plusDays(6);
+        return bookingRepository.findByItemIdAndDateRange(itemId, weekStart, end);
     }
 
     // POST method
 
-    public Booking createBooking(Long userId, Long itemId, LocalDateTime startDate, LocalDateTime endDate) {
+    public Booking createBooking(Long userId, Long itemId, LocalDate startDate, LocalDate endDate) throws IllegalArgumentException {
         // Lógica para criar uma reserva (omiti detalhes para focar na disponibilidade)
         // 1. Validar utilizador e item
         var user = userRepository.findById(userId)
@@ -112,7 +110,7 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
-    public List<LocalDate> checkAvailability(Long itemId, LocalDateTime start, LocalDateTime end) {
+    public List<LocalDate> getUnavailableDates(Long itemId, LocalDate start, LocalDate end) {
         // 1. Validar a entrada
         validateDateRange(start, end);
 
@@ -125,14 +123,13 @@ public class BookingService {
         return calculateUnavailableDates(start.toLocalDate(), end.toLocalDate(), existingBookings, blockedDates);
     }
 
-    private void validateDateRange(LocalDateTime start, LocalDateTime end) {
+    private void validateDateRange(LocalDate start, LocalDate end) {
         if (start.isAfter(end)) {
             throw new IllegalArgumentException("Ó moce, o início nã pode ser depois do fim!");
         }
     }
 
-    private List<Booking> getConflictingBookings(Long itemId, LocalDateTime start, LocalDateTime end) {
-        // Nota: Garante que o teu Repository aceita LocalDateTime, como fizemos antes
+    private List<Booking> getConflictingBookings(Long itemId, LocalDate start, LocalDate end) {
         return bookingRepository.findBookingsInRange(itemId, start, end);
     }
 
@@ -158,8 +155,8 @@ public class BookingService {
     }
 
     private boolean isDateInBookingRange(LocalDate date, Booking booking) {
-        LocalDate bStart = booking.getStartDate().toLocalDate();
-        LocalDate bEnd = booking.getEndDate().toLocalDate();
+        LocalDate bStart = booking.getStartDate();
+        LocalDate bEnd = booking.getEndDate();
 
         // Lógica: !(date < start) && !(date > end) -> está no meio ou nas pontas
         return !date.isBefore(bStart) && !date.isAfter(bEnd);

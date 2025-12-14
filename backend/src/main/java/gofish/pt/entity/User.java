@@ -75,6 +75,7 @@ public class User {
         booking.setUser(this);
     }
 
+    @JsonIgnore
     public List<Booking> getOwnedBookings() {
         return items.stream().map(Item::getBookings)
                 .flatMap(List::stream)
@@ -95,5 +96,9 @@ public class User {
         // Retorna um valor constante ou baseado na classe para evitar problemas com HashSets
         return getClass().hashCode();
     }
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private java.util.List<Review> reviews = new ArrayList<>();
 
 }

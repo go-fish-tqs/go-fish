@@ -32,11 +32,11 @@ export default function ItemsFilterBar({
   availableMaterials,
 }: ItemsFilterBarProps) {
   return (
-    <div className="p-6 bg-white shadow-lg rounded-xl border border-gray-100">
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+    <div className="p-6 mb-8 bg-white shadow-lg rounded-xl border border-gray-100">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* 1. Search */}
         <div className="col-span-1 md:col-span-2">
-          <label className="block pb-2 text-sm font-semibold text-gray-700">
+          <label className="block mb-2 text-sm font-semibold text-gray-700">
             Search
           </label>
           <div className="flex gap-2">
@@ -59,7 +59,7 @@ export default function ItemsFilterBar({
 
         {/* 2. Category Select */}
         <div>
-          <label className="block pb-2 text-sm font-semibold text-gray-700">
+          <label className="block mb-2 text-sm font-semibold text-gray-700">
             Category
           </label>
           <select
@@ -80,7 +80,7 @@ export default function ItemsFilterBar({
 
         {/* 3. Material Select */}
         <div>
-          <label className="block pb-2 text-sm font-semibold text-gray-700">
+          <label className="block mb-2 text-sm font-semibold text-gray-700">
             Material
           </label>
           <select
@@ -99,47 +99,38 @@ export default function ItemsFilterBar({
         </div>
 
         {/* 4. Price Range */}
-        <div className="col-span-1 md:col-span-2">
-          <label className="block pb-2 text-sm font-semibold text-gray-700">
-            Price Range
-          </label>
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                $
-              </span>
-              <input
-                type="number"
-                min={0}
-                max={priceRange[1]}
-                value={priceRange[0]}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  if (val >= 0 && val < priceRange[1])
-                    setPriceRange([val, priceRange[1]]);
-                }}
-                className="w-full border border-gray-300 rounded-lg pl-7 pr-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="Min"
-              />
-            </div>
-            <span className="text-gray-400">–</span>
-            <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                $
-              </span>
-              <input
-                type="number"
-                min={priceRange[0]}
-                max={10000}
-                value={priceRange[1]}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  if (val > priceRange[0]) setPriceRange([priceRange[0], val]);
-                }}
-                className="w-full border border-gray-300 rounded-lg pl-7 pr-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="Max"
-              />
-            </div>
+        <div className="md:col-span-4 mt-2">
+          <div className="flex justify-between mb-2">
+            <label className="text-sm font-semibold text-gray-700">
+              Price Range
+            </label>
+            <span className="text-sm font-medium text-blue-600">
+              ${priceRange[0]} - ${priceRange[1]}
+            </span>
+          </div>
+          <div className="flex items-center gap-6">
+            <input
+              type="range"
+              min={0}
+              max={1000}
+              value={priceRange[0]}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                if (val < priceRange[1]) setPriceRange([val, priceRange[1]]);
+              }}
+              className="w-full accent-blue-600 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            />
+            <input
+              type="range"
+              min={0}
+              max={1000}
+              value={priceRange[1]}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                if (val > priceRange[0]) setPriceRange([priceRange[0], val]);
+              }}
+              className="w-full accent-blue-600 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            />
           </div>
         </div>
       </div>
