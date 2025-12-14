@@ -2,6 +2,7 @@ package gofish.pt.service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -11,14 +12,12 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    // In production, this should be in environment variables
-    private static final String SECRET_KEY = "gofish-secret-key-for-jwt-token-generation-must-be-at-least-256-bits";
     private static final long EXPIRATION_TIME = 86400000; // 24 hours in milliseconds
 
     private final SecretKey key;
 
-    public JwtService() {
-        this.key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+    public JwtService(@Value("${jwt.secret}") String secretKey) {
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(Long userId, String email) {
