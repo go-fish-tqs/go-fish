@@ -1,5 +1,7 @@
 package gofish.pt.boundary;
 
+import gofish.pt.dto.LoginRequestDTO;
+import gofish.pt.dto.LoginResponseDTO;
 import gofish.pt.dto.UserRegistrationDTO;
 import gofish.pt.dto.UserRegistrationResponseDTO;
 import gofish.pt.entity.User;
@@ -22,5 +24,11 @@ public class AuthController {
         User user = userService.registerUser(registrationDTO);
         UserRegistrationResponseDTO response = new UserRegistrationResponseDTO(user.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
+        LoginResponseDTO response = userService.login(loginRequest);
+        return ResponseEntity.ok(response);
     }
 }
