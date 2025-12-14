@@ -29,3 +29,4 @@ deployment/nginx/ssl/
 .dockerignore
 docker-compose.override.yml
 
+deployment/.env.dev
