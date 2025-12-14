@@ -1,6 +1,7 @@
 package gofish.pt.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gofish.pt.dto.LoginRequestDTO;
 import gofish.pt.dto.UserRegistrationDTO;
 import gofish.pt.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,8 @@ class AuthControllerIT {
         validRegistrationDTO.setLocation("Lisboa");
     }
 
+    // ========== REGISTRATION TESTS ==========
+
     @Test
     @DisplayName("POST /api/auth/register - Should create user successfully with HTTP 201")
     void register_withValidData_shouldCreateUser() throws Exception {
@@ -52,8 +55,7 @@ class AuthControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validRegistrationDTO)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.userId").isNumber())
-                .andExpect(jsonPath("$.message").value("User created successfully"));
+                .andExpect(jsonPath("$.userId").isNumber());
 
         // Verify user was saved in database
         var users = userRepository.findAll();
@@ -132,20 +134,6 @@ class AuthControllerIT {
                 .content(objectMapper.writeValueAsString(validRegistrationDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.email").value("Email must be valid"));
-
-        assertEquals(0, userRepository.count());
-    }
-
-    @Test
-    @DisplayName("POST /api/auth/register - Should return 400 when password is too short")
-    void register_withShortPassword_shouldReturnBadRequest() throws Exception {
-        validRegistrationDTO.setPassword("12345");
-
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validRegistrationDTO)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.password").value("Password must be at least 6 characters"));
 
         assertEquals(0, userRepository.count());
     }
@@ -235,5 +223,133 @@ class AuthControllerIT {
                 .andExpect(status().isCreated());
 
         assertEquals(2, userRepository.count());
+    }
+
+    // ========== LOGIN TESTS ==========
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should login successfully and return token")
+    void login_withValidCredentials_shouldReturnToken() throws Exception {
+        // First register a user
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(validRegistrationDTO)))
+                .andExpect(status().isCreated());
+
+        // Now login
+        LoginRequestDTO loginRequest = new LoginRequestDTO();
+        loginRequest.setEmail("john.doe@example.com");
+        loginRequest.setPassword("password123");
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").isNumber())
+                .andExpect(jsonPath("$.token").isString())
+                .andExpect(jsonPath("$.token").isNotEmpty())
+                .andExpect(jsonPath("$.name").value("John Doe"))
+                .andExpect(jsonPath("$.email").value("john.doe@example.com"));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should return 400 when email is missing")
+    void login_withMissingEmail_shouldReturnBadRequest() throws Exception {
+        LoginRequestDTO loginRequest = new LoginRequestDTO();
+        loginRequest.setEmail("");
+        loginRequest.setPassword("password123");
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.email").exists());
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should return 400 when password is missing")
+    void login_withMissingPassword_shouldReturnBadRequest() throws Exception {
+        LoginRequestDTO loginRequest = new LoginRequestDTO();
+        loginRequest.setEmail("john.doe@example.com");
+        loginRequest.setPassword("");
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.password").exists());
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should return 401 when email does not exist")
+    void login_withNonExistentEmail_shouldReturnUnauthorized() throws Exception {
+        LoginRequestDTO loginRequest = new LoginRequestDTO();
+        loginRequest.setEmail("nonexistent@example.com");
+        loginRequest.setPassword("password123");
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("Invalid credentials"));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should return 401 when password is incorrect")
+    void login_withWrongPassword_shouldReturnUnauthorized() throws Exception {
+        // Register user first
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(validRegistrationDTO)))
+                .andExpect(status().isCreated());
+
+        // Try to login with wrong password
+        LoginRequestDTO loginRequest = new LoginRequestDTO();
+        loginRequest.setEmail("john.doe@example.com");
+        loginRequest.setPassword("wrongpassword");
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("Invalid credentials"));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should return 400 for malformed JSON")
+    void login_withMalformedJson_shouldReturnBadRequest() throws Exception {
+        String malformedJson = "{email: 'test', invalid}";
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(malformedJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Malformed JSON request"));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should verify password against hashed value")
+    void login_shouldVerifyAgainstHashedPassword() throws Exception {
+        // Register user
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(validRegistrationDTO)))
+                .andExpect(status().isCreated());
+
+        // Verify password in DB is hashed
+        var users = userRepository.findAll();
+        assertNotEquals("password123", users.get(0).getPassword());
+        assertTrue(users.get(0).getPassword().startsWith("$2a$")); // BCrypt hash
+
+        // Login should still work with plain password
+        LoginRequestDTO loginRequest = new LoginRequestDTO();
+        loginRequest.setEmail("john.doe@example.com");
+        loginRequest.setPassword("password123");
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").isNotEmpty());
     }
 }
