@@ -21,7 +21,7 @@ export default function BookingPage() {
     } = useQuery({
         queryKey: ["item", itemId],
         queryFn: async () => {
-            const res = await fetch(`${process.env.API_URL}/api/items/${itemId}`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items/${itemId}`);
             if (!res.ok) throw new Error("Failed to fetch item");
             return res.json() as Promise<Item>;
         },

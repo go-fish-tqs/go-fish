@@ -35,7 +35,7 @@ export default function BookingCalendar({
         queryKey: ["bookings", itemId, year, month],
         queryFn: async () => {
             const res = await fetch(
-                `${process.env.API_URL}/api/bookings/item/${itemId}/month?year=${year}&month=${month}`
+                `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/item/${itemId}/month?year=${year}&month=${month}`
             );
             if (!res.ok) throw new Error("Failed to fetch bookings");
             return res.json() as Promise<Booking[]>;

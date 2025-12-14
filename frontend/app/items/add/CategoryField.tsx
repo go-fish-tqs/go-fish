@@ -30,7 +30,7 @@ export function CategoryField() {
     const { data: categoryTree = [], isLoading } = useQuery({
         queryKey: ["categories"],
         queryFn: async () => {
-            const res = await fetch(`${process.env.API_URL}/api/items/categories`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items/categories`);
             if (!res.ok) throw new Error("Failed to fetch categories");
             return res.json() as Promise<CategoryNode[]>;
         },

@@ -33,7 +33,7 @@ export function MaterialField() {
     const { data: materialsMap, isLoading } = useQuery({
         queryKey: ["materials"],
         queryFn: async () => {
-            const res = await fetch(`${process.env.API_URL}/api/items/materials`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items/materials`);
             if (!res.ok) throw new Error("Failed to fetch materials");
             return res.json() as Promise<MaterialMap>;
         },
