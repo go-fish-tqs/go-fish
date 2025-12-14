@@ -1,5 +1,6 @@
 package gofish.pt.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -53,10 +54,12 @@ public class Item {
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
+    @JsonIgnoreProperties({"email", "password",  "location", "balance"})
     private User owner;
 
     @OneToMany
     @JoinColumn(name = "item_id")
+    @JsonIgnore
     private List<Booking> bookings = new ArrayList<>();
 
     public void addBooking(Booking booking) {

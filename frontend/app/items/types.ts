@@ -1,12 +1,13 @@
-export type Item = {
-  id: string;
+// types.ts (ou onde tiveres as tuas interfaces)
+export interface Item {
+  id: number;
   name: string;
   description: string;
   material?: string;
   category?: string;
   price?: number;
-  photoUrls?: string[];
-};
+  images?: string[];
+}
 
 export type CategoryNode = {
   id: string;

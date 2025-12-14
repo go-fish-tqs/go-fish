@@ -3,14 +3,15 @@ package gofish.pt.dto;
 import gofish.pt.entity.BookingStatus;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 public class BookingResponseDTO {
 
     private Long id;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private BookingStatus status;
     private Double price; // Vamos calcular isto na hora de converter!
 
