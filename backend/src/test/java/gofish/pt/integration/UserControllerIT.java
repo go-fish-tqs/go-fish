@@ -190,7 +190,7 @@ class UserControllerIT {
     void getUserOwnedBookings_shouldReturnEmptyListWhenNoOwnedItems() throws Exception {
         // Renter has no owned items
         mockMvc.perform(get("/api/users/{id}/owned-bookings", renter.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
