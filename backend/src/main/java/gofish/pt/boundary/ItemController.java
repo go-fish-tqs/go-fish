@@ -82,24 +82,29 @@ public class ItemController {
         return ResponseEntity.ok(blockedDates);
     }
 
+    @GetMapping("/{itemId}/blocked-dates")
+    public ResponseEntity<List<BlockedDate>> getBlockedDates(
+            @PathVariable Long itemId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        
+        List<BlockedDate> blockedDates = itemService.getBlockedDates(itemId, from, to);
+        return ResponseEntity.ok(blockedDates);
+    }
+
     @PostMapping("/{itemId}/blocked-dates")
     public ResponseEntity<BlockedDate> blockDates(
             @PathVariable Long itemId,
             @Valid @RequestBody BlockDateRequestDTO request) {
         
-        // CORREÇÃO: Usar o ID real do utilizador logado
         Long ownerId = getCurrentUserId();
-        
         BlockedDate savedBlockedDate = itemService.blockDateRange(itemId, request, ownerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedBlockedDate);
     }
 
     @DeleteMapping("/blocked-dates/{blockedDateId}")
     public ResponseEntity<Void> unblockDate(@PathVariable Long blockedDateId) {
-        
-        // CORREÇÃO: Usar o ID real do utilizador logado
         Long ownerId = getCurrentUserId();
-        
         itemService.unblockDateRange(blockedDateId, ownerId);
         return ResponseEntity.noContent().build();
     }
@@ -114,13 +119,37 @@ public class ItemController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
         }
 
-        // O .getName() retorna o username (ex: "ze_pescador")
-        String username = authentication.getName();
-
-        // Vamos à base de dados buscar o ID correspondente a este username
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+        // O JWT retorna o userId diretamente como principal
+        Object principal = authentication.getPrincipal();
         
-        return user.getId();
+        try {
+            // Se o principal já é um Long (userId) - usado em produção com JWT
+            if (principal instanceof Long) {
+                return (Long) principal;
+            }
+            
+            // Se for UserDetails (usado em testes com @WithMockUser)
+            if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
+                String username = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
+                User user = userRepository.findByUsername(username)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+                return user.getId();
+            }
+            
+            // Tenta converter String para Long (caso seja o userId como string)
+            String principalStr = principal.toString();
+            try {
+                return Long.parseLong(principalStr);
+            } catch (NumberFormatException e) {
+                // Se não for número, assume que é username
+                User user = userRepository.findByUsername(principalStr)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+                return user.getId();
+            }
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid user authentication: " + e.getMessage());
+        }
     }
 }

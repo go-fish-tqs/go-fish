@@ -106,8 +106,7 @@ class ItemControllerIT {
                 List.of("http://foto.com/1.jpg"),
                 Category.BOATS,
                 Material.FIBERGLASS_BOAT,
-                100.0,
-                owner.getId()
+                100.0
         );
 
         mockMvc.perform(post("/api/items")

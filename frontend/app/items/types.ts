@@ -9,6 +9,11 @@ export interface Item {
   images?: string[];
   photoUrls?: string[];
   available?: boolean;
+  owner?: {
+    id: number;
+    name?: string;
+    email?: string;
+  };
 }
 
 export type CategoryNode = {

@@ -32,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
 @Transactional
-@ActiveProfiles("test")
 class ReviewControllerIT {
 
     @Autowired

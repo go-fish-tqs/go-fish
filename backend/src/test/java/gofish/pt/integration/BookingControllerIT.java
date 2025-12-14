@@ -32,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
 @Transactional
-@ActiveProfiles("test")
 class BookingControllerIT {
 
     @Autowired private MockMvc mockMvc;
@@ -133,7 +132,6 @@ class BookingControllerIT {
         // 2. Preparar DTO de aprovação
         BookingStatusDTO statusDTO = new BookingStatusDTO();
         statusDTO.setStatus(BookingStatus.CONFIRMED);
-        statusDTO.setOwnerId(owner.getId());
 
         // Act & Assert
         mockMvc.perform(patch("/api/bookings/{id}/status", booking.getId())

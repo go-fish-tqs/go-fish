@@ -3,11 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveUserData } from "../lib/auth";
-import { useUser } from "../context/UserContext";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setUser } = useUser();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -75,23 +73,11 @@ export default function LoginPage() {
         
         // Save all user data
         saveUserData({
-          id: data.userId,
-          username: data.name,
-          email: data.email,
-          token: data.token
+          token: data.token,
+          userId: data.userId,
+          userName: data.name,
+          userEmail: data.email
         });
-        
-        // Update context
-        setUser({
-          id: data.userId,
-          username: data.name,
-          email: data.email
-        });
-        // Store auth data in localStorage
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userId", data.userId.toString());
-        localStorage.setItem("userName", data.name);
-        localStorage.setItem("userEmail", data.email);
         
         // Redirect to dashboard
         router.push("/dashboard");

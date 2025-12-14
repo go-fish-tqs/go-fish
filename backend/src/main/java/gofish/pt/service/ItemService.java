@@ -120,6 +120,10 @@ public class ItemService {
         return blockedDateRepository.save(blockedDate);
     }
 
+    public List<BlockedDate> getBlockedDates(Long itemId, LocalDate from, LocalDate to) {
+        return blockedDateRepository.findBlockedDatesInRange(itemId, from, to);
+    }
+
     public void unblockDateRange(Long blockedDateId, Long ownerId) {
         BlockedDate blockedDate = blockedDateRepository.findById(blockedDateId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Blocked date period not found"));
