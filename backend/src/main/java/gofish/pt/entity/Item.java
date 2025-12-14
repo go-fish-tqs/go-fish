@@ -1,16 +1,20 @@
 package gofish.pt.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@Entity(name = "items")
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "items")
 public class Item {
 
     // Attributes
@@ -30,8 +34,8 @@ public class Item {
 
     @ElementCollection
     @CollectionTable(name = "item_photos", joinColumns = @JoinColumn(name = "item_id"))
-    @Column(name = "photo_url", columnDefinition = "CLOB")
-    private List<String> photoUrls;
+    @Column(name = "photo_url", columnDefinition = "TEXT")
+    private List<String> photoUrls = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -46,28 +50,42 @@ public class Item {
     private Double price;
 
     @Column(nullable = false)
-    private Boolean available;
+    private Boolean available = true;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
+    @JsonIgnoreProperties({ "email", "password", "location", "balance" })
+    private User owner;
 
-    // Constructors
+    @OneToMany
+    @JoinColumn(name = "item_id")
+    @JsonIgnore
+    private List<Booking> bookings = new ArrayList<>();
 
-    // item is available by default
-    public Item() {
-        available = true;
+    public void addBooking(Booking booking) {
+        bookings.add(booking);
+        booking.setItem(this); // <--- O SEGREDO ESTÁ AQUI!
     }
 
-    public Item(Long userId, String name, String description, List<String> photoUrls, Material material,
-            Category category, Double price) {
-        this();
-        this.userId = userId;
-        this.name = name;
-        this.description = description;
-        this.photoUrls = photoUrls;
-        this.material = material;
-        this.category = category;
-        this.price = price;
+    public void removeBooking(Booking booking) {
+        bookings.remove(booking);
+        booking.setItem(null);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return getId() != null && getId().equals(item.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+    @OneToMany
+    @JoinColumn(name = "item_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private List<Review> reviews = new java.util.ArrayList<>();
 }

@@ -29,15 +29,12 @@ public class ItemDTO {
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-
     private Category category;
 
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Material material;
 
     @NotNull
     private Double price;
-
-    @NotNull
-    private Long userId;
 }

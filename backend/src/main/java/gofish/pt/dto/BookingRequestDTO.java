@@ -1,0 +1,22 @@
+package gofish.pt.dto;
+
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+import java.time.LocalDate;
+
+@Data
+public class BookingRequestDTO {
+
+    @NotNull(message = "Tens de dizer qual é o item, moce!")
+    private Long itemId;
+
+    @NotNull
+    @Future(message = "A data de início tem de ser no futuro!")
+    private LocalDate startDate;
+
+    @NotNull
+    @Future(message = "A data de fim tem de ser no futuro!")
+    private LocalDate endDate;
+}

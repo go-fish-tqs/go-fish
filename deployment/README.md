@@ -60,15 +60,18 @@ docker compose -f compose.prod.yaml down
 ## 🔧 Development Features
 
 ### Hot Reloading
+
 - **Backend**: Spring Boot DevTools automatically reloads on code changes
 - **Frontend**: Vite/React dev server with HMR (Hot Module Replacement)
 
 ### Debug Ports
+
 - **Backend Debug**: Port 5005 (Java Debug Wire Protocol)
   - Connect your IDE debugger to `localhost:5005`
 - **Frontend**: Port 3000 (main) + 5173 (Vite HMR)
 
 ### Database Access
+
 - **PostgreSQL**: Exposed on `localhost:5432`
   - Database: `gofish_dev`
   - Username: `postgres`
@@ -78,13 +81,16 @@ docker compose -f compose.prod.yaml down
   - Password: `admin`
 
 ### Volume Mounts
+
 Development uses volume mounts for instant code updates:
+
 - Backend: `../backend/src` → `/app/src`
 - Frontend: `../frontend/src` → `/usr/src/app/src`
 
 ## 🏭 Production Features
 
 ### Security
+
 - No exposed database ports (internal network only)
 - No debug ports
 - Minimal error messages
@@ -92,56 +98,57 @@ Development uses volume mounts for instant code updates:
 - Health checks for all services
 
 ### Optimization
+
 - Multi-stage builds for minimal image size
 - Production dependencies only
 - JVM tuning for backend
 - Optimized Node.js production build
 
 ### Monitoring
+
 - Health checks on all services
 - Log rotation (max 10MB, 3 files)
 - Startup probes with grace periods
 
-### Optional Nginx Reverse Proxy
-```bash
-# Start with Nginx proxy
-docker compose -f compose.prod.yaml --profile proxy up -d
-```
-
 ## 🔑 Environment Variables
 
 ### Development (.env.dev)
+
 Pre-configured with safe defaults for local development.
 
 ### Production (.env.prod)
+
 **⚠️ IMPORTANT**: Never commit `.env.prod` to version control!
 
 Required variables:
+
 - `POSTGRES_PASSWORD` - Strong database password
 - `API_URL` - Your production API URL
 
 ## 📊 Service Ports
 
 ### Development
-| Service | Port | Description |
-|---------|------|-------------|
-| Frontend | 3000 | React application |
-| Frontend HMR | 5173 | Vite hot reload |
-| Backend | 8080 | Spring Boot API |
-| Backend Debug | 5005 | Java debugger |
-| PostgreSQL | 5432 | Database |
-| PgAdmin | 5050 | DB admin tool |
+
+| Service       | Port | Description       |
+| ------------- | ---- | ----------------- |
+| Frontend      | 3000 | React application |
+| Frontend HMR  | 5173 | Vite hot reload   |
+| Backend       | 8080 | Spring Boot API   |
+| Backend Debug | 5005 | Java debugger     |
+| PostgreSQL    | 5432 | Database          |
+| PgAdmin       | 5050 | DB admin tool     |
 
 ### Production
-| Service | Port | Description |
-|---------|------|-------------|
+
+| Service  | Port | Description       |
+| -------- | ---- | ----------------- |
 | Frontend | 3000 | React application |
-| Backend | 8080 | Spring Boot API |
-| Nginx | 80/443 | Reverse proxy (optional) |
+| Backend  | 8080 | Spring Boot API   |
 
 ## 🛠️ Common Tasks
 
 ### Rebuild Services
+
 ```bash
 # Development
 docker compose -f compose.dev.yaml build
@@ -152,6 +159,7 @@ docker compose -f compose.prod.yaml build
 ```
 
 ### View Service Logs
+
 ```bash
 # All services
 docker compose -f compose.dev.yaml logs -f
@@ -163,6 +171,7 @@ docker compose -f compose.dev.yaml logs -f db
 ```
 
 ### Execute Commands in Containers
+
 ```bash
 # Backend shell
 docker compose -f compose.dev.yaml exec backend bash
@@ -175,6 +184,7 @@ docker compose -f compose.dev.yaml exec db psql -U postgres -d gofish_dev
 ```
 
 ### Database Operations
+
 ```bash
 # Create database backup
 docker compose -f compose.prod.yaml exec db pg_dump -U postgres gofish_prod > backup.sql
@@ -187,6 +197,7 @@ docker compose -f compose.dev.yaml exec db psql -U postgres -d gofish_dev
 ```
 
 ### Clean Up
+
 ```bash
 # Stop and remove containers
 docker compose -f compose.dev.yaml down
@@ -201,6 +212,7 @@ docker compose -f compose.dev.yaml down -v --rmi all
 ## 🐛 Troubleshooting
 
 ### Port Already in Use
+
 ```bash
 # Find process using port
 sudo lsof -i :8080
@@ -211,6 +223,7 @@ kill -9 <PID>
 ```
 
 ### Database Connection Issues
+
 ```bash
 # Check database health
 docker compose -f compose.dev.yaml ps db
@@ -223,6 +236,7 @@ docker compose -f compose.dev.yaml restart db
 ```
 
 ### Hot Reload Not Working
+
 ```bash
 # Rebuild with no cache
 docker compose -f compose.dev.yaml build --no-cache
@@ -232,6 +246,7 @@ docker compose -f compose.dev.yaml config
 ```
 
 ### Permission Issues
+
 ```bash
 # Fix file permissions
 sudo chown -R $USER:$USER ../backend ../frontend
@@ -240,12 +255,14 @@ sudo chown -R $USER:$USER ../backend ../frontend
 ## 📝 Best Practices
 
 ### Development
+
 1. Always use `compose.dev.yaml` for local development
 2. Don't commit `.env` files with secrets
 3. Use `docker compose down -v` to clean up between major changes
 4. Enable PgAdmin profile when you need database management
 
 ### Production
+
 1. Always set strong passwords in `.env.prod`
 2. Use secrets management (Docker secrets, Vault, etc.)
 3. Enable health checks and monitoring
@@ -256,6 +273,7 @@ sudo chown -R $USER:$USER ../backend ../frontend
 ## 🔄 CI/CD Integration
 
 ### GitHub Actions Example
+
 ```yaml
 - name: Deploy to Production
   run: |

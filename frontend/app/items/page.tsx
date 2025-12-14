@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import ItemsFilterBar from "@/app/ui/ItemsFilterBar";
-import ItemsGrid from "@/app/ui/ItemsGrid";
+import ItemsFilterBar from "@/app/items/_components/ItemsFilterBar";
+import ItemsGrid from "@/app/items/_components/ItemsGrid";
+import ProtectedRoute from "../components/ProtectedRoute";
 import {
   Item,
   ItemFilter,
@@ -42,7 +43,7 @@ export default function ItemsPage() {
     queryKey: ["materials"],
     queryFn: async () => {
       // UPDATED PATH: /api/items/materials
-      const res = await fetch("http://localhost:8080/api/items/materials");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items/materials`);
       if (!res.ok) throw new Error("Failed");
       return res.json() as Promise<MaterialMap>;
     },
@@ -53,7 +54,7 @@ export default function ItemsPage() {
     queryKey: ["categories"],
     queryFn: async () => {
       // UPDATED PATH: /api/items/categories
-      const res = await fetch("http://localhost:8080/api/items/categories");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items/categories`);
       if (!res.ok) throw new Error("Failed");
       return res.json() as Promise<CategoryNode[]>;
     },
@@ -75,7 +76,7 @@ export default function ItemsPage() {
         maxPrice: priceRange[1],
       };
 
-      const res = await fetch("http://localhost:8080/api/items/filter", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items/filter`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(filter),
@@ -114,28 +115,32 @@ export default function ItemsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 h-full space-y-6">
-      <div className="h-1/14">
-        <h1 className="text-3xl font-bold mb-8 text-gray-800">Available Gear</h1>
+    <ProtectedRoute>
+      <div className="max-w-7xl mx-auto p-6 h-full flex flex-col ">
+        <div className="">
+          <h1 className="text-3xl font-bold mb-8 text-gray-800">
+            Available Gear
+          </h1>
+        </div>
+        <div className="">
+          <ItemsFilterBar
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
+            onSearch={() => setSearch(searchInput)}
+            material={material}
+            setMaterial={setMaterial}
+            category={category}
+            setCategory={handleCategoryChange}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            flatCategories={flatCategories}
+            availableMaterials={availableMaterials}
+          />
+        </div>
+        <div className="">
+          <ItemsGrid items={items} isLoading={isLoading} isError={isError} />
+        </div>
       </div>
-      <div className="h-3/14">
-        <ItemsFilterBar
-          searchInput={searchInput}
-          setSearchInput={setSearchInput}
-          onSearch={() => setSearch(searchInput)}
-          material={material}
-          setMaterial={setMaterial}
-          category={category}
-          setCategory={handleCategoryChange}
-          priceRange={priceRange}
-          setPriceRange={setPriceRange}
-          flatCategories={flatCategories}
-          availableMaterials={availableMaterials}
-        />
-      </div>
-      <div className="h-9/14 overflow-y-auto">
-        <ItemsGrid items={items} isLoading={isLoading} isError={isError} />
-      </div>
-    </div>
+    </ProtectedRoute>
   );
 }

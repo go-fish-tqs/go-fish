@@ -30,7 +30,7 @@ ENVIRONMENT:
     prod        Start production environment
 
 OPTIONS:
-    --tools     Start with additional tools (PgAdmin for dev, Nginx for prod)
+    --tools     Start with additional tools (PgAdmin for dev only)
     --down      Stop and remove containers
     --logs      View logs
     --rebuild   Force rebuild images
@@ -40,7 +40,6 @@ EXAMPLES:
     ./deploy.sh dev                 # Start dev environment
     ./deploy.sh dev --tools         # Start dev with PgAdmin
     ./deploy.sh prod                # Start prod environment
-    ./deploy.sh prod --tools        # Start prod with Nginx
     ./deploy.sh dev --down          # Stop dev environment
     ./deploy.sh prod --logs         # View prod logs
 
@@ -62,6 +61,7 @@ case "$1" in
         ENV="dev"
         COMPOSE_FILE="compose.dev.yaml"
         ENV_FILE=".env.dev"
+        PROFILE="--profile monitoring"
         shift
         ;;
     prod)
@@ -85,9 +85,9 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --tools)
             if [ "$ENV" = "dev" ]; then
-                PROFILE="--profile tools"
+                PROFILE="$PROFILE --profile tools"
             else
-                PROFILE="--profile proxy"
+                echo -e "${YELLOW}Warning: --tools flag is only available for dev environment${NC}"
             fi
             shift
             ;;
@@ -100,7 +100,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --rebuild)
-            BUILD="--build --no-cache"
+            BUILD="--build"
             shift
             ;;
         --help|-h)
@@ -136,12 +136,7 @@ case "$ACTION" in
     up)
         echo -e "${GREEN}Starting $ENV environment...${NC}"
         
-        # Load environment file if it exists
-        if [ -f "$ENV_FILE" ]; then
-            export $(grep -v '^#' "$ENV_FILE" | xargs)
-        fi
-        
-        docker compose -f "$COMPOSE_FILE" $PROFILE up $DETACHED $BUILD
+        docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" $PROFILE up $DETACHED $BUILD
         
         echo ""
         echo -e "${GREEN}$ENV environment started!${NC}"
@@ -152,16 +147,15 @@ case "$ACTION" in
             echo "  Frontend:  http://localhost:3000"
             echo "  Backend:   http://localhost:8080"
             echo "  Database:  postgresql://localhost:5432/gofish_dev"
-            if [ -n "$PROFILE" ]; then
+            echo "  Prometheus: http://localhost:9190"
+            echo "  Grafana:    http://localhost:3030"
+            if [[ "$PROFILE" == *"--profile tools"* ]]; then
                 echo "  PgAdmin:   http://localhost:5050"
             fi
         else
             echo "Service URLs:"
             echo "  Frontend:  http://localhost:3000"
             echo "  Backend:   http://localhost:8080"
-            if [ -n "$PROFILE" ]; then
-                echo "  Nginx:     http://localhost:80"
-            fi
         fi
         
         echo ""
