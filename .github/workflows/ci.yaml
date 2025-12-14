@@ -45,7 +45,6 @@ jobs:
           projectKey: "GF"
           testPaths: "backend/target/surefire-reports/*.xml"
           testEnvironments: "CI"
-          testExecKey: "GF-TESTEXEC-001"
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
