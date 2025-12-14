@@ -35,12 +35,10 @@ class UserTest {
         assertThat(u.getBookings()).contains(b);
         assertThat(b.getUser()).isEqualTo(u);
 
-        // removeBooking currently (as implemented) also adds the booking
+        // removeBooking should remove the booking and clear user reference
         u.removeBooking(b);
-        // expect booking to still be present (added twice)
-        assertThat(u.getBookings()).contains(b);
-        assertThat(u.getBookings().size()).isGreaterThanOrEqualTo(1);
-        assertThat(b.getUser()).isEqualTo(u);
+        assertThat(u.getBookings()).doesNotContain(b);
+        assertThat(b.getUser()).isNull();
     }
 
     @Test

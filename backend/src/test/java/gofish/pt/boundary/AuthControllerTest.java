@@ -1,6 +1,7 @@
 package gofish.pt.boundary;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gofish.pt.config.TestSecurityConfig;
 import gofish.pt.dto.LoginRequestDTO;
 import gofish.pt.dto.LoginResponseDTO;
 import gofish.pt.dto.UserRegistrationDTO;
@@ -25,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthController.class)
-@Import(SecurityConfig.class)
+@Import(TestSecurityConfig.class)
 class AuthControllerTest {
 
     @Autowired
