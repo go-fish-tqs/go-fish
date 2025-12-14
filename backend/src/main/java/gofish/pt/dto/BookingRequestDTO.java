@@ -1,10 +1,10 @@
 package gofish.pt.dto;
 
-import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data // O Lombok faz os getters, setters, etc.
 public class BookingRequestDTO {
@@ -18,10 +18,10 @@ public class BookingRequestDTO {
     private Long userId;
 
     @NotNull
-    @FutureOrPresent(message = "A data de início tem de ser hoje ou no futuro!")
-    private LocalDateTime startDate;
+    @Future(message = "A data de início tem de ser no futuro!")
+    private LocalDate startDate;
 
     @NotNull
-    @FutureOrPresent(message = "A data de fim tem de ser hoje ou no futuro!")
-    private LocalDateTime endDate;
+    @Future(message = "A data de fim tem de ser no futuro!")
+    private LocalDate endDate;
 }

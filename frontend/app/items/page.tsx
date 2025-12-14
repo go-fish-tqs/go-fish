@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import ItemsFilterBar from "@/app/items/ItemsFilterBar";
-import ItemsGrid from "@/app/items/ItemsGrid";
+import ItemsFilterBar from "@/app/items/_components/ItemsFilterBar";
+import ItemsGrid from "@/app/items/_components/ItemsGrid";
 import {
   Item,
   ItemFilter,
@@ -114,13 +114,13 @@ export default function ItemsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 h-full flex flex-col gap-6 space-y-6">
-      <div className="h-1/16">
+    <div className="max-w-7xl mx-auto p-6 h-full flex flex-col ">
+      <div className="">
         <h1 className="text-3xl font-bold mb-8 text-gray-800">
           Available Gear
         </h1>
       </div>
-      <div className="h-2/16">
+      <div className="">
         <ItemsFilterBar
           searchInput={searchInput}
           setSearchInput={setSearchInput}
@@ -135,7 +135,7 @@ export default function ItemsPage() {
           availableMaterials={availableMaterials}
         />
       </div>
-      <div className="h-11/16">
+      <div className="">
         <ItemsGrid items={items} isLoading={isLoading} isError={isError} />
       </div>
     </div>

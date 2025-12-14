@@ -21,7 +21,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,8 +50,8 @@ class BookingControllerTest {
     private BookingResponseDTO testResponseDTO;
     private User testUser;
     private Item testItem;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     @BeforeEach
     void setUp() {
@@ -67,8 +66,8 @@ class BookingControllerTest {
         testItem.setName("Test Item");
         testItem.setPrice(25.0);
 
-        startDate = LocalDateTime.now().plusDays(1);
-        endDate = LocalDateTime.now().plusDays(3);
+        startDate = LocalDate.now().plusDays(1);
+        endDate = LocalDate.now().plusDays(3);
 
         testBooking = new Booking();
         testBooking.setId(1L);
@@ -99,7 +98,7 @@ class BookingControllerTest {
         request.setStartDate(startDate);
         request.setEndDate(endDate);
 
-        when(bookingService.createBooking(eq(1L), eq(1L), any(LocalDateTime.class), any(LocalDateTime.class)))
+        when(bookingService.createBooking(eq(1L), eq(1L), any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(testBooking);
         when(bookingMapper.toDTO(testBooking)).thenReturn(testResponseDTO);
 
@@ -110,7 +109,7 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.status").value("PENDING"));
 
-        verify(bookingService).createBooking(eq(1L), eq(1L), any(LocalDateTime.class), any(LocalDateTime.class));
+        verify(bookingService).createBooking(eq(1L), eq(1L), any(LocalDate.class), any(LocalDate.class));
         verify(bookingMapper).toDTO(testBooking);
     }
 

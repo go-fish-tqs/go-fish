@@ -50,7 +50,7 @@ export default function RootLayout({
             }}
           />
           <Sidebar />
-          <main className="flex-1 p-4 h-full">{children}</main>
+          <main className="flex-1 p-4 h-full overflow-y-auto">{children}</main>
         </Providers>
       </body>
     </html>

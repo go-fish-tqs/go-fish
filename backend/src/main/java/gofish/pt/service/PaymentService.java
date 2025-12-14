@@ -134,9 +134,9 @@ public class PaymentService {
             return 0L;
         }
 
-        long days = java.time.Duration.between(
+        long days = java.time.temporal.ChronoUnit.DAYS.between(
                 booking.getStartDate(),
-                booking.getEndDate()).toDays();
+                booking.getEndDate());
 
         if (days < 1)
             days = 1; // Minimum 1 day

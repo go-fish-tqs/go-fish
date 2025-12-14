@@ -19,7 +19,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,8 +66,8 @@ class PaymentServiceTest {
         booking.setUser(renter);
         booking.setItem(item);
         booking.setStatus(BookingStatus.PENDING);
-        booking.setStartDate(LocalDateTime.now().plusDays(1));
-        booking.setEndDate(LocalDateTime.now().plusDays(3));
+        booking.setStartDate(LocalDate.now().plusDays(1));
+        booking.setEndDate(LocalDate.now().plusDays(3));
 
         payment = new Payment();
         payment.setId(1L);
@@ -281,8 +281,8 @@ class PaymentServiceTest {
     @Test
     @DisplayName("Should return minimum 1 day when duration is less than 1 day")
     void calculateBookingAmount_WhenLessThanOneDay_ShouldReturnOneDayPrice() {
-        booking.setStartDate(LocalDateTime.now().plusDays(1));
-        booking.setEndDate(LocalDateTime.now().plusDays(1).plusHours(12));
+        booking.setStartDate(LocalDate.now().plusDays(1));
+        booking.setEndDate(LocalDate.now().plusDays(2));
 
         Long amount = paymentService.calculateBookingAmount(booking);
 

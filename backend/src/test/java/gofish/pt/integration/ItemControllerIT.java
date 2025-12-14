@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -30,17 +29,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional // Garante que faz rollback no fim de cada teste
 class ItemControllerIT {
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
 
-    @Autowired
-    private ItemRepository itemRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private BookingRepository bookingRepository; // Precisamos disto para testar disponibilidade
+    @Autowired private ItemRepository itemRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private BookingRepository bookingRepository; // Precisamos disto para testar disponibilidade
 
     private User owner;
     private Item rod;
@@ -125,17 +119,17 @@ class ItemControllerIT {
         Booking booking = new Booking();
         booking.setItem(rod);
         booking.setUser(owner); // O próprio dono reservou (só para teste)
-        booking.setStartDate(LocalDateTime.now().plusDays(2).withHour(0).withMinute(0)); // Daqui a 2 dias
-        booking.setEndDate(LocalDateTime.now().plusDays(3).withHour(23).withMinute(59)); // Até daqui a 3 dias
+        booking.setStartDate(LocalDate.now().plusDays(2)); // Daqui a 2 dias
+        booking.setEndDate(LocalDate.now().plusDays(3)); // Até daqui a 3 dias
         booking.setStatus(BookingStatus.CONFIRMED);
         bookingRepository.save(booking);
 
         // 2. Pedir disponibilidade para a próxima semana
-        LocalDate from = LocalDate.now();
+        LocalDate from = LocalDate.now().plusDays(1);
         LocalDate to = LocalDate.now().plusDays(5);
 
         // Act & Assert
-        mockMvc.perform(get("/api/items/{id}/availability", rod.getId())
+        mockMvc.perform(get("/api/items/{id}/unavailability", rod.getId())
                 .param("from", from.toString()) // 2025-XX-XX
                 .param("to", to.toString()))
                 .andExpect(status().isOk())
@@ -143,6 +137,22 @@ class ItemControllerIT {
                 // Pode devolver mais se houver dias passados no meio, mas pelo menos esses 2
                 .andExpect(jsonPath("$.length()").isNotEmpty());
     }
+
+    @Test
+    void getItemById() throws Exception {
+        mockMvc.perform(get("/api/items/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.name").value("Cana de Surfcasting"));
+    }
+
+    @Test
+    void getItemByIdNotFound() throws Exception {
+        mockMvc.perform(get("/api/items/67"))
+                .andExpect(status().isNotFound());
+
+    }
+
 
     @Test
     @DisplayName("GET /api/items/categories - Deve devolver apenas categorias de topo")
