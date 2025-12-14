@@ -6,16 +6,11 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
-@Data // O Lombok faz os getters, setters, etc.
+@Data
 public class BookingRequestDTO {
 
     @NotNull(message = "Tens de dizer qual é o item, moce!")
     private Long itemId;
-
-    // Nota: Num sistema real, o userId vem do Token de Login (SecurityContext),
-    // mas se ainda nã tens login, mete aqui para desenrascar.
-    @NotNull(message = "Quem é que vai pagar isto?")
-    private Long userId;
 
     @NotNull
     @Future(message = "A data de início tem de ser no futuro!")

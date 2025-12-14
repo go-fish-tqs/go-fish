@@ -11,6 +11,8 @@ import { CategoryField } from "./_components/CategoryField";
 import { MaterialField } from "./_components/MaterialField";
 import { PriceField } from "./_components/PriceField";
 import { SuccessModal } from "./_components/SuccessModal";
+import ProtectedRoute from "../../components/ProtectedRoute";
+import { getAuthHeaders } from "../../lib/auth";
 
 function ItemForm() {
   const { formData } = useFormContext();
@@ -25,7 +27,6 @@ function ItemForm() {
     }
 
     const itemData = {
-      userId: 1,
       name: formData.name,
       description: formData.description,
       photoUrls: formData.photoUrls,
@@ -39,7 +40,7 @@ function ItemForm() {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(itemData)
             });
 
@@ -109,8 +110,10 @@ function ItemForm() {
 
 export default function AddItemPage() {
   return (
-    <FormProvider>
-      <ItemForm />
-    </FormProvider>
+    <ProtectedRoute>
+      <FormProvider>
+        <ItemForm />
+      </FormProvider>
+    </ProtectedRoute>
   );
 }

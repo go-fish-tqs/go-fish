@@ -8,6 +8,8 @@ import gofish.pt.entity.*;
 import gofish.pt.repository.BookingRepository;
 import gofish.pt.repository.ItemRepository;
 import gofish.pt.repository.UserRepository;
+import gofish.pt.security.TestSecurityContextHelper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
 @Transactional
+@ActiveProfiles("test")
 class BookingControllerIT {
 
     @Autowired private MockMvc mockMvc;
@@ -79,12 +82,18 @@ class BookingControllerIT {
         kayak = itemRepository.saveAndFlush(kayak);
     }
 
+    @AfterEach
+    void tearDown() {
+        TestSecurityContextHelper.clearContext();
+    }
+
     @Test
     @DisplayName("POST /api/bookings - Deve criar reserva PENDING")
     void createBooking() throws Exception {
+        TestSecurityContextHelper.setAuthenticatedUser(renter.getId());
+
         // Arrange
         BookingRequestDTO request = new BookingRequestDTO();
-        request.setUserId(renter.getId());
         request.setItemId(kayak.getId());
         // Datas futuras para não dar erro
         request.setStartDate(LocalDate.now().plusDays(1));
@@ -119,6 +128,8 @@ class BookingControllerIT {
         booking.setStatus(BookingStatus.PENDING);
         booking = bookingRepository.saveAndFlush(booking);
 
+        TestSecurityContextHelper.setAuthenticatedUser(owner.getId()); // Autenticar como dono
+
         // 2. Preparar DTO de aprovação
         BookingStatusDTO statusDTO = new BookingStatusDTO();
         statusDTO.setStatus(BookingStatus.CONFIRMED);
@@ -145,10 +156,11 @@ class BookingControllerIT {
         booking.setStatus(BookingStatus.PENDING);
         booking = bookingRepository.saveAndFlush(booking);
 
-        // 2. O Renter tenta aprovar a própria reserva
+        TestSecurityContextHelper.setAuthenticatedUser(renter.getId()); // ID errado (não é o dono do item)
+
+        // 2. O Renter tenta aprovar a própria reserva (Espertinho!)
         BookingStatusDTO statusDTO = new BookingStatusDTO();
         statusDTO.setStatus(BookingStatus.CONFIRMED);
-        statusDTO.setOwnerId(renter.getId());
 
         // Act & Assert
         mockMvc.perform(patch("/api/bookings/{id}/status", booking.getId())

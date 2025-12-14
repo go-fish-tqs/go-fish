@@ -10,6 +10,7 @@ import gofish.pt.repository.BlockedDateRepository;
 import gofish.pt.repository.BookingRepository;
 import gofish.pt.repository.ItemRepository;
 import gofish.pt.repository.UserRepository;
+import gofish.pt.security.TestSecurityContextHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -96,6 +97,9 @@ class ItemControllerIT {
     @Test
     @DisplayName("POST /api/items - Deve criar um item novo")
     void createItem() throws Exception {
+        // Arrange
+        TestSecurityContextHelper.setAuthenticatedUser(owner.getId());
+        
         ItemDTO dto = new ItemDTO(
                 "Novo Barco",
                 "Barco rápido para pesca em alto mar",
@@ -112,6 +116,8 @@ class ItemControllerIT {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Novo Barco"))
                 .andExpect(header().exists("Location"));
+        
+        TestSecurityContextHelper.clearContext();
     }
 
     @Test

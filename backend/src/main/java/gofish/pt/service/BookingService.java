@@ -68,13 +68,18 @@ public class BookingService {
         var item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
 
-        // 2. Validar disponibilidade
+        // 2. Validar que o utilizador não está a tentar alugar o seu próprio item
+        if (item.getOwner().getId().equals(userId)) {
+            throw new IllegalArgumentException("Não podes alugar a tua própria cana de pesca!");
+        }
+
+        // 3. Validar disponibilidade
         boolean isAvailable = !bookingRepository.existsOverlappingBooking(itemId, startDate, endDate);
         if (!isAvailable) {
             throw new IllegalStateException("Item não disponível nas datas selecionadas");
         }
 
-        // 3. Criar e guardar a reserva
+        // 4. Criar e guardar a reserva
         Booking booking = new Booking();
         booking.setUser(user);
         booking.setItem(item);

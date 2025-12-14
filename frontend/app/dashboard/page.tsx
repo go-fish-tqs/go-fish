@@ -1,7 +1,22 @@
 "use client";
 
 import FeaturedItemCarousel from "./components/FeaturedItemCarousel";
+import ProtectedRoute from "../components/ProtectedRoute";
 import Link from "next/link";
+import { logout } from "../lib/auth";
+import { useState } from "react";
+import toast from "react-hot-toast";
+
+export default function DashboardPage() {
+  const [userName] = useState<string>(
+    typeof window !== 'undefined' ? localStorage.getItem("userName") || "" : ""
+  );
+
+  const handleLogout = () => {
+    toast.success("Logged out successfully");
+    logout();
+  };
+
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -49,6 +64,7 @@ export default function DashboardPage() {
   }
 
   return (
+    <ProtectedRoute>
     <div className="min-h-screen">
       {/* Background gradient */}
       <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
@@ -246,6 +262,7 @@ export default function DashboardPage() {
           </div>
         </section>
       </div>
-    </div>
+      </div>
+    </ProtectedRoute> 
   );
 }
