@@ -2,8 +2,52 @@
 
 import FeaturedItemCarousel from "./components/FeaturedItemCarousel";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userName, setUserName] = useState<string>("");
+
+  useEffect(() => {
+    // Check authentication
+    const token = localStorage.getItem("token");
+    const name = localStorage.getItem("userName");
+
+    if (!token) {
+      toast.error("Please log in to access the dashboard");
+      router.push("/login");
+      return;
+    }
+
+    setIsAuthenticated(true);
+    if (name) {
+      setUserName(name);
+    }
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
+    toast.success("Logged out successfully");
+    router.push("/");
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       {/* Background gradient */}
@@ -18,7 +62,7 @@ export default function DashboardPage() {
           <div>
             <div className="flex items-center gap-3 mb-2">
               <span className="text-sm font-medium text-blue-600 bg-blue-100/80 px-3 py-1 rounded-full">
-                Welcome back
+                Welcome back{userName && `, ${userName}`}
               </span>
               <span className="text-sm text-gray-400">•</span>
               <span className="text-sm text-gray-500">
@@ -32,15 +76,23 @@ export default function DashboardPage() {
               Discover premium gear ready for your next adventure
             </p>
           </div>
-          <Link
-            href="/items"
-            className="hidden md:flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-all duration-300 hover:shadow-lg hover:shadow-gray-900/20 hover:scale-105"
-          >
-            Browse All
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </Link>
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              href="/items"
+              className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-all duration-300 hover:shadow-lg hover:shadow-gray-900/20 hover:scale-105"
+            >
+              Browse All
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-3 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* Featured Carousel Section */}
