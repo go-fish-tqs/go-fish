@@ -61,6 +61,7 @@ case "$1" in
         ENV="dev"
         COMPOSE_FILE="compose.dev.yaml"
         ENV_FILE=".env.dev"
+        PROFILE="--profile monitoring"
         shift
         ;;
     prod)
@@ -84,7 +85,7 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --tools)
             if [ "$ENV" = "dev" ]; then
-                PROFILE="--profile tools"
+                PROFILE="$PROFILE --profile tools"
             else
                 echo -e "${YELLOW}Warning: --tools flag is only available for dev environment${NC}"
             fi
@@ -146,7 +147,9 @@ case "$ACTION" in
             echo "  Frontend:  http://localhost:3000"
             echo "  Backend:   http://localhost:8080"
             echo "  Database:  postgresql://localhost:5432/gofish_dev"
-            if [ -n "$PROFILE" ]; then
+            echo "  Prometheus: http://localhost:9190"
+            echo "  Grafana:    http://localhost:3030"
+            if [[ "$PROFILE" == *"--profile tools"* ]]; then
                 echo "  PgAdmin:   http://localhost:5050"
             fi
         else
