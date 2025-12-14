@@ -1,5 +1,6 @@
 package gofish.pt.integration;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.dto.BookingRequestDTO;
 import gofish.pt.dto.BookingStatusDTO;
@@ -76,6 +77,7 @@ class BookingControllerIT {
 
     @Test
     @DisplayName("POST /api/bookings - Deve criar reserva PENDING")
+    @Requirement("GF-48")
     void createBooking() throws Exception {
         // Arrange
         BookingRequestDTO request = new BookingRequestDTO();
@@ -99,6 +101,7 @@ class BookingControllerIT {
 
     @Test
     @DisplayName("GET /api/bookings/{id} - Deve devolver erro 404 se não existir")
+    @Requirement("GF-95")
     void getBookingNotFound() throws Exception {
         mockMvc.perform(get("/api/bookings/{id}", 9999L))
                 .andExpect(status().isNotFound());
@@ -106,6 +109,7 @@ class BookingControllerIT {
 
     @Test
     @DisplayName("PATCH /api/bookings/{id}/status - Dono aprova reserva")
+    @Requirement("GF-48")
     void updateBookingStatus() throws Exception {
         // 1. Criar uma reserva PENDING na base de dados
         Booking booking = new Booking();
@@ -131,6 +135,7 @@ class BookingControllerIT {
 
     @Test
     @DisplayName("PATCH /api/bookings/{id}/status - Erro se não for o dono")
+    @Requirement("GF-48")
     void updateBookingStatus_SecurityCheck() throws Exception {
         // 1. Criar reserva
         Booking booking = new Booking();

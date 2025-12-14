@@ -1,5 +1,6 @@
 package gofish.pt.boundary;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.dto.ConfirmPaymentDTO;
 import gofish.pt.dto.CreatePaymentIntentDTO;
@@ -53,6 +54,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /api/payments/create-intent - Should create PaymentIntent successfully")
+    @Requirement("GF-69")
     void createPaymentIntent_WithValidRequest_ShouldReturn200() throws Exception {
         when(paymentService.createPaymentIntent(any(CreatePaymentIntentDTO.class)))
                 .thenReturn(paymentIntentResponseDTO);
@@ -86,7 +88,9 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /api/payments/create-intent - Should return 400 for non-pending booking")
+    @Requirement("GF-69")
     void createPaymentIntent_WhenBookingNotPending_ShouldReturn400() throws Exception {
+
         when(paymentService.createPaymentIntent(any(CreatePaymentIntentDTO.class)))
                 .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Cannot process payment for non-pending booking"));
@@ -101,6 +105,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /api/payments/create-intent - Should return 400 when bookingId is null")
+    @Requirement("GF-69")
     void createPaymentIntent_WhenBookingIdNull_ShouldReturn400() throws Exception {
         CreatePaymentIntentDTO invalidDto = new CreatePaymentIntentDTO(null, 5000L, "eur");
 
@@ -114,6 +119,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /api/payments/create-intent - Should return 400 when amount is null")
+    @Requirement("GF-69")
     void createPaymentIntent_WhenAmountNull_ShouldReturn400() throws Exception {
         CreatePaymentIntentDTO invalidDto = new CreatePaymentIntentDTO(1L, null, "eur");
 
@@ -127,6 +133,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /api/payments/create-intent - Should return 400 when amount is negative")
+    @Requirement("GF-69")
     void createPaymentIntent_WhenAmountNegative_ShouldReturn400() throws Exception {
         CreatePaymentIntentDTO invalidDto = new CreatePaymentIntentDTO(1L, -5000L, "eur");
 
@@ -142,6 +149,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /api/payments/confirm - Should confirm payment successfully")
+    @Requirement("GF-69")
     void confirmPayment_WithValidRequest_ShouldReturn200() throws Exception {
         PaymentIntentResponseDTO succeededResponse = new PaymentIntentResponseDTO(
                 "secret_test_123",
@@ -164,6 +172,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /api/payments/confirm - Should return 404 when payment not found")
+    @Requirement("GF-69")
     void confirmPayment_WhenPaymentNotFound_ShouldReturn404() throws Exception {
         when(paymentService.confirmPayment(any(ConfirmPaymentDTO.class)))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment not found"));
@@ -178,6 +187,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /api/payments/confirm - Should return 402 when payment failed")
+    @Requirement("GF-69")
     void confirmPayment_WhenPaymentFailed_ShouldReturn402() throws Exception {
         when(paymentService.confirmPayment(any(ConfirmPaymentDTO.class)))
                 .thenThrow(new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED,
@@ -193,6 +203,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /api/payments/confirm - Should return 400 for Stripe processing error")
+    @Requirement("GF-69")
     void confirmPayment_WhenStripeError_ShouldReturn400() throws Exception {
         when(paymentService.confirmPayment(any(ConfirmPaymentDTO.class)))
                 .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST,

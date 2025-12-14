@@ -1,5 +1,6 @@
 package gofish.pt.boundary;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import gofish.pt.entity.Booking;
 import gofish.pt.entity.Item;
 import gofish.pt.service.UserService;
@@ -43,6 +44,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("GET /api/users/{id}/bookings - Should return user bookings")
+    @Requirement("GF-60")
     void getUserBookings_whenUserExists_returnsBookings() throws Exception {
         Long userId = 1L;
         when(userService.getUserBookings(userId)).thenReturn(List.of(testBooking));
@@ -57,6 +59,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("GET /api/users/{id}/bookings - Should return 404 when user not found")
+    @Requirement("GF-60")
     void getUserBookings_whenUserNotFound_returns404() throws Exception {
         Long userId = 999L;
         when(userService.getUserBookings(userId)).thenThrow(new IllegalArgumentException("User not found"));
@@ -70,6 +73,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("GET /api/users/{id}/owned-bookings - Should return owned bookings")
+    @Requirement("GF-55")
     void getUserOwnedBookings_whenUserExists_returnsOwnedBookings() throws Exception {
         Long userId = 1L;
         when(userService.getUserOwnedBookings(userId)).thenReturn(List.of(testBooking));
@@ -84,6 +88,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("GET /api/users/{id}/owned-bookings - Should return 404 when user not found")
+    @Requirement("GF-55")
     void getUserOwnedBookings_whenUserNotFound_returns404() throws Exception {
         Long userId = 999L;
         when(userService.getUserOwnedBookings(userId)).thenThrow(new IllegalArgumentException("User not found"));
@@ -97,6 +102,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("GET /api/users/{id}/owned-items - Should return owned items")
+    @Requirement("GF-66")
     void getUserOwnedItems_whenUserExists_returnsOwnedItems() throws Exception {
         Long userId = 1L;
         when(userService.getUserOwnedItems(userId)).thenReturn(List.of(testItem));
@@ -112,6 +118,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("GET /api/users/{id}/owned-items - Should return 404 when user not found")
+    @Requirement("GF-66")
     void getUserOwnedItems_whenUserNotFound_returns404() throws Exception {
         Long userId = 999L;
         when(userService.getUserOwnedItems(userId)).thenThrow(new IllegalArgumentException("User not found"));

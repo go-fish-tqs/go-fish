@@ -1,5 +1,6 @@
 package gofish.pt.integration;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.dto.ItemDTO;
 import gofish.pt.dto.ItemFilter;
@@ -69,6 +70,7 @@ class ItemControllerIT {
 
     @Test
     @DisplayName("POST /api/items - Deve criar um item novo")
+    @Requirement("GF-57")
     void createItem() throws Exception {
         // Arrange
         ItemDTO dto = new ItemDTO(
@@ -92,6 +94,7 @@ class ItemControllerIT {
 
     @Test
     @DisplayName("GET /api/items/{id} - Deve devolver o item correto")
+    @Requirement("GF-46")
     void getItem() throws Exception {
         mockMvc.perform(get("/api/items/{id}", rod.getId())) // Passa o ID gerado
                 .andExpect(status().isOk())
@@ -100,6 +103,7 @@ class ItemControllerIT {
 
     @Test
     @DisplayName("POST /api/items/filter - Deve filtrar items")
+    @Requirement("GF-45")
     void filterItems() throws Exception {
         // Filtra por categoria RODS (deve encontrar a cana criada no setUp)
         ItemFilter filter = new ItemFilter(null, Category.RODS, null, null, null, null, null);
@@ -114,6 +118,7 @@ class ItemControllerIT {
 
     @Test
     @DisplayName("GET /api/items/{id}/availability - Deve devolver datas ocupadas")
+    @Requirement("GF-47")
     void checkAvailability() throws Exception {
         // 1. Criar uma reserva CONFIRMADA para "bloquear" uns dias
         Booking booking = new Booking();
@@ -139,6 +144,7 @@ class ItemControllerIT {
     }
 
     @Test
+    @Requirement("GF-46")
     void getItemById() throws Exception {
         Long id = rod.getId();
         mockMvc.perform(get("/api/items/" + id))
@@ -148,6 +154,7 @@ class ItemControllerIT {
     }
 
     @Test
+    @Requirement("GF-46")
     void getItemByIdNotFound() throws Exception {
         mockMvc.perform(get("/api/items/67"))
                 .andExpect(status().isNotFound());

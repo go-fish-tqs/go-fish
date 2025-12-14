@@ -1,5 +1,6 @@
 package gofish.pt.integration;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.dto.LoginRequestDTO;
 import gofish.pt.dto.UserRegistrationDTO;
@@ -50,6 +51,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/register - Should create user successfully with HTTP 201")
+    @Requirement("GF-91")
     void register_withValidData_shouldCreateUser() throws Exception {
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -69,6 +71,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 when name is missing")
+    @Requirement("GF-91")
     void register_withMissingName_shouldReturnBadRequest() throws Exception {
         validRegistrationDTO.setName("");
 
@@ -84,6 +87,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 when email is missing")
+    @Requirement("GF-91")
     void register_withMissingEmail_shouldReturnBadRequest() throws Exception {
         validRegistrationDTO.setEmail("");
 
@@ -98,6 +102,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 when password is missing")
+    @Requirement("GF-91")
     void register_withMissingPassword_shouldReturnBadRequest() throws Exception {
         validRegistrationDTO.setPassword("");
 
@@ -112,6 +117,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 when location is missing")
+    @Requirement("GF-91")
     void register_withMissingLocation_shouldReturnBadRequest() throws Exception {
         validRegistrationDTO.setLocation("");
 
@@ -126,6 +132,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 when email format is invalid")
+    @Requirement("GF-91")
     void register_withInvalidEmailFormat_shouldReturnBadRequest() throws Exception {
         validRegistrationDTO.setEmail("invalid-email");
 
@@ -140,6 +147,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 409 when email already exists")
+    @Requirement("GF-91")
     void register_withDuplicateEmail_shouldReturnConflict() throws Exception {
         // First registration
         mockMvc.perform(post("/api/auth/register")
@@ -168,6 +176,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 for malformed JSON")
+    @Requirement("GF-91")
     void register_withMalformedJson_shouldReturnBadRequest() throws Exception {
         String malformedJson = "{name: 'John', invalid}";
 
@@ -182,6 +191,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 when all fields are missing")
+    @Requirement("GF-91")
     void register_withAllFieldsMissing_shouldReturnBadRequest() throws Exception {
         UserRegistrationDTO emptyDTO = new UserRegistrationDTO();
         emptyDTO.setName("");
@@ -203,6 +213,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/register - Multiple valid registrations should work")
+    @Requirement("GF-91")
     void register_multipleUsers_shouldCreateAll() throws Exception {
         // First user
         mockMvc.perform(post("/api/auth/register")
@@ -229,6 +240,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/login - Should login successfully and return token")
+    @Requirement("GF-93")
     void login_withValidCredentials_shouldReturnToken() throws Exception {
         // First register a user
         mockMvc.perform(post("/api/auth/register")
@@ -254,6 +266,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/login - Should return 400 when email is missing")
+    @Requirement("GF-93")
     void login_withMissingEmail_shouldReturnBadRequest() throws Exception {
         LoginRequestDTO loginRequest = new LoginRequestDTO();
         loginRequest.setEmail("");
@@ -268,6 +281,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/login - Should return 400 when password is missing")
+    @Requirement("GF-93")
     void login_withMissingPassword_shouldReturnBadRequest() throws Exception {
         LoginRequestDTO loginRequest = new LoginRequestDTO();
         loginRequest.setEmail("john.doe@example.com");
@@ -282,6 +296,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/login - Should return 401 when email does not exist")
+    @Requirement("GF-93")
     void login_withNonExistentEmail_shouldReturnUnauthorized() throws Exception {
         LoginRequestDTO loginRequest = new LoginRequestDTO();
         loginRequest.setEmail("nonexistent@example.com");
@@ -296,6 +311,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/login - Should return 401 when password is incorrect")
+    @Requirement("GF-93")
     void login_withWrongPassword_shouldReturnUnauthorized() throws Exception {
         // Register user first
         mockMvc.perform(post("/api/auth/register")
@@ -317,6 +333,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/login - Should return 400 for malformed JSON")
+    @Requirement("GF-93")
     void login_withMalformedJson_shouldReturnBadRequest() throws Exception {
         String malformedJson = "{email: 'test', invalid}";
 
@@ -329,6 +346,7 @@ class AuthControllerIT {
 
     @Test
     @DisplayName("POST /api/auth/login - Should verify password against hashed value")
+    @Requirement("GF-93")
     void login_shouldVerifyAgainstHashedPassword() throws Exception {
         // Register user
         mockMvc.perform(post("/api/auth/register")

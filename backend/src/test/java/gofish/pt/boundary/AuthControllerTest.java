@@ -1,5 +1,6 @@
 package gofish.pt.boundary;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.dto.LoginRequestDTO;
 import gofish.pt.dto.LoginResponseDTO;
@@ -71,6 +72,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/register - Should create user and return 201")
+    @Requirement("GF-91")
     void register_withValidData_shouldReturnCreated() throws Exception {
         when(userService.registerUser(any(UserRegistrationDTO.class))).thenReturn(testUser);
 
@@ -85,6 +87,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 when name is missing")
+    @Requirement("GF-91")
     void register_withMissingName_shouldReturnBadRequest() throws Exception {
         validRegistrationDTO.setName("");
 
@@ -99,6 +102,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 when email is missing")
+    @Requirement("GF-91")
     void register_withMissingEmail_shouldReturnBadRequest() throws Exception {
         validRegistrationDTO.setEmail("");
 
@@ -113,6 +117,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 when password is missing")
+    @Requirement("GF-91")
     void register_withMissingPassword_shouldReturnBadRequest() throws Exception {
         validRegistrationDTO.setPassword("");
 
@@ -127,6 +132,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 when location is missing")
+    @Requirement("GF-91")
     void register_withMissingLocation_shouldReturnBadRequest() throws Exception {
         validRegistrationDTO.setLocation("");
 
@@ -141,6 +147,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 when email format is invalid")
+    @Requirement("GF-91")
     void register_withInvalidEmail_shouldReturnBadRequest() throws Exception {
         validRegistrationDTO.setEmail("invalid-email");
 
@@ -155,6 +162,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 409 when email already exists")
+    @Requirement("GF-91")
     void register_withDuplicateEmail_shouldReturnConflict() throws Exception {
         when(userService.registerUser(any(UserRegistrationDTO.class)))
                 .thenThrow(new DuplicateEmailException("Email already in use"));
@@ -170,6 +178,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/register - Should return 400 for malformed JSON")
+    @Requirement("GF-91")
     void register_withMalformedJson_shouldReturnBadRequest() throws Exception {
         String malformedJson = "{name: 'John', invalid}";
 
@@ -186,6 +195,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/login - Should login successfully with valid credentials")
+    @Requirement("GF-93")
     void login_withValidCredentials_shouldReturn200() throws Exception {
         when(userService.login(any(LoginRequestDTO.class))).thenReturn(loginResponse);
 
@@ -203,6 +213,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/login - Should return 400 when email is missing")
+    @Requirement("GF-93")
     void login_withMissingEmail_shouldReturnBadRequest() throws Exception {
         validLoginRequest.setEmail("");
 
@@ -217,6 +228,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/login - Should return 400 when password is missing")
+    @Requirement("GF-93")
     void login_withMissingPassword_shouldReturnBadRequest() throws Exception {
         validLoginRequest.setPassword("");
 
@@ -231,6 +243,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/login - Should return 401 with invalid credentials")
+    @Requirement("GF-93")
     void login_withInvalidCredentials_shouldReturnUnauthorized() throws Exception {
         when(userService.login(any(LoginRequestDTO.class)))
                 .thenThrow(new InvalidCredentialsException("Invalid credentials"));
@@ -246,6 +259,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/login - Should return 400 for malformed JSON")
+    @Requirement("GF-93")
     void login_withMalformedJson_shouldReturnBadRequest() throws Exception {
         String malformedJson = "{email: 'test', invalid}";
 

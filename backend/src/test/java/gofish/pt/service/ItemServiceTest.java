@@ -1,5 +1,6 @@
 package gofish.pt.service;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import gofish.pt.dto.ItemDTO;
 import gofish.pt.dto.ItemFilter;
 import gofish.pt.entity.Category;
@@ -50,11 +51,13 @@ class ItemServiceTest {
     }
 
     @Test
+    @Requirement("GF-42")
     void repositoryStartsEmpty() {
         assertThat(itemService.findAll()).isEmpty();
     }
 
     @Test
+    @Requirement("GF-46")
     void findById() {
         when(repository.findById(1L)).thenReturn(Optional.of(i1));
         when(repository.findById(2L)).thenReturn(Optional.of(i2));
@@ -66,12 +69,14 @@ class ItemServiceTest {
     }
 
     @Test
+    @Requirement("GF-42")
     void findAll() {
         when(repository.findAll()).thenReturn(List.of(i1, i2));
         assertThat(itemService.findAll()).hasSize(2);
     }
 
     @Test
+    @Requirement("GF-57")
     void save() {
         when(itemMapper.toEntity(dto1)).thenReturn(i1);
         when(repository.save(i1)).thenReturn(i1);
@@ -80,6 +85,7 @@ class ItemServiceTest {
     }
 
     @Test
+    @Requirement("GF-57")
     void saveReturnsNullWhenMapperReturnsNull() {
         when(itemMapper.toEntity(any(ItemDTO.class))).thenReturn(null);
 
@@ -106,6 +112,7 @@ class ItemServiceTest {
     }
 
     @Test
+    @Requirement("GF-42")
     void findAllSpecWithDefaultSort() {
         List<Item> mockedResult = List.of(i1, i2);
 
@@ -123,6 +130,7 @@ class ItemServiceTest {
     }
 
     @Test
+    @Requirement("GF-42")
     void findAllWithSort() {
         List<Item> mockedResult = List.of(i1, i2);
         ItemFilter filter = new ItemFilter(null, null, null, null, null, "price", Sort.Direction.DESC);

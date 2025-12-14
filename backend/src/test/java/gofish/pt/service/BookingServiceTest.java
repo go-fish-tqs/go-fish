@@ -1,5 +1,6 @@
 package gofish.pt.service;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import gofish.pt.entity.*;
 import gofish.pt.repository.BookingRepository;
 import gofish.pt.repository.ItemRepository;
@@ -71,6 +72,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Deve criar reserva com sucesso quando tudo está livre")
+    @Requirement("GF-48")
     void shouldCreateBooking_WhenAvailable() {
         // Arrange (Preparar o terreno)
         LocalDate start = LocalDate.now().plusDays(5);
@@ -97,6 +99,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Deve lançar erro se o item já estiver ocupado")
+    @Requirement("GF-51")
     void shouldThrowError_WhenItemIsOccupied() {
         LocalDate start = LocalDate.now().plusDays(5);
         LocalDate end = LocalDate.now().plusDays(7);
@@ -120,6 +123,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Dono deve conseguir confirmar uma reserva pendente")
+    @Requirement("GF-48")
     void ownerShouldConfirmBooking() {
         // Arrange
         when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
@@ -134,6 +138,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Deve lançar erro se quem tenta confirmar não for o dono")
+    @Requirement("GF-48")
     void shouldThrowError_WhenNonOwnerTriesToConfirm() {
         // Arrange
         when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
@@ -145,6 +150,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Não deve deixar alterar uma reserva que já foi aceite")
+    @Requirement("GF-48")
     void shouldThrowError_WhenUpdatingConfirmedBooking() {
         // Arrange
         booking.setStatus(BookingStatus.CONFIRMED); // Já está aceite
@@ -160,6 +166,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Deve devolver lista de dias ocupados + dias passados")
+    @Requirement("GF-49")
     void shouldReturnUnavailableDates() {
         // Arrange
         LocalDate today = LocalDate.now();
@@ -193,6 +200,7 @@ class BookingServiceTest {
 
     @Test
     @DisplayName("Deve lançar erro se data de fim for antes da de início")
+    @Requirement("GF-49")
     void shouldThrowError_WhenDatesAreInverted() {
         LocalDate start = LocalDate.now().plusDays(5);
         LocalDate end = LocalDate.now().plusDays(2); // Fim antes do início

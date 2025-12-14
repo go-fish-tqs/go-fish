@@ -1,5 +1,6 @@
 package gofish.pt.boundary;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import gofish.pt.dto.BookingRequestDTO;
@@ -91,6 +92,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("POST /api/bookings - Should create booking and return 201")
+    @Requirement("GF-48")
     void createBooking_withValidRequest_returnsCreated() throws Exception {
         BookingRequestDTO request = new BookingRequestDTO();
         request.setUserId(1L);
@@ -115,6 +117,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("GET /api/bookings/{id} - Should return booking when found")
+    @Requirement("GF-95")
     void getBooking_whenExists_returnsBooking() throws Exception {
         when(bookingService.getBooking(1L)).thenReturn(Optional.of(testBooking));
         when(bookingMapper.toDTO(testBooking)).thenReturn(testResponseDTO);
@@ -129,6 +132,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("GET /api/bookings/{id} - Should return 404 when not found")
+    @Requirement("GF-95")
     void getBooking_whenNotExists_returns404() throws Exception {
         when(bookingService.getBooking(999L)).thenReturn(Optional.empty());
 
@@ -140,6 +144,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("PATCH /api/bookings/{id}/status - Should update booking status")
+    @Requirement("GF-48")
     void updateStatus_withValidRequest_returnsUpdatedBooking() throws Exception {
         BookingStatusDTO statusDto = new BookingStatusDTO();
         statusDto.setStatus(BookingStatus.CONFIRMED);
@@ -162,6 +167,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("GET /api/bookings/item/{itemId}/month - Should return bookings for month")
+    @Requirement("GF-49")
     void getBookingsByMonth_returnsBookingsList() throws Exception {
         when(bookingService.getBookingsByItemAndMonth(1L, 2024, 12)).thenReturn(List.of(testBooking));
         when(bookingMapper.toDTO(testBooking)).thenReturn(testResponseDTO);
@@ -178,6 +184,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("GET /api/bookings/item/{itemId}/week - Should return bookings for week")
+    @Requirement("GF-49")
     void getBookingsByWeek_returnsBookingsList() throws Exception {
         LocalDate weekStart = LocalDate.of(2024, 12, 9);
 
@@ -195,6 +202,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("GET /api/bookings/item/{itemId}/month - Should return empty list when no bookings")
+    @Requirement("GF-49")
     void getBookingsByMonth_whenNoBookings_returnsEmptyList() throws Exception {
         when(bookingService.getBookingsByItemAndMonth(1L, 2024, 1)).thenReturn(List.of());
 

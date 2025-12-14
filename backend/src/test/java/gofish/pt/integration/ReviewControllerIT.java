@@ -1,5 +1,6 @@
 package gofish.pt.integration;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.dto.ReviewDeleteDTO;
 import gofish.pt.dto.ReviewRequestDTO;
@@ -81,6 +82,7 @@ class ReviewControllerIT {
 
     @Test
     @DisplayName("POST /api/reviews - Should create review with status 201")
+    @Requirement("GF-64")
     void createReview() throws Exception {
         ReviewRequestDTO request = new ReviewRequestDTO();
         request.setUserId(reviewer.getId());
@@ -100,6 +102,7 @@ class ReviewControllerIT {
 
     @Test
     @DisplayName("POST /api/reviews - Should return 409 for duplicate review")
+    @Requirement("GF-64")
     void createDuplicateReview() throws Exception {
         // Create first review directly
         Review existing = new Review();
@@ -124,6 +127,7 @@ class ReviewControllerIT {
 
     @Test
     @DisplayName("POST /api/reviews - Should return 400 for invalid rating")
+    @Requirement("GF-64")
     void createReview_InvalidRating() throws Exception {
         ReviewRequestDTO request = new ReviewRequestDTO();
         request.setUserId(reviewer.getId());
@@ -139,6 +143,7 @@ class ReviewControllerIT {
 
     @Test
     @DisplayName("GET /api/reviews/{id} - Should return review")
+    @Requirement("GF-68")
     void getReview() throws Exception {
         Review review = new Review();
         review.setUser(reviewer);
@@ -155,6 +160,7 @@ class ReviewControllerIT {
 
     @Test
     @DisplayName("GET /api/reviews/{id} - Should return 404 if not found")
+    @Requirement("GF-68")
     void getReviewNotFound() throws Exception {
         mockMvc.perform(get("/api/reviews/{id}", 9999L))
                 .andExpect(status().isNotFound());
@@ -162,6 +168,7 @@ class ReviewControllerIT {
 
     @Test
     @DisplayName("GET /api/reviews/item/{itemId} - Should return paginated reviews")
+    @Requirement("GF-68")
     void getReviewsByItem() throws Exception {
         // Create multiple reviews
         Review r1 = new Review();
@@ -188,6 +195,7 @@ class ReviewControllerIT {
 
     @Test
     @DisplayName("GET /api/reviews/user/{userId} - Should return user's reviews")
+    @Requirement("GF-68")
     void getReviewsByUser() throws Exception {
         Review review = new Review();
         review.setUser(reviewer);
@@ -206,6 +214,7 @@ class ReviewControllerIT {
 
     @Test
     @DisplayName("GET /api/reviews/item/{itemId}/rating - Should return average rating")
+    @Requirement("GF-68")
     void getAverageRating() throws Exception {
         // Create reviews with different ratings
         Review r1 = new Review();
@@ -227,6 +236,7 @@ class ReviewControllerIT {
 
     @Test
     @DisplayName("PUT /api/reviews/{id} - Author should update review")
+    @Requirement("GF-64")
     void updateReview() throws Exception {
         Review review = new Review();
         review.setUser(reviewer);
@@ -250,6 +260,7 @@ class ReviewControllerIT {
 
     @Test
     @DisplayName("PUT /api/reviews/{id} - Should return 403 when non-author tries to update")
+    @Requirement("GF-64")
     void updateReview_NonAuthor() throws Exception {
         Review review = new Review();
         review.setUser(reviewer);
@@ -271,6 +282,7 @@ class ReviewControllerIT {
 
     @Test
     @DisplayName("DELETE /api/reviews/{id} - Author should delete review")
+    @Requirement("GF-64")
     void deleteReview() throws Exception {
         Review review = new Review();
         review.setUser(reviewer);
@@ -290,6 +302,7 @@ class ReviewControllerIT {
 
     @Test
     @DisplayName("DELETE /api/reviews/{id} - Should return 403 when non-author tries to delete")
+    @Requirement("GF-64")
     void deleteReview_NonAuthor() throws Exception {
         Review review = new Review();
         review.setUser(reviewer);

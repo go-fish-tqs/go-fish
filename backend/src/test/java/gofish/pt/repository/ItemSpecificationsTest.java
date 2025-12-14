@@ -1,5 +1,6 @@
 package gofish.pt.repository;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
 import gofish.pt.entity.Material;
@@ -79,6 +80,7 @@ class ItemSpecificationsTest {
     }
 
     @Test
+    @Requirement("GF-45")
     void filterByCategory() {
         spec = categoryIs(Category.RODS);
 
@@ -89,6 +91,7 @@ class ItemSpecificationsTest {
     }
 
     @Test
+    @Requirement("GF-44")
     void filterByName() {
         spec = nameContains("fishing");
         result = itemRepository.findAll(spec);
@@ -102,6 +105,7 @@ class ItemSpecificationsTest {
     }
 
     @Test
+    @Requirement("GF-45")
     void filterByMaterial() {
         spec = materialIs(Material.CARBON_FIBER);
         result = itemRepository.findAll(spec);
@@ -110,6 +114,7 @@ class ItemSpecificationsTest {
     }
 
     @Test
+    @Requirement("GF-45")
     void filterByMultipleConditions() {
         spec = Specification.allOf(nameContains("fishing"), priceBetween(10d, 20d), availableIs(true));
         result = itemRepository.findAll(spec);
@@ -118,6 +123,7 @@ class ItemSpecificationsTest {
     }
 
     @Test
+    @Requirement("GF-42")
     void sortByPrice() {
         spec = null;
         sort = Sort.by(Sort.Direction.DESC, "price");
@@ -127,6 +133,7 @@ class ItemSpecificationsTest {
     }
 
     @Test
+    @Requirement("GF-42")
     void findAllWhenNull() {
         spec = null;
         assertThat(itemRepository.findAll(spec)).isEqualTo(itemRepository.findAll());

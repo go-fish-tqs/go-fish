@@ -1,5 +1,6 @@
 package gofish.pt.integration;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.entity.*;
 import gofish.pt.repository.BookingRepository;
@@ -129,6 +130,7 @@ class UserControllerIT {
 
     @Test
     @DisplayName("GET /api/users/{id}/bookings - Should return all bookings for a user")
+    @Requirement("GF-60")
     void getUserBookings_shouldReturnBookingsWhenUserExists() throws Exception {
         mockMvc.perform(get("/api/users/{id}/bookings", renter.getId())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -140,6 +142,7 @@ class UserControllerIT {
 
     @Test
     @DisplayName("GET /api/users/{id}/bookings - Should return 404 when user not found")
+    @Requirement("GF-60")
     void getUserBookings_shouldReturn404WhenUserNotFound() throws Exception {
         mockMvc.perform(get("/api/users/{id}/bookings", 9999L)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -149,6 +152,7 @@ class UserControllerIT {
 
     @Test
     @DisplayName("GET /api/users/{id}/bookings - Should return empty list when user has no bookings")
+    @Requirement("GF-60")
     void getUserBookings_shouldReturnEmptyListWhenNoBookings() throws Exception {
         // Create a new user with no bookings
         User noBookingUser = new User();
@@ -167,6 +171,7 @@ class UserControllerIT {
 
     @Test
     @DisplayName("GET /api/users/{id}/owned-bookings - Should return all bookings for owned items")
+    @Requirement("GF-55")
     void getUserOwnedBookings_shouldReturnOwnedBookingsWhenUserIsOwner() throws Exception {
         mockMvc.perform(get("/api/users/{id}/owned-bookings", owner.getId())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -178,6 +183,7 @@ class UserControllerIT {
 
     @Test
     @DisplayName("GET /api/users/{id}/owned-bookings - Should return 404 when user not found")
+    @Requirement("GF-55")
     void getUserOwnedBookings_shouldReturn404WhenUserNotFound() throws Exception {
         mockMvc.perform(get("/api/users/{id}/owned-bookings", 9999L)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -187,6 +193,7 @@ class UserControllerIT {
 
     @Test
     @DisplayName("GET /api/users/{id}/owned-bookings - Should return empty list when user has no items")
+    @Requirement("GF-55")
     void getUserOwnedBookings_shouldReturnEmptyListWhenNoOwnedItems() throws Exception {
         // Renter has no owned items
         mockMvc.perform(get("/api/users/{id}/owned-bookings", renter.getId())
@@ -197,6 +204,7 @@ class UserControllerIT {
 
     @Test
     @DisplayName("GET /api/users/{id}/owned-items - Should return all items owned by user")
+    @Requirement("GF-66")
     void getUserOwnedItems_shouldReturnOwnedItemsWhenUserIsOwner() throws Exception {
         mockMvc.perform(get("/api/users/{id}/owned-items", owner.getId())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -208,6 +216,7 @@ class UserControllerIT {
 
     @Test
     @DisplayName("GET /api/users/{id}/owned-items - Should return 404 when user not found")
+    @Requirement("GF-66")
     void getUserOwnedItems_shouldReturn404WhenUserNotFound() throws Exception {
         mockMvc.perform(get("/api/users/{id}/owned-items", 9999L)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -217,6 +226,7 @@ class UserControllerIT {
 
     @Test
     @DisplayName("GET /api/users/{id}/owned-items - Should return empty list when user owns no items")
+    @Requirement("GF-66")
     void getUserOwnedItems_shouldReturnEmptyListWhenNoOwnedItems() throws Exception {
         mockMvc.perform(get("/api/users/{id}/owned-items", renter.getId())
                         .contentType(MediaType.APPLICATION_JSON))
