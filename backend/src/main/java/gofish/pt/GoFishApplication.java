@@ -15,7 +15,8 @@ public class GoFishApplication {
     }
 
     @Bean
-    MeterRegistryCustomizer<MeterRegistry> metricsCommonTags(@Value("${spring.application.name}") String appName) {
+    MeterRegistryCustomizer<MeterRegistry> metricsCommonTags(
+            @Value("${spring.application.name:GoFish}") String appName) {
         return registry -> registry.config().commonTags("application", appName);
     }
 

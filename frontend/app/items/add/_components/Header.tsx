@@ -2,7 +2,7 @@
 
 export function Header() {
     return (
-        <div className="mb-8 border-b border-gray-200 dark:border-gray-700 pb-6">
+        <div className="mb-8 border-b border-gray-200 dark:border-gray-700 pb-6 max-h-20">
             <div className="flex items-center gap-4 mb-3">
                 <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
                     <svg
