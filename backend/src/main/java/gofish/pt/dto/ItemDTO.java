@@ -37,7 +37,4 @@ public class ItemDTO {
 
     @NotNull
     private Double price;
-
-    @NotNull
-    private Long userId;
 }

@@ -12,8 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,6 +28,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ItemController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 class ItemControllerTest {
 
     @Autowired
@@ -60,8 +64,7 @@ class ItemControllerTest {
                 List.of("http://example.com/photo.jpg"),
                 Category.RODS,
                 Material.GRAPHITE,
-                25.99,
-                1L);
+                25.99);
     }
 
     @Test
