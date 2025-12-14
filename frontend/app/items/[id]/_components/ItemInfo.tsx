@@ -17,7 +17,7 @@ export default function ItemInfo({ item }: ItemInfoProps) {
             {new Intl.NumberFormat("pt-PT", {
               style: "currency",
               currency: "EUR",
-            }).format(item.price)}
+            }).format(item.price ?? 0)}
           </span>
           {!item.available && (
             <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
@@ -62,10 +62,9 @@ export default function ItemInfo({ item }: ItemInfoProps) {
         <button
           disabled={!item.available}
           className={`w-full flex items-center justify-center rounded-md px-8 py-3 text-base font-medium text-white 
-            ${
-              item.available
-                ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
-                : "bg-gray-400 cursor-not-allowed"
+            ${item.available
+              ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
+              : "bg-gray-400 cursor-not-allowed"
             }`}
         >
           {item.available ? "Request booking" : "Unavailable"}

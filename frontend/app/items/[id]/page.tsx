@@ -64,7 +64,7 @@ export default function ItemPage({ params }: PageProps) {
         Back to Items
       </Link>
       <div className="grid gap-6 lg:gap-8 lg:grid-cols-2 items-start">
-        <ItemGallery images={item.photoUrls} name={item.name} />
+        <ItemGallery images={item.photoUrls || []} name={item.name} />
         <ItemInfo item={item} />
       </div>
     </div>

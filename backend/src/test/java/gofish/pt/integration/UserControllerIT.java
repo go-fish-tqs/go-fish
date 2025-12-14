@@ -1,7 +1,6 @@
 package gofish.pt.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xpandit.xray.junit.annotations.XrayTest;
 import gofish.pt.entity.*;
 import gofish.pt.repository.BookingRepository;
 import gofish.pt.repository.ItemRepository;
@@ -129,11 +128,10 @@ class UserControllerIT {
     }
 
     @Test
-    @XrayTest("GF-01")
     @DisplayName("GET /api/users/{id}/bookings - Should return all bookings for a user")
     void getUserBookings_shouldReturnBookingsWhenUserExists() throws Exception {
         mockMvc.perform(get("/api/users/{id}/bookings", renter.getId())
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id").value(ownedBooking.getId()))
@@ -141,17 +139,15 @@ class UserControllerIT {
     }
 
     @Test
-    @XrayTest("GF-02")
     @DisplayName("GET /api/users/{id}/bookings - Should return 404 when user not found")
     void getUserBookings_shouldReturn404WhenUserNotFound() throws Exception {
         mockMvc.perform(get("/api/users/{id}/bookings", 9999L)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User not found with id: 9999"));
     }
 
     @Test
-    @XrayTest("GF-03")
     @DisplayName("GET /api/users/{id}/bookings - Should return empty list when user has no bookings")
     void getUserBookings_shouldReturnEmptyListWhenNoBookings() throws Exception {
         // Create a new user with no bookings
@@ -164,17 +160,16 @@ class UserControllerIT {
         noBookingUser = userRepository.save(noBookingUser);
 
         mockMvc.perform(get("/api/users/{id}/bookings", noBookingUser.getId())
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test
-    @XrayTest("GF-04")
     @DisplayName("GET /api/users/{id}/owned-bookings - Should return all bookings for owned items")
     void getUserOwnedBookings_shouldReturnOwnedBookingsWhenUserIsOwner() throws Exception {
         mockMvc.perform(get("/api/users/{id}/owned-bookings", owner.getId())
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id").value(ownedBooking.getId()))
@@ -182,17 +177,15 @@ class UserControllerIT {
     }
 
     @Test
-    @XrayTest("GF-05")
     @DisplayName("GET /api/users/{id}/owned-bookings - Should return 404 when user not found")
     void getUserOwnedBookings_shouldReturn404WhenUserNotFound() throws Exception {
         mockMvc.perform(get("/api/users/{id}/owned-bookings", 9999L)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User not found with id: 9999"));
     }
 
     @Test
-    @XrayTest("GF-06")
     @DisplayName("GET /api/users/{id}/owned-bookings - Should return empty list when user has no items")
     void getUserOwnedBookings_shouldReturnEmptyListWhenNoOwnedItems() throws Exception {
         // Renter has no owned items
@@ -203,11 +196,10 @@ class UserControllerIT {
     }
 
     @Test
-    @XrayTest("GF-07")
     @DisplayName("GET /api/users/{id}/owned-items - Should return all items owned by user")
     void getUserOwnedItems_shouldReturnOwnedItemsWhenUserIsOwner() throws Exception {
         mockMvc.perform(get("/api/users/{id}/owned-items", owner.getId())
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name").value("Cana de Surfcasting"))
@@ -215,21 +207,19 @@ class UserControllerIT {
     }
 
     @Test
-    @XrayTest("GF-08")
     @DisplayName("GET /api/users/{id}/owned-items - Should return 404 when user not found")
     void getUserOwnedItems_shouldReturn404WhenUserNotFound() throws Exception {
         mockMvc.perform(get("/api/users/{id}/owned-items", 9999L)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User not found with id: 9999"));
     }
 
     @Test
-    @XrayTest("GF-09")
     @DisplayName("GET /api/users/{id}/owned-items - Should return empty list when user owns no items")
     void getUserOwnedItems_shouldReturnEmptyListWhenNoOwnedItems() throws Exception {
         mockMvc.perform(get("/api/users/{id}/owned-items", renter.getId())
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }

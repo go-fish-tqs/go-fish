@@ -1,8 +1,9 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, Suspense } from "react";
+import toast from "react-hot-toast";
 import { Item } from "@/app/items/types";
 import {
   BackButton,
@@ -12,15 +13,24 @@ import {
   BookingError,
   BookingCalendar,
   ItemReviews,
+  PaymentModal,
 } from "../_components";
+
+interface BookingResponse {
+  id: number;
+  status: string;
+}
 
 function BookingFormContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const itemId = searchParams.get("itemId");
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingId, setBookingId] = useState<number | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
@@ -98,6 +108,40 @@ function BookingFormContent() {
     enabled: !!itemId,
   });
 
+  // Create booking mutation
+  const createBookingMutation = useMutation({
+    mutationFn: async (data: { userId: number; itemId: string; startDate: string; endDate: string }) => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/bookings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: data.userId,
+          itemId: Number(data.itemId),
+          startDate: new Date(data.startDate).toISOString(),
+          endDate: new Date(data.endDate).toISOString(),
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || "Failed to create booking");
+      }
+
+      return response.json() as Promise<BookingResponse>;
+    },
+    onSuccess: (data) => {
+      setBookingId(data.id);
+      setShowPaymentModal(true);
+      toast.success("Booking created! Please complete payment.");
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Failed to create booking");
+      setIsSubmitting(false);
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -116,42 +160,25 @@ function BookingFormContent() {
 
     setIsSubmitting(true);
 
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      const bookingData = {
-        itemId: Number(itemId),
-        startDate,
-        endDate,
-        userId: 1,
-      };
+    createBookingMutation.mutate({
+      userId: 1, // TODO: Get from auth context
+      itemId: itemId!,
+      startDate,
+      endDate,
+    });
+  };
 
-      console.log("Creating booking:", bookingData);
-      const res = await fetch(`${apiUrl}/api/bookings`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(bookingData),
-      });
+  const handlePaymentSuccess = () => {
+    setShowPaymentModal(false);
+    toast.success("Payment successful! Your booking is confirmed.");
+    router.push("/dashboard");
+  };
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Failed to create booking");
-      }
-
-      setSuccess(true);
-      setStartDate("");
-      setEndDate("");
-      // Optionally redirect after a delay
-      setTimeout(() => {
-        window.location.href = "/items";
-      }, 2000);
-    } catch (error: any) {
-      console.error("Error creating booking:", error);
-      setError(error.message || "An error occurred while creating the booking");
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handlePaymentClose = () => {
+    setShowPaymentModal(false);
+    setIsSubmitting(false);
+    // Booking remains in PENDING status - it was already created via mutation
+    toast("Booking saved. You can complete payment later.", { icon: "📝" });
   };
 
   if (!itemId) {
@@ -173,8 +200,8 @@ function BookingFormContent() {
 
   return (
     <div className="h-full w-full overflow-y-auto scrollbar-hide">
-      <div className="min-h-full p-6 lg:p-10">
-        <div className="max-w-6xl mx-auto animate-fade-in space-y-6">
+      <div className="min-h-full p-6 lg:p-10 space-y-6">
+        <div className="max-w-6xl mx-auto animate-fade-in">
           <BackButton href="/items" label="Back to Items" />
 
           <div className="backdrop-blur-2xl bg-gradient-to-br from-white/70 via-white/60 to-blue-50/40 border border-white/50 rounded-3xl p-6 lg:p-10 shadow-2xl shadow-blue-900/5">
@@ -187,75 +214,86 @@ function BookingFormContent() {
               </p>
             </div>
 
-            {/* Success Message */}
-            {success && (
-              <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <svg
-                    className="w-5 h-5 text-green-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <p className="text-green-800 font-medium">
-                    Booking created successfully! Redirecting...
-                  </p>
-                </div>
+            <div className="flex flex-col lg:flex-row gap-8 mb-8">
+              {/* Item Summary */}
+              <div className="lg:w-1/2">
+                <ItemSummary item={item} />
               </div>
-            )}
 
-            {/* Error Message */}
-            {error && (
-              <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 shadow-sm">
-                <div className="flex items-start gap-3">
-                  <svg
-                    className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <div className="flex-1">
-                    <p className="text-red-800 font-medium">
-                      Unable to create booking
-                    </p>
-                    <p className="text-red-700 text-sm mt-1">{error}</p>
+              {/* Booking Form */}
+              <div className="lg:w-1/2">
+                {/* Success Message */}
+                {success && (
+                  <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <svg
+                        className="w-5 h-5 text-green-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      <p className="text-green-800 font-medium">
+                        Booking created successfully! Redirecting...
+                      </p>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => setError(null)}
-                    className="text-red-600 hover:text-red-700 font-semibold text-sm flex-shrink-0"
-                  >
-                    ✕
-                  </button>
-                </div>
+                )}
+
+                {/* Error Message */}
+                {error && (
+                  <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      <svg
+                        className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <div className="flex-1">
+                        <p className="text-red-800 font-medium">
+                          Unable to create booking
+                        </p>
+                        <p className="text-red-700 text-sm mt-1">{error}</p>
+                      </div>
+                      <button
+                        onClick={() => setError(null)}
+                        className="text-red-600 hover:text-red-700 font-semibold text-sm flex-shrink-0"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <BookingDateForm
+                  startDate={startDate}
+                  endDate={endDate}
+                  onStartDateChange={setStartDate}
+                  onEndDateChange={setEndDate}
+                  onSubmit={handleSubmit}
+                  isSubmitting={isSubmitting}
+                />
               </div>
-            )}
-            <BookingDateForm
-              startDate={startDate}
-              endDate={endDate}
-              onStartDateChange={setStartDate}
-              onEndDateChange={setEndDate}
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
-            />
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-4">
-          <div className="lg:flex-1">
+        <div className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto">
+          <div className="lg:w-1/2">
             {/* AQUI ESTÁ A MAGIA: Passamos as datas bloqueadas ao calendário */}
             <BookingCalendar
               itemId={itemId}
@@ -266,11 +304,24 @@ function BookingFormContent() {
               unavailableDates={blockedDates}
             />
           </div>
-          <div className="lg:w-80">
+          <div className="lg:w-1/2">
             <ItemReviews itemId={itemId} />
           </div>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      {item && (
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={handlePaymentClose}
+          onSuccess={handlePaymentSuccess}
+          item={item}
+          startDate={startDate}
+          endDate={endDate}
+          bookingId={bookingId}
+        />
+      )}
     </div>
   );
 }

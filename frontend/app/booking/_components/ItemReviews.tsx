@@ -87,7 +87,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
     const { data: reviewsData, isLoading, isError } = useQuery({
         queryKey: ["reviews", itemId],
         queryFn: async () => {
-            const res = await fetch(`${process.env.API_URL}/api/reviews/item/${itemId}?page=0&size=10`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/item/${itemId}?page=0&size=10`);
             if (!res.ok) throw new Error("Failed to fetch reviews");
             return res.json() as Promise<ReviewsResponse>;
         },
@@ -98,7 +98,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
     const { data: averageRating } = useQuery({
         queryKey: ["reviews", itemId, "rating"],
         queryFn: async () => {
-            const res = await fetch(`${process.env.API_URL}/api/reviews/item/${itemId}/rating`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/item/${itemId}/rating`);
             if (!res.ok) throw new Error("Failed to fetch rating");
             return res.json() as Promise<number>;
         },
@@ -108,7 +108,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
     // Create review mutation
     const createReviewMutation = useMutation({
         mutationFn: async (data: { rating: number; comment: string }) => {
-            const res = await fetch(`${process.env.API_URL}/api/reviews`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -140,7 +140,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
     // Delete review mutation
     const deleteReviewMutation = useMutation({
         mutationFn: async (reviewId: number) => {
-            const res = await fetch(`${process.env.API_URL}/api/reviews/${reviewId}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${reviewId}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId: CURRENT_USER_ID }),

@@ -21,6 +21,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     depends_on:
       db:
         condition: service_healthy
@@ -44,6 +46,7 @@ services:
     environment:
       - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
       - WATCHPACK_POLLING=true # For file watching in Docker (Next.js)
     depends_on:
       - backend

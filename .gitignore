@@ -1,11 +1,28 @@
 *.vscode/
 
-# Environment files
+# Environment files - CRITICAL: Never commit these!
 .env
-.env.local
-.env.prod
-.env.*.local
+.env.*
+!.env.example
+!.env.*.example
+*.env
+*.env.*
+!*.env.example
 
+# Specific deployment environment files
+deployment/.env
+deployment/.env.*
+!deployment/.env.example
+!deployment/.env.*.example
+
+# Frontend environment files
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Backend application properties with secrets
+backend/src/main/resources/application-secrets.properties
+backend/src/main/resources/application-local.properties
 
 node_modules/
 **/node_modules/
@@ -17,13 +34,21 @@ pnpm-debug.log*
 # Build artifacts
 dist/
 build/
+target/
 
-# Deployment
+# Deployment - sensitive files
 deployment/.env
-deployment/.env.prod
+deployment/.env.*
+!deployment/.env.example
+!deployment/.env.*.example
 deployment/backups/
 deployment/nginx/ssl/
+deployment/secrets/
+deployment/*.key
+deployment/*.pem
+deployment/*.crt
 
 # Docker
 .dockerignore
 docker-compose.override.yml
+
