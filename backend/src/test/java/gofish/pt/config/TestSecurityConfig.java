@@ -13,9 +13,10 @@ public class TestSecurityConfig {
     @Primary
     public SecurityFilterChain testSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
+            // CSRF protection disabled for integration tests - this is acceptable in test environment
+            .csrf(csrf -> csrf.disable()) // NOSONAR
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()
+                .anyRequest().permitAll() // NOSONAR - All requests allowed in test context
             );
         return http.build();
     }
