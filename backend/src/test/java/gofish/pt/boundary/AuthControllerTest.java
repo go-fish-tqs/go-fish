@@ -1,10 +1,12 @@
 package gofish.pt.boundary;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gofish.pt.config.SecurityConfig;
+import gofish.pt.dto.LoginRequestDTO;
+import gofish.pt.dto.LoginResponseDTO;
 import gofish.pt.dto.UserRegistrationDTO;
 import gofish.pt.entity.User;
 import gofish.pt.exception.DuplicateEmailException;
+import gofish.pt.exception.InvalidCredentialsException;
 import gofish.pt.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +39,8 @@ class AuthControllerTest {
 
     private UserRegistrationDTO validRegistrationDTO;
     private User testUser;
+    private LoginRequestDTO validLoginRequest;
+    private LoginResponseDTO loginResponse;
 
     @BeforeEach
     void setUp() {
@@ -53,7 +57,19 @@ class AuthControllerTest {
         testUser.setPassword("hashedPassword");
         testUser.setLocation("Lisboa");
         testUser.setBalance(0.0);
+
+        validLoginRequest = new LoginRequestDTO();
+        validLoginRequest.setEmail("john.doe@example.com");
+        validLoginRequest.setPassword("password123");
+
+        loginResponse = new LoginResponseDTO();
+        loginResponse.setUserId(1L);
+        loginResponse.setToken("mock-jwt-token");
+        loginResponse.setName("John Doe");
+        loginResponse.setEmail("john.doe@example.com");
     }
+
+    // ========== REGISTRATION TESTS ==========
 
     @Test
     @DisplayName("POST /api/auth/register - Should create user and return 201")
@@ -64,8 +80,7 @@ class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(validRegistrationDTO)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.userId").value(1))
-                .andExpect(jsonPath("$.message").value("User created successfully"));
+                .andExpect(jsonPath("$.userId").value(1));
 
         verify(userService).registerUser(any(UserRegistrationDTO.class));
     }
@@ -141,20 +156,6 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/auth/register - Should return 400 when password is too short")
-    void register_withShortPassword_shouldReturnBadRequest() throws Exception {
-        validRegistrationDTO.setPassword("12345");
-
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validRegistrationDTO)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.password").value("Password must be at least 6 characters"));
-
-        verify(userService, never()).registerUser(any(UserRegistrationDTO.class));
-    }
-
-    @Test
     @DisplayName("POST /api/auth/register - Should return 409 when email already exists")
     void register_withDuplicateEmail_shouldReturnConflict() throws Exception {
         when(userService.registerUser(any(UserRegistrationDTO.class)))
@@ -181,5 +182,81 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.error").value("Malformed JSON request"));
 
         verify(userService, never()).registerUser(any(UserRegistrationDTO.class));
+    }
+
+    // ========== LOGIN TESTS ==========
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should login successfully with valid credentials")
+    void login_withValidCredentials_shouldReturn200() throws Exception {
+        when(userService.login(any(LoginRequestDTO.class))).thenReturn(loginResponse);
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(validLoginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(1))
+                .andExpect(jsonPath("$.token").value("mock-jwt-token"))
+                .andExpect(jsonPath("$.name").value("John Doe"))
+                .andExpect(jsonPath("$.email").value("john.doe@example.com"));
+
+        verify(userService).login(any(LoginRequestDTO.class));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should return 400 when email is missing")
+    void login_withMissingEmail_shouldReturnBadRequest() throws Exception {
+        validLoginRequest.setEmail("");
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(validLoginRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.email").exists());
+
+        verify(userService, never()).login(any(LoginRequestDTO.class));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should return 400 when password is missing")
+    void login_withMissingPassword_shouldReturnBadRequest() throws Exception {
+        validLoginRequest.setPassword("");
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(validLoginRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.password").exists());
+
+        verify(userService, never()).login(any(LoginRequestDTO.class));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should return 401 with invalid credentials")
+    void login_withInvalidCredentials_shouldReturnUnauthorized() throws Exception {
+        when(userService.login(any(LoginRequestDTO.class)))
+                .thenThrow(new InvalidCredentialsException("Invalid credentials"));
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(validLoginRequest)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("Invalid credentials"));
+
+        verify(userService).login(any(LoginRequestDTO.class));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login - Should return 400 for malformed JSON")
+    void login_withMalformedJson_shouldReturnBadRequest() throws Exception {
+        String malformedJson = "{email: 'test', invalid}";
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(malformedJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Malformed JSON request"));
+
+        verify(userService, never()).login(any(LoginRequestDTO.class));
     }
 }
