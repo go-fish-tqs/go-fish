@@ -6,6 +6,7 @@ import gofish.pt.dto.ReviewResponseDTO;
 import gofish.pt.dto.ReviewUpdateDTO;
 import gofish.pt.entity.Review;
 import gofish.pt.mapper.ReviewMapper;
+import gofish.pt.security.SecurityUtils;
 import gofish.pt.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,11 @@ public class ReviewController {
     // --- CREATE ---
     @PostMapping
     public ResponseEntity<ReviewResponseDTO> createReview(@Valid @RequestBody ReviewRequestDTO request) {
+        // Get authenticated user ID from JWT token
+        Long authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+        
         Review review = reviewService.createReview(
-                request.getUserId(),
+                authenticatedUserId,
                 request.getItemId(),
                 request.getRating(),
                 request.getComment());
@@ -83,9 +87,12 @@ public class ReviewController {
             @PathVariable Long id,
             @Valid @RequestBody ReviewUpdateDTO request) {
 
+        // Get authenticated user ID (must be the review author)
+        Long authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+
         Review review = reviewService.updateReview(
                 id,
-                request.getUserId(),
+                authenticatedUserId,
                 request.getRating(),
                 request.getComment());
 
@@ -94,11 +101,11 @@ public class ReviewController {
 
     // --- DELETE ---
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(
-            @PathVariable Long id,
-            @Valid @RequestBody ReviewDeleteDTO request) {
+    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
+        // Get authenticated user ID (must be the review author)
+        Long authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
 
-        reviewService.deleteReview(id, request.getUserId());
+        reviewService.deleteReview(id, authenticatedUserId);
         return ResponseEntity.noContent().build();
     }
 }

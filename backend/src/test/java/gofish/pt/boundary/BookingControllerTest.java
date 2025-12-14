@@ -11,13 +11,17 @@ import gofish.pt.entity.BookingStatus;
 import gofish.pt.entity.Item;
 import gofish.pt.entity.User;
 import gofish.pt.mapper.BookingMapper;
+import gofish.pt.security.TestSecurityContextHelper;
 import gofish.pt.service.BookingService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -33,6 +37,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(BookingController.class)
+@AutoConfigureMockMvc(addFilters = false)  // Disable security filters for unit tests
+@ActiveProfiles("test")  // Activate test profile to exclude production security config
 class BookingControllerTest {
 
     @Autowired
@@ -90,12 +96,18 @@ class BookingControllerTest {
         testResponseDTO.setPrice(50.0);
     }
 
+    @AfterEach
+    void tearDown() {
+        TestSecurityContextHelper.clearContext();
+    }
+
     @Test
     @DisplayName("POST /api/bookings - Should create booking and return 201")
     @Requirement("GF-48")
     void createBooking_withValidRequest_returnsCreated() throws Exception {
+        TestSecurityContextHelper.setAuthenticatedUser(1L);
+
         BookingRequestDTO request = new BookingRequestDTO();
-        request.setUserId(1L);
         request.setItemId(1L);
         request.setStartDate(startDate);
         request.setEndDate(endDate);
@@ -146,9 +158,10 @@ class BookingControllerTest {
     @DisplayName("PATCH /api/bookings/{id}/status - Should update booking status")
     @Requirement("GF-48")
     void updateStatus_withValidRequest_returnsUpdatedBooking() throws Exception {
+        TestSecurityContextHelper.setAuthenticatedUser(1L); // Mock authenticated as owner
+
         BookingStatusDTO statusDto = new BookingStatusDTO();
         statusDto.setStatus(BookingStatus.CONFIRMED);
-        statusDto.setOwnerId(1L);
 
         testBooking.setStatus(BookingStatus.CONFIRMED);
         testResponseDTO.setStatus(BookingStatus.CONFIRMED);

@@ -52,3 +52,4 @@ deployment/*.crt
 .dockerignore
 docker-compose.override.yml
 
+deployment/.env.dev

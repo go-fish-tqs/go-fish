@@ -8,6 +8,7 @@ import gofish.pt.entity.*;
 import gofish.pt.repository.BookingRepository;
 import gofish.pt.repository.ItemRepository;
 import gofish.pt.repository.UserRepository;
+import gofish.pt.security.TestSecurityContextHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional // Garante que faz rollback no fim de cada teste
+@ActiveProfiles("test")
 class ItemControllerIT {
 
     @Autowired private MockMvc mockMvc;
@@ -73,14 +76,15 @@ class ItemControllerIT {
     @Requirement("GF-57")
     void createItem() throws Exception {
         // Arrange
+        TestSecurityContextHelper.setAuthenticatedUser(owner.getId());
+        
         ItemDTO dto = new ItemDTO(
                 "Novo Barco",
                 "Barco rápido",
                 List.of("http://foto.com/1.jpg"),
                 Category.BOATS,
                 Material.FIBERGLASS_BOAT,
-                100.0,
-                owner.getId() // <--- Usa o ID real do dono
+                100.0
         );
 
         // Act & Assert
@@ -90,6 +94,8 @@ class ItemControllerIT {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Novo Barco"))
                 .andExpect(header().exists("Location"));
+        
+        TestSecurityContextHelper.clearContext();
     }
 
     @Test

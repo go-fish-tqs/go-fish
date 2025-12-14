@@ -4,6 +4,7 @@ import gofish.pt.dto.ItemDTO;
 import gofish.pt.entity.Item;
 import gofish.pt.entity.User;
 import gofish.pt.repository.UserRepository;
+import gofish.pt.security.SecurityUtils;
 import jakarta.persistence.EntityNotFoundException;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,21 +17,16 @@ public abstract class ItemMapper {
     @Autowired
     protected UserRepository userRepository;
 
-    // A regra: O campo 'owner' vem do 'userId' usando o método 'mapUser'
-    @Mapping(target = "owner", source = "userId", qualifiedByName = "idToUser")
+    // A regra: O campo 'owner' vem do utilizador autenticado usando o método 'getAuthenticatedUser'
+    @Mapping(target = "owner", expression = "java(getAuthenticatedUser())")
     public abstract Item toEntity(ItemDTO dto);
 
-    // Podes ter o contrário também, para quando mandas dados para o frontend
-    @Mapping(target = "userId", source = "owner.id")
     public abstract ItemDTO toDTO(Item item);
 
-    // O método artesanal que vai buscar o User à base de dados
-    @org.mapstruct.Named("idToUser")
-    protected User mapUser(Long id) {
-        if (id == null) {
-            throw new EntityNotFoundException("userId is required to create an item");
-        }
-        return userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+    // O método que obtém o utilizador autenticado do contexto de segurança
+    protected User getAuthenticatedUser() {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Authenticated user not found with id: " + userId));
     }
 }

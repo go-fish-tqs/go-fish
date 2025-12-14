@@ -15,6 +15,8 @@ import {
   ItemReviews,
   PaymentModal,
 } from "../_components";
+import ProtectedRoute from "../../components/ProtectedRoute";
+import { getAuthHeaders } from "../../lib/auth";
 
 interface BookingResponse {
   id: number;
@@ -110,14 +112,11 @@ function BookingFormContent() {
 
   // Create booking mutation
   const createBookingMutation = useMutation({
-    mutationFn: async (data: { userId: number; itemId: string; startDate: string; endDate: string }) => {
+    mutationFn: async (data: { itemId: string; startDate: string; endDate: string }) => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/bookings`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
-          userId: data.userId,
           itemId: Number(data.itemId),
           startDate: new Date(data.startDate).toISOString(),
           endDate: new Date(data.endDate).toISOString(),
@@ -161,7 +160,6 @@ function BookingFormContent() {
     setIsSubmitting(true);
 
     createBookingMutation.mutate({
-      userId: 1, // TODO: Get from auth context
       itemId: itemId!,
       startDate,
       endDate,
@@ -328,8 +326,10 @@ function BookingFormContent() {
 
 export default function AddBookingPage() {
   return (
-    <Suspense fallback={<BookingSkeleton />}>
-      <BookingFormContent />
-    </Suspense>
+    <ProtectedRoute>
+      <Suspense fallback={<BookingSkeleton />}>
+        <BookingFormContent />
+      </Suspense>
+    </ProtectedRoute>
   );
 }

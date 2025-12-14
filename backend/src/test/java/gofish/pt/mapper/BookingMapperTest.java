@@ -84,8 +84,8 @@ class BookingMapperTest {
     void shouldMapToEntity_WithPendingStatus() {
         // Arrange
         BookingRequestDTO request = new BookingRequestDTO();
-        request.setUserId(99L); // Nota: O mapper ignora isto no toEntity, quem trata é o service
-        request.setItemId(88L); // Idem
+        // userId is now obtained from SecurityContext in the controller, not from DTO
+        request.setItemId(88L);
         request.setStartDate(LocalDate.now());
         request.setEndDate(LocalDate.now().plusDays(1));
 

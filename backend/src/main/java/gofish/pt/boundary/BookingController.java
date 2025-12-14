@@ -5,6 +5,7 @@ import gofish.pt.dto.BookingResponseDTO;
 import gofish.pt.dto.BookingStatusDTO;
 import gofish.pt.entity.Booking;
 import gofish.pt.mapper.BookingMapper;
+import gofish.pt.security.SecurityUtils;
 import gofish.pt.service.BookingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,14 +30,16 @@ public class BookingController {
     public ResponseEntity<BookingResponseDTO> createBooking(@Valid @RequestBody BookingRequestDTO request) {
 
         try{
-            // 1. Chamas o serviço passando os dados do DTO
+            // Get authenticated user ID from JWT token
+            Long authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+            
+            // Create booking with authenticated user
             Booking booking = bookingService.createBooking(
-                    request.getUserId(),
+                    authenticatedUserId,
                     request.getItemId(),
                     request.getStartDate(),
                     request.getEndDate());
 
-            // 2. Convertes o resultado para DTO de resposta
             BookingResponseDTO response = bookingMapper.toDTO(booking);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -57,10 +60,13 @@ public class BookingController {
             @PathVariable Long id,
             @Valid @RequestBody BookingStatusDTO statusDto) {
 
+        // Get authenticated user ID (must be the item owner)
+        Long authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+
         Booking booking = bookingService.updateBookingStatus(
                 id,
                 statusDto.getStatus(),
-                statusDto.getOwnerId());
+                authenticatedUserId);
 
         return ResponseEntity.ok(bookingMapper.toDTO(booking));
     }

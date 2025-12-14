@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { Item } from "@/app/items/types";
+import { useState } from "react";
 
 interface ItemCardProps {
   item: Item;
@@ -8,6 +11,7 @@ interface ItemCardProps {
 
 export default function ItemCard({ item, index = 0 }: ItemCardProps) {
   const staggerClass = `stagger-${(index % 6) + 1}`;
+  const [imageError, setImageError] = useState(false);
 
   return (
     <Link
@@ -23,11 +27,12 @@ export default function ItemCard({ item, index = 0 }: ItemCardProps) {
     >
       {/* Image Container */}
       <div className="relative h-48 bg-gradient-to-br from-blue-100 to-indigo-100 overflow-hidden">
-        {item.photoUrls && item.photoUrls.length > 0 ? (
+        {item.photoUrls && item.photoUrls.length > 0 && !imageError ? (
           <img
             src={item.photoUrls[0]}
             alt={item.name}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            onError={() => setImageError(true)}
           />
         ) : (
           <div className="h-full w-full flex items-center justify-center">
