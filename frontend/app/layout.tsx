@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+"use client";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/app/ui/Sidebar";
@@ -6,6 +7,7 @@ import Providers from "@/app/providers";
 import { Toaster } from "react-hot-toast";
 import CLSMonitor from "@/app/components/CLSMonitor";
 import SuspendedBanner from "@/app/components/SuspendedBanner";
+import { usePathname } from "next/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,21 +19,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "GoFish",
-  description: "Fishing equipment booking platform",
-};
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const isAuthPage = pathname === '/login' || pathname === '/register';
+
   return (
     <html lang="en" className="h-full">
-      <body className="bg-blue-100 h-full flex overflow-hidden">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-full flex overflow-hidden`}>
         <CLSMonitor />
         <Providers>
+          <SuspendedBanner />
           <Toaster
             position="top-right"
             toastOptions={{
@@ -52,9 +53,9 @@ export default function RootLayout({
               },
             }}
           />
-          <Sidebar />
+          {!isAuthPage && <Sidebar />}
 
-          <main className="flex-1 h-full min-w-0 overflow-y-auto">
+          <main className={`flex-1 h-full min-w-0 overflow-y-auto bg-blue-100 ${isAuthPage ? 'w-full' : ''}`}>
             {children}
           </main>
         </Providers>

@@ -207,7 +207,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="h-screen w-64  overflow-hidden flex flex-col">
+    <aside className="relative h-screen w-64 overflow-hidden flex flex-col">
       {/* Glassmorphism Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-blue-50/50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800" />
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5" />
