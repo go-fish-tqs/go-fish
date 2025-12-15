@@ -30,24 +30,31 @@ public class AdminItemController {
      * PUT /api/admin/items/{id}/deactivate - Deactivate an item
      */
     @PutMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivateItem(
+    public ResponseEntity<String> deactivateItem(
             @PathVariable Long id,
             @Valid @RequestBody DeactivateItemDTO dto,
             Authentication authentication) {
-        Long adminId = (Long) authentication.getPrincipal();
+        Long adminId = parseAdminId(authentication);
         adminService.deactivateItem(id, dto.getReason(), adminId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Item deactivated successfully");
     }
 
-    /**
-     * PUT /api/admin/items/{id}/reactivate - Reactivate an item
-     */
     @PutMapping("/{id}/reactivate")
-    public ResponseEntity<Void> reactivateItem(
+    public ResponseEntity<String> reactivateItem(
             @PathVariable Long id,
             Authentication authentication) {
-        Long adminId = (Long) authentication.getPrincipal();
+        Long adminId = parseAdminId(authentication);
         adminService.reactivateItem(id, adminId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Item reactivated successfully");
+    }
+
+    private Long parseAdminId(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof Long) {
+            return (Long) principal;
+        } else if (principal instanceof String) {
+            return Long.parseLong((String) principal);
+        }
+        throw new IllegalArgumentException("Invalid principal type");
     }
 }

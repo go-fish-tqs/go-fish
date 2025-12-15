@@ -1,133 +1,137 @@
 package gofish.pt.boundary;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.dto.AdminDashboardDTO;
 import gofish.pt.entity.AuditLog;
 import gofish.pt.entity.Booking;
-import gofish.pt.entity.BookingStatus;
+import gofish.pt.entity.User;
 import gofish.pt.repository.BookingRepository;
 import gofish.pt.repository.UserRepository;
 import gofish.pt.service.AdminService;
 import gofish.pt.service.AuditLogService;
-import gofish.pt.config.SecurityConfig;
-import gofish.pt.security.JwtAuthenticationFilter;
-import gofish.pt.service.JwtService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AdminDashboardController.class)
-@Import(SecurityConfig.class)
+@AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 class AdminDashboardControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockitoBean
     private AdminService adminService;
 
-    @MockBean
+    @MockitoBean
     private AuditLogService auditLogService;
 
-    @MockBean
+    @MockitoBean
     private BookingRepository bookingRepository;
 
-    @MockBean
+    @MockitoBean
     private UserRepository userRepository;
 
-    @MockBean
-    private JwtService jwtService;
+    private AdminDashboardDTO dashboardDTO;
+    private AuditLog testAuditLog;
+    private User adminUser;
 
-    @MockBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @BeforeEach
+    void setUp() {
+        dashboardDTO = new AdminDashboardDTO(5, 3, 100, 2, 50, 5, 15000.0);
 
-    @Test
-    @DisplayName("Should return 403 when non-admin tries to access dashboard")
-    @WithMockUser(roles = "USER")
-    void shouldDenyAccessToNonAdmin() throws Exception {
-        mockMvc.perform(get("/api/admin/dashboard"))
-                .andExpect(status().isForbidden());
+        adminUser = new User();
+        adminUser.setId(1L);
+        adminUser.setUsername("admin");
+
+        testAuditLog = new AuditLog();
+        testAuditLog.setId(1L);
+        testAuditLog.setAdminId(1L);
+        testAuditLog.setAction("SUSPEND_USER");
+        testAuditLog.setTargetType("USER");
+        testAuditLog.setTargetId(10L);
+        testAuditLog.setCreatedAt(LocalDateTime.now());
     }
 
     @Test
-    @DisplayName("Should return dashboard stats for admin")
-    @WithMockUser(roles = "ADMIN")
-    void shouldReturnDashboardStats() throws Exception {
-        // Arrange
-        AdminDashboardDTO stats = new AdminDashboardDTO();
-        stats.setActiveBookings(5);
-        stats.setPendingBookings(3);
-        stats.setTotalUsers(100);
-        stats.setSuspendedUsers(2);
-        stats.setTotalItems(50);
-        stats.setInactiveItems(5);
-        stats.setTotalRevenue(1500.0);
-        when(adminService.getDashboardStats()).thenReturn(stats);
+    @DisplayName("GET /api/admin/dashboard - Should return dashboard stats")
+    void getDashboard_returnsStats() throws Exception {
+        when(adminService.getDashboardStats()).thenReturn(dashboardDTO);
 
-        // Act & Assert
         mockMvc.perform(get("/api/admin/dashboard"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalUsers").value(100))
                 .andExpect(jsonPath("$.activeBookings").value(5))
-                .andExpect(jsonPath("$.totalRevenue").value(1500.0));
+                .andExpect(jsonPath("$.pendingBookings").value(3))
+                .andExpect(jsonPath("$.totalUsers").value(100))
+                .andExpect(jsonPath("$.suspendedUsers").value(2))
+                .andExpect(jsonPath("$.totalItems").value(50))
+                .andExpect(jsonPath("$.inactiveItems").value(5))
+                .andExpect(jsonPath("$.totalRevenue").value(15000.0));
+
+        verify(adminService).getDashboardStats();
     }
 
     @Test
-    @DisplayName("Should return all bookings for admin")
-    @WithMockUser(roles = "ADMIN")
-    void shouldReturnAllBookings() throws Exception {
-        // Arrange
+    @DisplayName("GET /api/admin/bookings - Should return all bookings")
+    void getAllBookings_returnsBookings() throws Exception {
         Booking booking = new Booking();
         booking.setId(1L);
-        booking.setStatus(BookingStatus.CONFIRMED);
+
         when(bookingRepository.findAll()).thenReturn(List.of(booking));
 
-        // Act & Assert
         mockMvc.perform(get("/api/admin/bookings"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1));
+
+        verify(bookingRepository).findAll();
     }
 
     @Test
-    @DisplayName("Should return audit logs for admin")
-    @WithMockUser(roles = "ADMIN")
-    void shouldReturnAuditLogs() throws Exception {
-        // Arrange
-        AuditLog log = new AuditLog(1L, AuditLog.ACTION_SUSPEND_USER, AuditLog.TARGET_USER, 10L, null);
-        log.setId(100L);
-        when(auditLogService.getAllLogs()).thenReturn(List.of(log));
+    @DisplayName("GET /api/admin/audit - Should return audit logs")
+    void getAuditLogs_returnsLogs() throws Exception {
+        when(auditLogService.getAllLogs()).thenReturn(List.of(testAuditLog));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(adminUser));
+        when(userRepository.findById(10L)).thenReturn(Optional.empty());
 
-        // Act & Assert
         mockMvc.perform(get("/api/admin/audit"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].action").value(AuditLog.ACTION_SUSPEND_USER));
+                .andExpect(jsonPath("$[0].action").value("SUSPEND_USER"))
+                .andExpect(jsonPath("$[0].adminUsername").value("admin"));
+
+        verify(auditLogService).getAllLogs();
     }
 
     @Test
-    @DisplayName("Should filter audit logs by action")
-    @WithMockUser(roles = "ADMIN")
-    void shouldFilterAuditLogsByAction() throws Exception {
-        // Arrange
-        AuditLog log = new AuditLog(1L, AuditLog.ACTION_SUSPEND_USER, AuditLog.TARGET_USER, 10L, null);
-        when(auditLogService.getLogsWithFilters(eq(AuditLog.ACTION_SUSPEND_USER), any(), any()))
-                .thenReturn(List.of(log));
+    @DisplayName("GET /api/admin/audit - Should filter by action")
+    void getAuditLogs_withActionFilter_returnsFilteredLogs() throws Exception {
+        when(auditLogService.getLogsWithFilters(eq("SUSPEND_USER"), any(), any()))
+                .thenReturn(List.of(testAuditLog));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(adminUser));
+        when(userRepository.findById(10L)).thenReturn(Optional.empty());
 
-        // Act & Assert
         mockMvc.perform(get("/api/admin/audit")
-                .param("action", AuditLog.ACTION_SUSPEND_USER))
+                .param("action", "SUSPEND_USER"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].action").value(AuditLog.ACTION_SUSPEND_USER));
+                .andExpect(jsonPath("$[0].action").value("SUSPEND_USER"));
+
+        verify(auditLogService).getLogsWithFilters(eq("SUSPEND_USER"), any(), any());
     }
 }

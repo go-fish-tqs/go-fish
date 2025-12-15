@@ -6,6 +6,8 @@ import gofish.pt.entity.Item;
 import gofish.pt.entity.User;
 import gofish.pt.exception.DuplicateEmailException;
 import gofish.pt.repository.UserRepository;
+import gofish.pt.repository.UserRoleRepository;
+import gofish.pt.repository.UserStatusRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +31,18 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserRoleRepository userRoleRepository;
+
+    @Mock
+    private UserStatusRepository userStatusRepository;
+
+    @Mock
+    private JwtService jwtService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService userService;
@@ -47,6 +62,7 @@ class UserServiceTest {
     @DisplayName("Should register user with hashed password")
     void registerUser_withValidData_shouldHashPassword() {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        when(passwordEncoder.encode("password123")).thenReturn("$2a$10$hashedPassword");
 
         User savedUser = new User();
         savedUser.setId(1L);
@@ -57,6 +73,8 @@ class UserServiceTest {
         savedUser.setBalance(0.0);
 
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        when(userRoleRepository.save(any())).thenReturn(null);
+        when(userStatusRepository.save(any())).thenReturn(null);
 
         User result = userService.registerUser(registrationDTO);
 
@@ -92,12 +110,15 @@ class UserServiceTest {
     @DisplayName("Should set balance to 0.0 for new user")
     void registerUser_shouldSetDefaultBalance() {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
 
         User savedUser = new User();
         savedUser.setId(1L);
         savedUser.setBalance(0.0);
 
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        when(userRoleRepository.save(any())).thenReturn(null);
+        when(userStatusRepository.save(any())).thenReturn(null);
 
         userService.registerUser(registrationDTO);
 
@@ -111,7 +132,10 @@ class UserServiceTest {
     @DisplayName("Should check email existence before creating user")
     void registerUser_shouldCheckEmailFirst() {
         when(userRepository.existsByEmail("john.doe@example.com")).thenReturn(false);
+        when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
         when(userRepository.save(any(User.class))).thenReturn(new User());
+        when(userRoleRepository.save(any())).thenReturn(null);
+        when(userStatusRepository.save(any())).thenReturn(null);
 
         userService.registerUser(registrationDTO);
 
@@ -142,7 +166,8 @@ class UserServiceTest {
         Long userId = 2L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> userService.getUserBookings(userId));
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> userService.getUserBookings(userId));
         assertTrue(ex.getMessage().contains("User not found"));
         verify(userRepository).findById(userId);
     }
