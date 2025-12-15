@@ -5,8 +5,8 @@ on:
     branches: [main]
 
 jobs:
-  frontend-type-check:
-    name: Frontend Type Check
+  frontend-build:
+    name: Frontend Build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -31,8 +31,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run type check
-        run: pnpm tsc --noEmit
+      - name: Run Build
+        run: pnpm build
 
   build-test:
     name: Build & Test
