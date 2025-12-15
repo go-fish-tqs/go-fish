@@ -72,20 +72,4 @@ public class Item {
         booking.setItem(null);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Item item = (Item) o;
-        return getId() != null && getId().equals(item.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-    @OneToMany
-    @JoinColumn(name = "item_id")
-    @com.fasterxml.jackson.annotation.JsonIgnore
-    private List<Review> reviews = new java.util.ArrayList<>();
 }
