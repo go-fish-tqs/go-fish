@@ -50,6 +50,7 @@ export function logout() {
   localStorage.removeItem('userId');
   localStorage.removeItem('userName');
   localStorage.removeItem('userEmail');
+  localStorage.removeItem('profilePhoto');
   
   window.location.href = '/';
 }

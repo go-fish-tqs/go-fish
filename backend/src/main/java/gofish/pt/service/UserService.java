@@ -64,7 +64,8 @@ public class UserService {
                 user.getId(),
                 token,
                 user.getUsername(),
-                user.getEmail()
+                user.getEmail(),
+                user.getProfilePhoto()
         );
     }
     public List<Booking> getUserBookings(Long userId) {

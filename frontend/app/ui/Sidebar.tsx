@@ -59,6 +59,8 @@ export default function Sidebar() {
       const email = localStorage.getItem("userEmail") || "";
       const photo = localStorage.getItem("profilePhoto") || "";
       
+      console.log("🔍 Sidebar loadUserData:", { name, email, photo });
+      
       setUserName(name);
       setUserEmail(email);
       setProfilePhoto(photo);

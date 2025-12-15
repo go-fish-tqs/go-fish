@@ -71,13 +71,27 @@ export default function LoginPage() {
       if (response.status === 200) {
         const data = await response.json();
         
-        // Save all user data
+        console.log("🔐 Login response:", data);
+        
+        // Save all user data including profile photo
         saveUserData({
           token: data.token,
           userId: data.userId,
           userName: data.name,
           userEmail: data.email
         });
+        
+        // Save or clear profile photo
+        if (data.profilePhoto) {
+          console.log("✅ Saving profilePhoto:", data.profilePhoto);
+          localStorage.setItem("profilePhoto", data.profilePhoto);
+        } else {
+          console.log("🗑️ No profilePhoto, clearing old value");
+          localStorage.removeItem("profilePhoto");
+        }
+        
+        // Trigger event to update sidebar
+        window.dispatchEvent(new Event('userDataUpdated'));
         
         // Redirect to dashboard
         router.push("/dashboard");
