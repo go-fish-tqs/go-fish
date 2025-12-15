@@ -60,10 +60,27 @@ class ItemServiceTest {
         owner.setUsername("owner");
         owner.setEmail("owner@test.com");
         
-        i1 = new Item(1L, "simple rod", "very simple", List.of(), Category.RODS, Material.BRASS, 5.0, true, owner, null,
-                null);
-        i2 = new Item(2L, "cool rod", "very cool", List.of(), Category.RODS, Material.GRAPHITE, 7.0, true, owner, null,
-                null);
+        i1 = new Item();
+        i1.setId(1L);
+        i1.setName("simple rod");
+        i1.setDescription("very simple");
+        i1.setPhotoUrls(List.of());
+        i1.setCategory(Category.RODS);
+        i1.setMaterial(Material.BRASS);
+        i1.setPrice(5.0);
+        i1.setAvailable(true);
+        i1.setOwner(owner);
+
+        i2 = new Item();
+        i2.setId(2L);
+        i2.setName("cool rod");
+        i2.setDescription("very cool");
+        i2.setPhotoUrls(List.of());
+        i2.setCategory(Category.RODS);
+        i2.setMaterial(Material.GRAPHITE);
+        i2.setPrice(7.0);
+        i2.setAvailable(true);
+        i2.setOwner(owner);
         dto1 = new ItemDTO("simple rod", "very simple", List.of(), Category.RODS, Material.BRASS, 5.0);
         dto2 = new ItemDTO("cool rod", "very cool", List.of(), Category.RODS, Material.GRAPHITE, 7.0);
     }

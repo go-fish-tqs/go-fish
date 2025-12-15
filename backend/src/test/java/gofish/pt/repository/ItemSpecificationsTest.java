@@ -47,33 +47,25 @@ class ItemSpecificationsTest {
         userRepository.save(zePescador); // <--- O user ganha ID aqui
 
         // 3. AGORA CRIA OS ITENS ASSOCIADOS AO ZÉ
-        rod = new Item(
-                null, // <--- Mete NULL aqui direto! O Hibernate gera o ID.
-                "Fishing Rod",
-                "Strong rod",
-                List.of("img1"),
-                Category.RODS,
-                Material.CARBON_FIBER,
-                19.99,
-                true,
-                zePescador, // <--- Mete aqui o USER que criaste!
-                null, // bookings (pode ser null se a lista for opcional no construtor)
-                null // reviews
-        );
+        rod = new Item();
+        rod.setName("Fishing Rod");
+        rod.setDescription("Strong rod");
+        rod.setPhotoUrls(List.of("img1"));
+        rod.setCategory(Category.RODS);
+        rod.setMaterial(Material.CARBON_FIBER);
+        rod.setPrice(15.99);
+        rod.setAvailable(true);
+        rod.setOwner(zePescador); // <--- Associa o dono que acab
 
-        reel = new Item(
-                null, // <--- Mete NULL aqui também
-                "Fishing Reel",
-                "Smooth reel",
-                List.of("img2"),
-                Category.REELS,
-                Material.ALUMINUM,
-                7.99,
-                true,
-                zePescador, // <--- O mesmo dono
-                null, // bookings
-                null // reviews
-        );
+        reel = new Item();
+        reel.setName("Fishing Reel");
+        reel.setDescription("Smooth reel");
+        reel.setPhotoUrls(List.of("img2"));
+        reel.setCategory(Category.REELS);
+        reel.setMaterial(Material.ALUMINUM);
+        reel.setPrice(7.99);
+        reel.setAvailable(true);
+        reel.setOwner(zePescador); // <--- Associa o dono que acab
 
         itemRepository.saveAll(List.of(rod, reel));
     }
