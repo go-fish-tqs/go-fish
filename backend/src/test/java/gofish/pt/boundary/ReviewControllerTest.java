@@ -1,5 +1,6 @@
 package gofish.pt.boundary;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.dto.ReviewDeleteDTO;
 import gofish.pt.dto.ReviewRequestDTO;
@@ -94,6 +95,7 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("POST /api/reviews - Should create review and return 201")
+    @Requirement("GF-64")
     void createReview_withValidRequest_returnsCreated() throws Exception {
         TestSecurityContextHelper.setAuthenticatedUser(1L);
 
@@ -116,6 +118,7 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("POST /api/reviews - Should return 400 for invalid rating")
+    @Requirement("GF-64")
     void createReview_withInvalidRating_returnsBadRequest() throws Exception {
         TestSecurityContextHelper.setAuthenticatedUser(1L);
 
@@ -131,6 +134,7 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("GET /api/reviews/{id} - Should return review when found")
+    @Requirement("GF-68")
     void getReview_whenExists_returnsReview() throws Exception {
         when(reviewService.getReview(1L)).thenReturn(Optional.of(testReview));
         when(reviewMapper.toDTO(testReview)).thenReturn(testResponseDTO);
@@ -145,6 +149,7 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("GET /api/reviews/{id} - Should return 404 when not found")
+    @Requirement("GF-68")
     void getReview_whenNotExists_returns404() throws Exception {
         when(reviewService.getReview(999L)).thenReturn(Optional.empty());
 
@@ -156,6 +161,7 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("GET /api/reviews/item/{itemId} - Should return paginated reviews")
+    @Requirement("GF-68")
     void getReviewsByItem_returnsPaginatedReviews() throws Exception {
         Page<Review> reviewPage = new PageImpl<>(List.of(testReview));
 
@@ -172,6 +178,7 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("GET /api/reviews/user/{userId} - Should return paginated reviews")
+    @Requirement("GF-68")
     void getReviewsByUser_returnsPaginatedReviews() throws Exception {
         Page<Review> reviewPage = new PageImpl<>(List.of(testReview));
 
@@ -188,6 +195,7 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("GET /api/reviews/item/{itemId}/rating - Should return average rating")
+    @Requirement("GF-68")
     void getAverageRating_returnsAverage() throws Exception {
         when(reviewService.getAverageRating(1L)).thenReturn(4.5);
 
@@ -200,6 +208,7 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("GET /api/reviews/item/{itemId}/rating - Should return 0 when no reviews")
+    @Requirement("GF-68")
     void getAverageRating_whenNoReviews_returnsZero() throws Exception {
         when(reviewService.getAverageRating(1L)).thenReturn(null);
 
@@ -212,6 +221,7 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("PUT /api/reviews/{id} - Should update review")
+    @Requirement("GF-64")
     void updateReview_withValidRequest_returnsUpdatedReview() throws Exception {
         TestSecurityContextHelper.setAuthenticatedUser(1L);
 
@@ -237,6 +247,7 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("DELETE /api/reviews/{id} - Should delete review and return 204")
+    @Requirement("GF-64")
     void deleteReview_returnsNoContent() throws Exception {
         TestSecurityContextHelper.setAuthenticatedUser(1L);
 

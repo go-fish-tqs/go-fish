@@ -1,5 +1,6 @@
 package gofish.pt.service;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import gofish.pt.dto.LoginRequestDTO;
 import gofish.pt.dto.LoginResponseDTO;
 import gofish.pt.entity.User;
@@ -56,6 +57,7 @@ class UserServiceLoginTest {
 
     @Test
     @DisplayName("Should login successfully with valid credentials")
+    @Requirement("GF-93")
     void login_withValidCredentials_shouldReturnToken() {
         when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(testUser));
         when(jwtService.generateToken(1L, "john@example.com")).thenReturn("mock-jwt-token");
@@ -74,6 +76,7 @@ class UserServiceLoginTest {
 
     @Test
     @DisplayName("Should throw InvalidCredentialsException when email not found")
+    @Requirement("GF-91")
     void login_withNonExistentEmail_shouldThrowException() {
         when(userRepository.findByEmail("unknown@example.com")).thenReturn(Optional.empty());
 
@@ -89,6 +92,7 @@ class UserServiceLoginTest {
 
     @Test
     @DisplayName("Should throw InvalidCredentialsException when password is incorrect")
+    @Requirement("GF-91")
     void login_withWrongPassword_shouldThrowException() {
         when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(testUser));
 
@@ -104,6 +108,7 @@ class UserServiceLoginTest {
 
     @Test
     @DisplayName("Should verify password against hashed value in database")
+    @Requirement("GF-91")
     void login_shouldVerifyHashedPassword() {
         when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(testUser));
         when(jwtService.generateToken(anyLong(), anyString())).thenReturn("token");

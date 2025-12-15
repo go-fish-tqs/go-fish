@@ -1,5 +1,6 @@
 package gofish.pt.integration;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.config.TestSecurityConfig;
 import gofish.pt.dto.BlockDateRequestDTO;
@@ -96,6 +97,7 @@ class ItemControllerIT {
 
     @Test
     @DisplayName("POST /api/items - Deve criar um item novo")
+    @Requirement("GF-57")
     void createItem() throws Exception {
         // Arrange
         TestSecurityContextHelper.setAuthenticatedUser(owner.getId());
@@ -121,6 +123,7 @@ class ItemControllerIT {
 
     @Test
     @DisplayName("GET /api/items/{id} - Deve devolver o item correto")
+    @Requirement("GF-46")
     void getItem() throws Exception {
         mockMvc.perform(get("/api/items/{id}", rod.getId()))
                 .andExpect(status().isOk())
@@ -129,6 +132,7 @@ class ItemControllerIT {
 
     @Test
     @DisplayName("POST /api/items/filter - Deve filtrar items")
+    @Requirement("GF-45")
     void filterItems() throws Exception {
         ItemFilter filter = new ItemFilter(null, Category.RODS, null, null, null, null, null);
 
@@ -142,6 +146,7 @@ class ItemControllerIT {
 
     @Test
     @DisplayName("GET /api/items/{id}/availability - Deve devolver datas ocupadas por reservas")
+    @Requirement("GF-47")
     void checkAvailability_withBookings() throws Exception {
         Booking booking = new Booking();
         booking.setItem(rod);
@@ -164,6 +169,7 @@ class ItemControllerIT {
     }
 
     @Test
+    @Requirement("GF-46")
     void getItemById() throws Exception {
         Long id = rod.getId();
         mockMvc.perform(get("/api/items/" + id))
@@ -173,6 +179,7 @@ class ItemControllerIT {
     }
 
     @Test
+    @Requirement("GF-46")
     void getItemByIdNotFound() throws Exception {
         mockMvc.perform(get("/api/items/67"))
                 .andExpect(status().isNotFound());

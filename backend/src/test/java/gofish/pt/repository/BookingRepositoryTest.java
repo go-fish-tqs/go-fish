@@ -1,5 +1,6 @@
 package gofish.pt.repository;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import gofish.pt.entity.*; // Importa as tuas entidades todas
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,6 +52,7 @@ class BookingRepositoryTest {
 
     @Test
     @DisplayName("Deve detetar conflito quando as datas são exatamente iguais")
+    @Requirement("GF-51")
     void shouldFindOverlap_WhenDatesAreExact() {
         // Arrange: Já existe uma reserva de dia 10 a 12
         createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 12), BookingStatus.CONFIRMED);
@@ -68,6 +70,7 @@ class BookingRepositoryTest {
 
     @Test
     @DisplayName("Deve detetar conflito quando a nova reserva está DENTRO da existente")
+    @Requirement("GF-51")
     void shouldFindOverlap_WhenNewIsInsideExisting() {
         // Arrange: Reserva de 10 a 20
         createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 20), BookingStatus.CONFIRMED);
@@ -85,6 +88,7 @@ class BookingRepositoryTest {
 
     @Test
     @DisplayName("NÃO deve detetar conflito se a reserva existente estiver CANCELADA")
+    @Requirement("GF-48")
     void shouldNotFindOverlap_WhenExistingIsCancelled() {
         // Arrange: Reserva de 10 a 12, mas CANCELADA
         createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 12), BookingStatus.CANCELLED);
@@ -102,6 +106,7 @@ class BookingRepositoryTest {
 
     @Test
     @DisplayName("NÃO deve detetar conflito se as datas apenas se tocam (Fim = Início)")
+    @Requirement("GF-48")
     void shouldNotFindOverlap_WhenDatesTouch() {
         // Arrange: Reserva acaba dia 10 às 12:00
         createBooking(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 10), BookingStatus.CONFIRMED);
@@ -121,6 +126,7 @@ class BookingRepositoryTest {
 
     @Test
     @DisplayName("Deve encontrar reservas confirmadas dentro de um intervalo")
+    @Requirement("GF-51")
     void shouldFindBookingsInRange() {
         // Arrange
         // Reserva 1: Dia 5 a 10 (CONFIRMADA)
