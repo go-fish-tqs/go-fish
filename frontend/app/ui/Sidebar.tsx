@@ -13,8 +13,18 @@ const baseNavItems = [
     href: "/",
     label: "Home",
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+        />
       </svg>
     ),
   },
@@ -22,8 +32,18 @@ const baseNavItems = [
     href: "/dashboard",
     label: "Dashboard",
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+        />
       </svg>
     ),
   },
@@ -31,8 +51,18 @@ const baseNavItems = [
     href: "/items",
     label: "Browse Items",
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+        />
       </svg>
     ),
   },
@@ -58,8 +88,18 @@ const baseNavItems = [
     href: "/items/add",
     label: "Add Item",
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M12 4v16m8-8H4"
+        />
       </svg>
     ),
   },
@@ -133,7 +173,8 @@ export default function Sidebar() {
       if (name) {
         const parts = name.split(" ");
         const firstInitial = parts[0]?.charAt(0).toUpperCase() || "";
-        const lastInitial = parts[parts.length - 1]?.charAt(0).toUpperCase() || "";
+        const lastInitial =
+          parts[parts.length - 1]?.charAt(0).toUpperCase() || "";
         setInitials(firstInitial + lastInitial);
       } else {
         setInitials("??");
@@ -144,14 +185,14 @@ export default function Sidebar() {
     loadUserData();
 
     // Listen for storage changes (from other tabs/windows)
-    window.addEventListener('storage', loadUserData);
+    window.addEventListener("storage", loadUserData);
 
     // Create custom event listener for same-window updates
-    window.addEventListener('userDataUpdated', loadUserData);
+    window.addEventListener("userDataUpdated", loadUserData);
 
     return () => {
-      window.removeEventListener('storage', loadUserData);
-      window.removeEventListener('userDataUpdated', loadUserData);
+      window.removeEventListener("storage", loadUserData);
+      window.removeEventListener("userDataUpdated", loadUserData);
     };
   }, [pathname]); // Re-run when pathname changes (e.g., after login redirect)
 
@@ -166,7 +207,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="h-screen w-64 relative overflow-hidden flex flex-col">
+    <aside className="h-screen w-64  overflow-hidden flex flex-col">
       {/* Glassmorphism Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-blue-50/50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800" />
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5" />
@@ -182,8 +223,18 @@ export default function Sidebar() {
         <div className="flex items-center gap-3 mb-10 px-2">
           <div className="relative">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12a8 8 0 01-8 8m8-8a8 8 0 00-8-8m8 8h-8m0 8a8 8 0 01-8-8m8 8v-8m-8 0a8 8 0 018-8m-8 8h8m0-8v8" />
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20 12a8 8 0 01-8 8m8-8a8 8 0 00-8-8m8 8h-8m0 8a8 8 0 01-8-8m8 8v-8m-8 0a8 8 0 018-8m-8 8h8m0-8v8"
+                />
               </svg>
             </div>
             <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white dark:border-slate-900" />
@@ -192,7 +243,9 @@ export default function Sidebar() {
             <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-indigo-400">
               GoFish
             </h1>
-            <p className="text-[10px] text-gray-400 font-medium -mt-0.5">Rental Platform</p>
+            <p className="text-[10px] text-gray-400 font-medium -mt-0.5">
+              Rental Platform
+            </p>
           </div>
         </div>
 
@@ -207,9 +260,10 @@ export default function Sidebar() {
                 className={`
                   group relative flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm
                   transition-all duration-300 ease-out
-                  ${active
-                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25"
-                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-slate-800/50 hover:text-gray-900 dark:hover:text-white"
+                  ${
+                    active
+                      ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-slate-800/50 hover:text-gray-900 dark:hover:text-white"
                   }
                 `}
               >
@@ -219,10 +273,16 @@ export default function Sidebar() {
                 )}
 
                 {/* Icon */}
-                <span className={`
+                <span
+                  className={`
                   transition-transform duration-300 group-hover:scale-110
-                  ${active ? "text-white" : "text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400"}
-                `}>
+                  ${
+                    active
+                      ? "text-white"
+                      : "text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400"
+                  }
+                `}
+                >
                   {item.icon}
                 </span>
 
@@ -237,7 +297,12 @@ export default function Sidebar() {
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 )}
               </Link>
@@ -302,7 +367,12 @@ export default function Sidebar() {
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
               </svg>
             </button>
           </div>

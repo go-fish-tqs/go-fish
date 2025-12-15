@@ -112,16 +112,23 @@ function BookingFormContent() {
 
   // Create booking mutation
   const createBookingMutation = useMutation({
-    mutationFn: async (data: { itemId: string; startDate: string; endDate: string }) => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/bookings`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          itemId: Number(data.itemId),
-          startDate: new Date(data.startDate).toISOString(),
-          endDate: new Date(data.endDate).toISOString(),
-        }),
-      });
+    mutationFn: async (data: {
+      itemId: string;
+      startDate: string;
+      endDate: string;
+    }) => {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || ""}/api/bookings`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({
+            itemId: Number(data.itemId),
+            startDate: new Date(data.startDate).toISOString(),
+            endDate: new Date(data.endDate).toISOString(),
+          }),
+        }
+      );
 
       if (!response.ok) {
         const error = await response.text();
@@ -136,7 +143,9 @@ function BookingFormContent() {
       toast.success("Booking created! Please complete payment.");
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Failed to create booking");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create booking"
+      );
       setIsSubmitting(false);
     },
   });
@@ -221,61 +230,77 @@ function BookingFormContent() {
               {/* Booking Form */}
               <div className="lg:w-1/2">
                 {/* Success Message */}
-                {success && (
-                  <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <svg
-                        className="w-5 h-5 text-green-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      <p className="text-green-800 font-medium">
-                        Booking created successfully! Redirecting...
-                      </p>
+                <div
+                  className={`transition-all duration-300 ${
+                    success
+                      ? "mb-6 opacity-100 h-auto"
+                      : "mb-0 opacity-0 h-0 overflow-hidden"
+                  }`}
+                >
+                  {success && (
+                    <div className="p-4 rounded-xl bg-green-50 border border-green-200 shadow-sm\">
+                      <div className="flex items-center gap-3">
+                        <svg
+                          className="w-5 h-5 text-green-600 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        <p className="text-green-800 font-medium">
+                          Booking created successfully! Redirecting...
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {/* Error Message */}
-                {error && (
-                  <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 shadow-sm">
-                    <div className="flex items-start gap-3">
-                      <svg
-                        className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <div className="flex-1">
-                        <p className="text-red-800 font-medium">
-                          Unable to create booking
-                        </p>
-                        <p className="text-red-700 text-sm mt-1">{error}</p>
+                <div
+                  className={`transition-all duration-300 ${
+                    error
+                      ? "mb-6 opacity-100 h-auto"
+                      : "mb-0 opacity-0 h-0 overflow-hidden"
+                  }`}
+                >
+                  {error && (
+                    <div className="p-4 rounded-xl bg-red-50 border border-red-200 shadow-sm\">
+                      <div className="flex items-start gap-3">
+                        <svg
+                          className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0\"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <div className="flex-1">
+                          <p className="text-red-800 font-medium">
+                            Unable to create booking
+                          </p>
+                          <p className="text-red-700 text-sm mt-1">{error}</p>
+                        </div>
+                        <button
+                          onClick={() => setError(null)}
+                          className="text-red-600 hover:text-red-700 font-semibold text-sm flex-shrink-0\"
+                        >
+                          ✕
+                        </button>
                       </div>
-                      <button
-                        onClick={() => setError(null)}
-                        className="text-red-600 hover:text-red-700 font-semibold text-sm flex-shrink-0"
-                      >
-                        ✕
-                      </button>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 <BookingDateForm
                   startDate={startDate}
