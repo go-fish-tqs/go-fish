@@ -299,7 +299,6 @@
                     <excludes>
                         <exclude>**/config/*</exclude>
                         <exclude>**/*Config.class</exclude>
-                        <exclude>**/*Controller.class</exclude>
                         <exclude>**/DataInitializer.class</exclude>
                         <exclude>**/SecurityConfig.class</exclude>
                         <exclude>**/CorsConfig.class</exclude>
