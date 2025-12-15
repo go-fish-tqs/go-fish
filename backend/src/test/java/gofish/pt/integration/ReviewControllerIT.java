@@ -3,7 +3,6 @@ package gofish.pt.integration;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gofish.pt.config.TestSecurityConfig;
-import gofish.pt.dto.ReviewDeleteDTO;
 import gofish.pt.dto.ReviewRequestDTO;
 import gofish.pt.dto.ReviewUpdateDTO;
 import gofish.pt.entity.*;

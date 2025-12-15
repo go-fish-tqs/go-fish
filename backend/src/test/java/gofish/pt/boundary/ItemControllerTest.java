@@ -2,12 +2,12 @@ package gofish.pt.boundary;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gofish.pt.config.TestSecurityConfig;
 import gofish.pt.dto.ItemDTO;
 import gofish.pt.dto.ItemFilter;
 import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
 import gofish.pt.entity.Material;
+import gofish.pt.entity.User;
 import gofish.pt.repository.UserRepository; // Importar Repositório
 import gofish.pt.service.BookingService;
 import gofish.pt.service.ItemService;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -57,9 +56,15 @@ class ItemControllerTest {
 
     private Item testItem;
     private ItemDTO testDto;
+    private User testOwner;
 
     @BeforeEach
     void setUp() {
+        testOwner = new User();
+        testOwner.setId(1L);
+        testOwner.setUsername("testuser");
+        testOwner.setEmail("test@example.com");
+
         testItem = new Item();
         testItem.setId(1L);
         testItem.setName("Test Rod");
@@ -68,6 +73,7 @@ class ItemControllerTest {
         testItem.setMaterial(Material.GRAPHITE);
         testItem.setPrice(25.99);
         testItem.setAvailable(true);
+        testItem.setOwner(testOwner);
 
         testDto = new ItemDTO(
                 "Test Rod",

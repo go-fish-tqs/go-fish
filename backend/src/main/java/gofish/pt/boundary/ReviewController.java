@@ -1,6 +1,5 @@
 package gofish.pt.boundary;
 
-import gofish.pt.dto.ReviewDeleteDTO;
 import gofish.pt.dto.ReviewRequestDTO;
 import gofish.pt.dto.ReviewResponseDTO;
 import gofish.pt.dto.ReviewUpdateDTO;
