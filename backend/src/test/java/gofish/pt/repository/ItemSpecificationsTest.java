@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static gofish.pt.repository.ItemSpecifications.*;
@@ -51,7 +52,7 @@ class ItemSpecificationsTest {
         rod = new Item();
         rod.setName("Fishing Rod");
         rod.setDescription("Strong rod");
-        rod.setPhotoUrls(List.of("img1"));
+        rod.setPhotoUrls(new ArrayList<>(List.of("img1")));
         rod.setCategory(Category.RODS);
         rod.setMaterial(Material.CARBON_FIBER);
         rod.setPrice(15.99);
@@ -61,7 +62,7 @@ class ItemSpecificationsTest {
         reel = new Item();
         reel.setName("Fishing Reel");
         reel.setDescription("Smooth reel");
-        reel.setPhotoUrls(List.of("img2"));
+        reel.setPhotoUrls(new ArrayList<>(List.of("img2")));
         reel.setCategory(Category.REELS);
         reel.setMaterial(Material.ALUMINUM);
         reel.setPrice(7.99);
@@ -129,6 +130,75 @@ class ItemSpecificationsTest {
     void findAllWhenNull() {
         spec = null;
         assertThat(itemRepository.findAll(spec)).isEqualTo(itemRepository.findAll());
+    }
+
+    @Test
+    void filterByNameWithNull() {
+        spec = nameContains(null);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void filterByCategoryWithNull() {
+        spec = categoryIs(null);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void filterByMaterialWithNull() {
+        spec = materialIs(null);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void filterByPriceBetweenWithOnlyMin() {
+        spec = priceBetween(10.0, null);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo("Fishing Rod");
+    }
+
+    @Test
+    void filterByPriceBetweenWithOnlyMax() {
+        spec = priceBetween(null, 10.0);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo("Fishing Reel");
+    }
+
+    @Test
+    void filterByPriceBetweenWithBothNull() {
+        spec = priceBetween(null, null);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void filterByAvailableIsTrue() {
+        spec = availableIs(true);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void filterByAvailableIsFalse() {
+        rod.setAvailable(false);
+        itemRepository.save(rod);
+
+        spec = availableIs(false);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo("Fishing Rod");
+    }
+
+    @Test
+    void filterByAvailableIsNull() {
+        spec = availableIs(null);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(2);
     }
 
 }

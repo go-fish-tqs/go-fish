@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -116,4 +115,39 @@ class ItemMapperTest {
         
         TestSecurityContextHelper.clearContext();
     }
+
+    @Test
+    @DisplayName("Deve mapear corretamente todas as propriedades do DTO")
+    void shouldMapAllDTOProperties() {
+        Long userId = 1L;
+        User user = new User();
+        user.setId(userId);
+
+        TestSecurityContextHelper.setAuthenticatedUser(userId);
+
+        ItemDTO dto = new ItemDTO(
+            "Test Item",
+            "Test Description",
+            List.of("photo1.jpg", "photo2.jpg"),
+            Category.REELS,
+            Material.ALUMINUM,
+            25.5
+        );
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        Item item = itemMapper.toEntity(dto);
+
+        assertThat(item.getName()).isEqualTo("Test Item");
+        assertThat(item.getDescription()).isEqualTo("Test Description");
+        assertThat(item.getPhotoUrls()).containsExactly("photo1.jpg", "photo2.jpg");
+        assertThat(item.getCategory()).isEqualTo(Category.REELS);
+        assertThat(item.getMaterial()).isEqualTo(Material.ALUMINUM);
+        assertThat(item.getPrice()).isEqualTo(25.5);
+        assertThat(item.getOwner()).isEqualTo(user);
+
+        TestSecurityContextHelper.clearContext();
+    }
 }
+
+

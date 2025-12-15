@@ -126,4 +126,69 @@ class BookingMapperTest {
 
         assertThat(mapper.calculatePrice(booking)).isEqualTo(0.0);
     }
+
+    @Test
+    @DisplayName("Deve lidar com item sem fotos")
+    void shouldHandleItemWithoutPhotos() {
+        User user = new User();
+        user.setId(1L);
+
+        Item item = new Item();
+        item.setId(1L);
+        item.setPrice(30.0);
+        item.setPhotoUrls(List.of()); // Lista vazia
+
+        Booking booking = new Booking();
+        booking.setUser(user);
+        booking.setItem(item);
+        booking.setStartDate(LocalDate.now());
+        booking.setEndDate(LocalDate.now());
+
+        BookingResponseDTO dto = mapper.toDTO(booking);
+
+        assertThat(dto.getItemPhotoUrl()).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve calcular preço para múltiplos dias corretamente")
+    void shouldCalculatePriceForMultipleDays() {
+        Item item = new Item();
+        item.setPrice(75.0);
+
+        Booking booking = new Booking();
+        booking.setItem(item);
+        booking.setStartDate(LocalDate.of(2025, 1, 1));
+        booking.setEndDate(LocalDate.of(2025, 1, 10)); // 9 dias
+
+        Double price = mapper.calculatePrice(booking);
+
+        assertThat(price).isEqualTo(675.0); // 9 * 75
+    }
+
+    @Test
+    @DisplayName("Deve mapear status do booking corretamente")
+    void shouldMapBookingStatus() {
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("test");
+
+        Item item = new Item();
+        item.setId(1L);
+        item.setName("Test");
+        item.setPrice(10.0);
+        item.setPhotoUrls(List.of("photo.jpg"));
+
+        Booking booking = new Booking();
+        booking.setId(1L);
+        booking.setUser(user);
+        booking.setItem(item);
+        booking.setStartDate(LocalDate.now());
+        booking.setEndDate(LocalDate.now());
+        booking.setStatus(BookingStatus.CONFIRMED);
+
+        BookingResponseDTO dto = mapper.toDTO(booking);
+
+        assertThat(dto.getStatus()).isEqualTo(BookingStatus.CONFIRMED);
+    }
 }
+

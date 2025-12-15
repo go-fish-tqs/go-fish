@@ -215,4 +215,170 @@ class BookingServiceTest {
 
         assertThatThrownBy(() -> bookingService.getUnavailableDates(1L, start, end))
                 .isInstanceOf(IllegalArgumentException.class);
-    }}
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando usuário não existe")
+    void shouldThrowError_WhenUserNotFound() {
+        LocalDate start = LocalDate.now().plusDays(5);
+        LocalDate end = LocalDate.now().plusDays(7);
+
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookingService.createBooking(999L, fishingRod.getId(), start, end))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Utilizador não encontrado");
+
+        verify(bookingRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando item não existe")
+    void shouldThrowError_WhenItemNotFound() {
+        LocalDate start = LocalDate.now().plusDays(5);
+        LocalDate end = LocalDate.now().plusDays(7);
+
+        when(userRepository.findById(renter.getId())).thenReturn(Optional.of(renter));
+        when(itemRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookingService.createBooking(renter.getId(), 999L, start, end))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Item não encontrado");
+
+        verify(bookingRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando usuário tenta alugar próprio item")
+    void shouldThrowError_WhenUserTriesToRentOwnItem() {
+        LocalDate start = LocalDate.now().plusDays(5);
+        LocalDate end = LocalDate.now().plusDays(7);
+
+        when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+        when(itemRepository.findById(fishingRod.getId())).thenReturn(Optional.of(fishingRod));
+
+        assertThatThrownBy(() -> bookingService.createBooking(owner.getId(), fishingRod.getId(), start, end))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Não podes alugar a tua própria cana");
+
+        verify(bookingRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando booking não encontrado")
+    void shouldThrowError_WhenBookingNotFoundForUpdate() {
+        when(bookingRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookingService.updateBookingStatus(999L, BookingStatus.CONFIRMED, owner.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Reserva nã encontrada");
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro ao tentar mudar para status inválido")
+    void shouldThrowError_WhenInvalidStatusTransition() {
+        when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
+
+        assertThatThrownBy(() -> bookingService.updateBookingStatus(booking.getId(), BookingStatus.ACTIVE, owner.getId()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Só podes Confirmar ou Rejeitar");
+    }
+
+    @Test
+    @DisplayName("Deve retornar bookings por userId")
+    void shouldGetBookingsByUserId() {
+        List<Booking> expected = List.of(booking);
+        when(bookingRepository.findAllByUserId(renter.getId())).thenReturn(expected);
+
+        List<Booking> result = bookingService.getBookingsByUserId(renter.getId());
+
+        assertThat(result).hasSize(1);
+        assertThat(result).containsExactly(booking);
+        verify(bookingRepository, times(1)).findAllByUserId(renter.getId());
+    }
+
+    @Test
+    @DisplayName("Deve retornar bookings por itemId")
+    void shouldGetBookingsByItemId() {
+        List<Booking> expected = List.of(booking);
+        when(bookingRepository.findAllByItemId(fishingRod.getId())).thenReturn(expected);
+
+        List<Booking> result = bookingService.getBookingsByItemId(fishingRod.getId());
+
+        assertThat(result).hasSize(1);
+        assertThat(result).containsExactly(booking);
+        verify(bookingRepository, times(1)).findAllByItemId(fishingRod.getId());
+    }
+
+    @Test
+    @DisplayName("Deve retornar bookings por item e mês")
+    void shouldGetBookingsByItemAndMonth() {
+        LocalDate start = LocalDate.of(2025, 12, 1);
+        LocalDate end = LocalDate.of(2025, 12, 31);
+        List<Booking> expected = List.of(booking);
+        
+        when(bookingRepository.findByItemIdAndDateRange(fishingRod.getId(), start, end)).thenReturn(expected);
+
+        List<Booking> result = bookingService.getBookingsByItemAndMonth(fishingRod.getId(), 2025, 12);
+
+        assertThat(result).hasSize(1);
+        verify(bookingRepository, times(1)).findByItemIdAndDateRange(fishingRod.getId(), start, end);
+    }
+
+    @Test
+    @DisplayName("Deve retornar bookings por item e semana")
+    void shouldGetBookingsByItemAndWeek() {
+        LocalDate weekStart = LocalDate.of(2025, 12, 15);
+        LocalDate weekEnd = weekStart.plusDays(6);
+        List<Booking> expected = List.of(booking);
+        
+        when(bookingRepository.findByItemIdAndDateRange(fishingRod.getId(), weekStart, weekEnd)).thenReturn(expected);
+
+        List<Booking> result = bookingService.getBookingsByItemAndWeek(fishingRod.getId(), weekStart);
+
+        assertThat(result).hasSize(1);
+        verify(bookingRepository, times(1)).findByItemIdAndDateRange(fishingRod.getId(), weekStart, weekEnd);
+    }
+
+    @Test
+    @DisplayName("Deve retornar booking por ID")
+    void shouldGetBookingById() {
+        when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
+
+        Optional<Booking> result = bookingService.getBooking(booking.getId());
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo(booking);
+    }
+
+    @Test
+    @DisplayName("Deve retornar todos os bookings")
+    void shouldGetAllBookings() {
+        List<Booking> expected = List.of(booking);
+        when(bookingRepository.findAll()).thenReturn(expected);
+
+        List<Booking> result = bookingService.getBookings();
+
+        assertThat(result).hasSize(1);
+        assertThat(result).containsExactly(booking);
+    }
+
+    @Test
+    @DisplayName("Deve incluir datas bloqueadas em datas indisponíveis")
+    void shouldIncludeBlockedDatesInUnavailable() {
+        LocalDate today = LocalDate.now();
+        LocalDate queryStart = today;
+        LocalDate queryEnd = today.plusDays(5);
+
+        BlockedDate blockedDate = new BlockedDate(today.plusDays(1), today.plusDays(2), "Manutenção", fishingRod);
+
+        when(bookingRepository.findBookingsInRange(eq(fishingRod.getId()), any(), any()))
+                .thenReturn(List.of());
+        when(blockedDateRepository.findBlockedDatesInRange(eq(fishingRod.getId()), any(), any()))
+                .thenReturn(List.of(blockedDate));
+
+        List<LocalDate> unavailableDates = bookingService.getUnavailableDates(fishingRod.getId(), queryStart, queryEnd);
+
+        assertThat(unavailableDates).contains(today.plusDays(1), today.plusDays(2));
+    }
+}

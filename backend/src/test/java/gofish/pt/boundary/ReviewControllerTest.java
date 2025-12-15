@@ -2,7 +2,6 @@ package gofish.pt.boundary;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gofish.pt.dto.ReviewDeleteDTO;
 import gofish.pt.dto.ReviewRequestDTO;
 import gofish.pt.dto.ReviewResponseDTO;
 import gofish.pt.dto.ReviewUpdateDTO;
