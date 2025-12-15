@@ -2,6 +2,7 @@ package gofish.pt.service;
 
 import gofish.pt.dto.BlockDateRequestDTO;
 import gofish.pt.dto.ItemFilter;
+import gofish.pt.dto.ItemUpdateDTO;
 import gofish.pt.entity.*;
 import gofish.pt.dto.ItemDTO;
 import gofish.pt.mapper.ItemMapper;
@@ -67,6 +68,66 @@ public class ItemService {
 
         if (item == null)
             return null;
+        return itemRepository.save(item);
+    }
+
+    /**
+     * Updates an existing item with partial data
+     * Only the owner can update the item
+     * Price changes do not affect existing bookings
+     * 
+     * @param itemId The ID of the item to update
+     * @param updateDTO The update data (all fields optional)
+     * @param ownerId The ID of the user attempting the update
+     * @return The updated item
+     * @throws ResponseStatusException 404 if item not found, 403 if not owner
+     */
+    public Item updateItem(Long itemId, ItemUpdateDTO updateDTO, Long ownerId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
+
+        System.out.println("=== UPDATE ITEM SERVICE DEBUG ===");
+        System.out.println("Item owner: " + item.getOwner());
+        System.out.println("Item owner ID: " + (item.getOwner() != null ? item.getOwner().getId() : "null"));
+        System.out.println("Requesting user ID: " + ownerId);
+        System.out.println("Are they equal? " + (item.getOwner() != null && item.getOwner().getId().equals(ownerId)));
+
+        // Authorization: Only owner can update
+        if (item.getOwner() == null || !item.getOwner().getId().equals(ownerId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the item owner can update this item");
+        }
+
+        // Apply partial updates - only update fields that are provided
+        if (updateDTO.getName() != null) {
+            item.setName(updateDTO.getName());
+        }
+
+        if (updateDTO.getDescription() != null) {
+            item.setDescription(updateDTO.getDescription());
+        }
+
+        if (updateDTO.getPhotoUrls() != null) {
+            item.setPhotoUrls(updateDTO.getPhotoUrls());
+        }
+
+        if (updateDTO.getCategory() != null) {
+            item.setCategory(updateDTO.getCategory());
+        }
+
+        if (updateDTO.getMaterial() != null) {
+            item.setMaterial(updateDTO.getMaterial());
+        }
+
+        if (updateDTO.getPrice() != null) {
+            // Price changes do not affect existing bookings
+            // They already have their price locked in
+            item.setPrice(updateDTO.getPrice());
+        }
+
+        if (updateDTO.getAvailable() != null) {
+            item.setAvailable(updateDTO.getAvailable());
+        }
+
         return itemRepository.save(item);
     }
 

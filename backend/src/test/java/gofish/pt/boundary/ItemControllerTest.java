@@ -1,12 +1,13 @@
 package gofish.pt.boundary;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gofish.pt.config.TestSecurityConfig;
 import gofish.pt.dto.ItemDTO;
 import gofish.pt.dto.ItemFilter;
 import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
 import gofish.pt.entity.Material;
+import gofish.pt.entity.User;
 import gofish.pt.repository.UserRepository; // Importar Repositório
 import gofish.pt.service.BookingService;
 import gofish.pt.service.ItemService;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -56,9 +56,15 @@ class ItemControllerTest {
 
     private Item testItem;
     private ItemDTO testDto;
+    private User testOwner;
 
     @BeforeEach
     void setUp() {
+        testOwner = new User();
+        testOwner.setId(1L);
+        testOwner.setUsername("testuser");
+        testOwner.setEmail("test@example.com");
+
         testItem = new Item();
         testItem.setId(1L);
         testItem.setName("Test Rod");
@@ -67,6 +73,7 @@ class ItemControllerTest {
         testItem.setMaterial(Material.GRAPHITE);
         testItem.setPrice(25.99);
         testItem.setAvailable(true);
+        testItem.setOwner(testOwner);
 
         testDto = new ItemDTO(
                 "Test Rod",
@@ -79,6 +86,7 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("POST /api/items/filter - Should return filtered items")
+    @Requirement("GF-44")
     void getItems_withFilter_returnsFilteredItems() throws Exception {
         ItemFilter filter = new ItemFilter("rod", null, null, null, null, null, null);
         when(itemService.findAll(any(ItemFilter.class))).thenReturn(List.of(testItem));
@@ -97,6 +105,7 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("POST /api/items/filter - Should return all items when filter is null")
+    @Requirement("GF-42")
     void getItems_withNullFilter_returnsAllItems() throws Exception {
         when(itemService.findAll((ItemFilter) null)).thenReturn(List.of(testItem));
 
@@ -111,6 +120,7 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("GET /api/items/{id} - Should return item when found")
+    @Requirement("GF-46")
     void getItem_whenExists_returnsItem() throws Exception {
         when(itemService.findById(1L)).thenReturn(Optional.of(testItem));
 
@@ -124,6 +134,7 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("GET /api/items/{id} - Should return 404 when item not found")
+    @Requirement("GF-46")
     void getItem_whenNotExists_returns404() throws Exception {
         when(itemService.findById(999L)).thenReturn(Optional.empty());
 
@@ -136,6 +147,7 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("POST /api/items - Should create item and return 201")
+    @Requirement("GF-57")
     void createItem_withValidDto_createsAndReturns201() throws Exception {
         when(itemService.save(any(ItemDTO.class))).thenReturn(testItem);
 

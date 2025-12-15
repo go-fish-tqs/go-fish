@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +61,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Should register user with hashed password")
+    @Requirement("GF-91")
     void registerUser_withValidData_shouldHashPassword() {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("$2a$10$hashedPassword");
@@ -95,6 +97,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Should throw DuplicateEmailException when email exists")
+    @Requirement("GF-91")
     void registerUser_withExistingEmail_shouldThrowException() {
         when(userRepository.existsByEmail("john.doe@example.com")).thenReturn(true);
 
@@ -108,6 +111,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Should set balance to 0.0 for new user")
+    @Requirement("GF-91")
     void registerUser_shouldSetDefaultBalance() {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
@@ -130,6 +134,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Should check email existence before creating user")
+    @Requirement("GF-91")
     void registerUser_shouldCheckEmailFirst() {
         when(userRepository.existsByEmail("john.doe@example.com")).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
@@ -145,6 +150,7 @@ class UserServiceTest {
     }
 
     @Test
+    @Requirement("GF-66")
     void getUserBookings_returnsBookings() {
         Long userId = 1L;
         User user = mock(User.class);
@@ -162,6 +168,7 @@ class UserServiceTest {
     }
 
     @Test
+    @Requirement("GF-91")
     void getUserBookings_userNotFound_throws() {
         Long userId = 2L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
@@ -173,6 +180,7 @@ class UserServiceTest {
     }
 
     @Test
+    @Requirement("GF-91")
     void getUserOwnedBookings_returnsOwnedBookings() {
         Long userId = 3L;
         User user = mock(User.class);
@@ -198,6 +206,7 @@ class UserServiceTest {
     }
 
     @Test
+    @Requirement("GF-91")
     void getUserOwnedItems_returnsItems() {
         Long userId = 4L;
         User user = mock(User.class);
@@ -215,6 +224,7 @@ class UserServiceTest {
     }
 
     @Test
+    @Requirement("GF-91")
     void getUserOwnedItems_userNotFound_throws() {
         Long userId = 5L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());

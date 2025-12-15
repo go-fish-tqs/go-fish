@@ -1,5 +1,6 @@
 package gofish.pt.service;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ class JwtServiceTest {
 
     @Test
     @DisplayName("Should generate valid JWT token with userId and email")
+    @Requirement("GF-93")
     void testGenerateToken() {
         // Arrange
         Long userId = 123L;
@@ -34,6 +36,7 @@ class JwtServiceTest {
 
     @Test
     @DisplayName("Should extract email from valid token")
+    @Requirement("GF-93")
     void testExtractEmail() {
         // Arrange
         Long userId = 123L;
@@ -49,6 +52,7 @@ class JwtServiceTest {
 
     @Test
     @DisplayName("Should extract userId from valid token")
+    @Requirement("GF-93")
     void testExtractUserId() {
         // Arrange
         Long userId = 123L;
@@ -64,6 +68,7 @@ class JwtServiceTest {
 
     @Test
     @DisplayName("Should validate valid token")
+    @Requirement("GF-93")
     void testValidateValidToken() {
         // Arrange
         Long userId = 123L;
@@ -79,6 +84,7 @@ class JwtServiceTest {
 
     @Test
     @DisplayName("Should reject invalid token")
+    @Requirement("GF-93")
     void testValidateInvalidToken() {
         // Arrange
         String invalidToken = "invalid.token.here";
@@ -92,6 +98,7 @@ class JwtServiceTest {
 
     @Test
     @DisplayName("Should reject malformed token")
+    @Requirement("GF-93")
     void testValidateMalformedToken() {
         // Arrange
         String malformedToken = "not-a-jwt-token";
@@ -105,6 +112,7 @@ class JwtServiceTest {
 
     @Test
     @DisplayName("Should reject empty token")
+    @Requirement("GF-93")
     void testValidateEmptyToken() {
         // Arrange
         String emptyToken = "";
@@ -118,6 +126,7 @@ class JwtServiceTest {
 
     @Test
     @DisplayName("Should reject null token")
+    @Requirement("GF-93")
     void testValidateNullToken() {
         // Arrange
         String nullToken = null;
@@ -131,6 +140,7 @@ class JwtServiceTest {
 
     @Test
     @DisplayName("Should generate different tokens for different users")
+    @Requirement("GF-93")
     void testGenerateDifferentTokensForDifferentUsers() {
         // Arrange
         Long userId1 = 1L;
@@ -148,6 +158,7 @@ class JwtServiceTest {
 
     @Test
     @DisplayName("Should include userId in token claims")
+    @Requirement("GF-93")
     void testTokenContainsUserId() {
         // Arrange
         Long userId = 456L;
@@ -163,6 +174,7 @@ class JwtServiceTest {
 
     @Test
     @DisplayName("Should include email as subject in token")
+    @Requirement("GF-93")
     void testTokenContainsEmailAsSubject() {
         // Arrange
         Long userId = 789L;

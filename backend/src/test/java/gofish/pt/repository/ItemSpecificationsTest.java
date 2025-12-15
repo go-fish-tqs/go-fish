@@ -1,5 +1,6 @@
 package gofish.pt.repository;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import gofish.pt.entity.Category;
 import gofish.pt.entity.Item;
 import gofish.pt.entity.Material;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static gofish.pt.repository.ItemSpecifications.*;
@@ -47,42 +49,31 @@ class ItemSpecificationsTest {
         userRepository.save(zePescador); // <--- O user ganha ID aqui
 
         // 3. AGORA CRIA OS ITENS ASSOCIADOS AO ZÉ
-        rod = new Item(
-                null, // <--- Mete NULL aqui direto! O Hibernate gera o ID.
-                "Fishing Rod",
-                "Strong rod",
-                List.of("img1"),
-                Category.RODS,
-                Material.CARBON_FIBER,
-                19.99,
-                true,
-                true, // active (admin status)
-                null, // deactivationReason
-                zePescador, // <--- Mete aqui o USER que criaste!
-                null, // bookings (pode ser null se a lista for opcional no construtor)
-                null // reviews
-        );
+        rod = new Item();
+        rod.setName("Fishing Rod");
+        rod.setDescription("Strong rod");
+        rod.setPhotoUrls(new ArrayList<>(List.of("img1")));
+        rod.setCategory(Category.RODS);
+        rod.setMaterial(Material.CARBON_FIBER);
+        rod.setPrice(15.99);
+        rod.setAvailable(true);
+        rod.setOwner(zePescador); // <--- Associa o dono que acab
 
-        reel = new Item(
-                null, // <--- Mete NULL aqui também
-                "Fishing Reel",
-                "Smooth reel",
-                List.of("img2"),
-                Category.REELS,
-                Material.ALUMINUM,
-                7.99,
-                true,
-                true, // active (admin status)
-                null, // deactivationReason
-                zePescador, // <--- O mesmo dono
-                null, // bookings
-                null // reviews
-        );
+        reel = new Item();
+        reel.setName("Fishing Reel");
+        reel.setDescription("Smooth reel");
+        reel.setPhotoUrls(new ArrayList<>(List.of("img2")));
+        reel.setCategory(Category.REELS);
+        reel.setMaterial(Material.ALUMINUM);
+        reel.setPrice(7.99);
+        reel.setAvailable(true);
+        reel.setOwner(zePescador); // <--- Associa o dono que acab
 
         itemRepository.saveAll(List.of(rod, reel));
     }
 
     @Test
+    @Requirement("GF-45")
     void filterByCategory() {
         spec = categoryIs(Category.RODS);
 
@@ -93,6 +84,7 @@ class ItemSpecificationsTest {
     }
 
     @Test
+    @Requirement("GF-44")
     void filterByName() {
         spec = nameContains("fishing");
         result = itemRepository.findAll(spec);
@@ -106,6 +98,7 @@ class ItemSpecificationsTest {
     }
 
     @Test
+    @Requirement("GF-45")
     void filterByMaterial() {
         spec = materialIs(Material.CARBON_FIBER);
         result = itemRepository.findAll(spec);
@@ -114,6 +107,7 @@ class ItemSpecificationsTest {
     }
 
     @Test
+    @Requirement("GF-45")
     void filterByMultipleConditions() {
         spec = Specification.allOf(nameContains("fishing"), priceBetween(10d, 20d), availableIs(true));
         result = itemRepository.findAll(spec);
@@ -122,6 +116,7 @@ class ItemSpecificationsTest {
     }
 
     @Test
+    @Requirement("GF-42")
     void sortByPrice() {
         spec = null;
         sort = Sort.by(Sort.Direction.DESC, "price");
@@ -131,9 +126,79 @@ class ItemSpecificationsTest {
     }
 
     @Test
+    @Requirement("GF-42")
     void findAllWhenNull() {
         spec = null;
         assertThat(itemRepository.findAll(spec)).isEqualTo(itemRepository.findAll());
+    }
+
+    @Test
+    void filterByNameWithNull() {
+        spec = nameContains(null);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void filterByCategoryWithNull() {
+        spec = categoryIs(null);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void filterByMaterialWithNull() {
+        spec = materialIs(null);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void filterByPriceBetweenWithOnlyMin() {
+        spec = priceBetween(10.0, null);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo("Fishing Rod");
+    }
+
+    @Test
+    void filterByPriceBetweenWithOnlyMax() {
+        spec = priceBetween(null, 10.0);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo("Fishing Reel");
+    }
+
+    @Test
+    void filterByPriceBetweenWithBothNull() {
+        spec = priceBetween(null, null);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void filterByAvailableIsTrue() {
+        spec = availableIs(true);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void filterByAvailableIsFalse() {
+        rod.setAvailable(false);
+        itemRepository.save(rod);
+
+        spec = availableIs(false);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo("Fishing Rod");
+    }
+
+    @Test
+    void filterByAvailableIsNull() {
+        spec = availableIs(null);
+        result = itemRepository.findAll(spec);
+        assertThat(result).hasSize(2);
     }
 
 }

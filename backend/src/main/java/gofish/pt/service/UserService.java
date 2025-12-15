@@ -21,6 +21,19 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import gofish.pt.entity.Booking;
+import gofish.pt.entity.Item;
+import gofish.pt.entity.User;
+import gofish.pt.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import gofish.pt.dto.UserRegistrationDTO;
+import gofish.pt.exception.DuplicateEmailException;
+import gofish.pt.exception.InvalidCredentialsException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Service
 @Transactional

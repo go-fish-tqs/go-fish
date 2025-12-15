@@ -3,6 +3,7 @@ package gofish.pt.boundary;
 import gofish.pt.dto.BlockDateRequestDTO;
 import gofish.pt.dto.ItemDTO;
 import gofish.pt.dto.ItemFilter;
+import gofish.pt.dto.ItemUpdateDTO;
 import gofish.pt.entity.*;
 import gofish.pt.repository.UserRepository; // Importar Repositório
 import gofish.pt.service.BookingService;
@@ -18,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException; // Importar
 
 import java.net.URI;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,7 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Item> getItem(@PathVariable Integer id) {
+    public ResponseEntity<Item> getItem(@PathVariable Long id) {
         return itemService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -58,6 +57,19 @@ public class ItemController {
         Item saved = itemService.save(item);
         URI location = URI.create("/api/items/" + saved.getId());
         return ResponseEntity.created(location).body(saved);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Item> updateItem(
+            @PathVariable Long id,
+            @Valid @RequestBody ItemUpdateDTO updateDTO) {
+        Long ownerId = getCurrentUserId();
+        System.out.println("=== UPDATE ITEM DEBUG ===");
+        System.out.println("Item ID: " + id);
+        System.out.println("Owner ID from JWT: " + ownerId);
+        System.out.println("Update DTO: " + updateDTO);
+        Item updated = itemService.updateItem(id, updateDTO, ownerId);
+        return ResponseEntity.ok(updated);
     }
 
     @GetMapping("/categories")
@@ -122,6 +134,14 @@ public class ItemController {
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        System.out.println("=== GET CURRENT USER DEBUG ===");
+        System.out.println("Authentication: " + authentication);
+        System.out.println("Is authenticated: " + (authentication != null && authentication.isAuthenticated()));
+        System.out.println("Principal: " + (authentication != null ? authentication.getPrincipal() : "null"));
+        System.out.println("Principal class: " + (authentication != null && authentication.getPrincipal() != null
+                ? authentication.getPrincipal().getClass()
+                : "null"));
+
         if (authentication == null || !authentication.isAuthenticated()
                 || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
@@ -133,30 +153,39 @@ public class ItemController {
         try {
             // Se o principal já é um Long (userId) - usado em produção com JWT
             if (principal instanceof Long) {
+                System.out.println("Principal is Long: " + principal);
                 return (Long) principal;
             }
 
             // Se for UserDetails (usado em testes com @WithMockUser)
             if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
                 String username = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
+                System.out.println("Principal is UserDetails, username: " + username);
                 User user = userRepository.findByUsername(username)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+                System.out.println("Found user ID: " + user.getId());
                 return user.getId();
             }
 
             // Tenta converter String para Long (caso seja o userId como string)
             String principalStr = principal.toString();
+            System.out.println("Principal as String: " + principalStr);
             try {
-                return Long.parseLong(principalStr);
+                Long userId = Long.parseLong(principalStr);
+                System.out.println("Parsed userId: " + userId);
+                return userId;
             } catch (NumberFormatException e) {
                 // Se não for número, assume que é username
+                System.out.println("Not a number, treating as username");
                 User user = userRepository.findByUsername(principalStr)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+                System.out.println("Found user ID: " + user.getId());
                 return user.getId();
             }
         } catch (ResponseStatusException e) {
             throw e;
         } catch (Exception e) {
+            System.out.println("Error getting user ID: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                     "Invalid user authentication: " + e.getMessage());
         }

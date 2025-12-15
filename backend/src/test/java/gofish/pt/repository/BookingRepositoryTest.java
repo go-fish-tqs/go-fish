@@ -1,5 +1,6 @@
 package gofish.pt.repository;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import gofish.pt.entity.*; // Importa as tuas entidades todas
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,6 +52,7 @@ class BookingRepositoryTest {
 
     @Test
     @DisplayName("Deve detetar conflito quando as datas são exatamente iguais")
+    @Requirement("GF-51")
     void shouldFindOverlap_WhenDatesAreExact() {
         // Arrange: Já existe uma reserva de dia 10 a 12
         createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 12), BookingStatus.CONFIRMED);
@@ -68,6 +70,7 @@ class BookingRepositoryTest {
 
     @Test
     @DisplayName("Deve detetar conflito quando a nova reserva está DENTRO da existente")
+    @Requirement("GF-51")
     void shouldFindOverlap_WhenNewIsInsideExisting() {
         // Arrange: Reserva de 10 a 20
         createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 20), BookingStatus.CONFIRMED);
@@ -85,6 +88,7 @@ class BookingRepositoryTest {
 
     @Test
     @DisplayName("NÃO deve detetar conflito se a reserva existente estiver CANCELADA")
+    @Requirement("GF-48")
     void shouldNotFindOverlap_WhenExistingIsCancelled() {
         // Arrange: Reserva de 10 a 12, mas CANCELADA
         createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 12), BookingStatus.CANCELLED);
@@ -102,6 +106,7 @@ class BookingRepositoryTest {
 
     @Test
     @DisplayName("NÃO deve detetar conflito se as datas apenas se tocam (Fim = Início)")
+    @Requirement("GF-48")
     void shouldNotFindOverlap_WhenDatesTouch() {
         // Arrange: Reserva acaba dia 10 às 12:00
         createBooking(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 10), BookingStatus.CONFIRMED);
@@ -121,6 +126,7 @@ class BookingRepositoryTest {
 
     @Test
     @DisplayName("Deve encontrar reservas confirmadas dentro de um intervalo")
+    @Requirement("GF-51")
     void shouldFindBookingsInRange() {
         // Arrange
         // Reserva 1: Dia 5 a 10 (CONFIRMADA)
@@ -163,5 +169,77 @@ class BookingRepositoryTest {
         long days = java.time.temporal.ChronoUnit.DAYS.between(start, end);
         if (days == 0) days = 1;
         return days * price;
+    }
+
+    @Test
+    void shouldFindAllByUserId() {
+        createBooking(LocalDate.of(2025, 1, 5), LocalDate.of(2025, 1, 10), BookingStatus.CONFIRMED);
+        createBooking(LocalDate.of(2025, 1, 15), LocalDate.of(2025, 1, 20), BookingStatus.PENDING);
+
+        List<Booking> bookings = bookingRepository.findAllByUserId(zePescador.getId());
+
+        assertThat(bookings).hasSize(2);
+    }
+
+    @Test
+    void shouldFindAllByItemId() {
+        createBooking(LocalDate.of(2025, 1, 5), LocalDate.of(2025, 1, 10), BookingStatus.CONFIRMED);
+        createBooking(LocalDate.of(2025, 1, 15), LocalDate.of(2025, 1, 20), BookingStatus.ACTIVE);
+
+        List<Booking> bookings = bookingRepository.findAllByItemId(fishingRod.getId());
+
+        assertThat(bookings).hasSize(2);
+    }
+
+    @Test
+    void shouldNotFindOverlap_WhenBookingIsPending() {
+        createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 12), BookingStatus.PENDING);
+
+        boolean exists = bookingRepository.existsOverlappingBooking(
+                fishingRod.getId(),
+                LocalDate.of(2025, 1, 10),
+                LocalDate.of(2025, 1, 12)
+        );
+
+        assertThat(exists).isFalse();
+    }
+
+    @Test
+    void shouldNotFindOverlap_WhenBookingIsCompleted() {
+        createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 12), BookingStatus.COMPLETED);
+
+        boolean exists = bookingRepository.existsOverlappingBooking(
+                fishingRod.getId(),
+                LocalDate.of(2025, 1, 10),
+                LocalDate.of(2025, 1, 12)
+        );
+
+        assertThat(exists).isFalse();
+    }
+
+    @Test
+    void shouldFindOverlap_WhenNewEndsAfterExisting() {
+        createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 15), BookingStatus.CONFIRMED);
+
+        boolean exists = bookingRepository.existsOverlappingBooking(
+                fishingRod.getId(),
+                LocalDate.of(2025, 1, 12),
+                LocalDate.of(2025, 1, 20)
+        );
+
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    void shouldFindOverlap_WhenNewStartsBeforeExisting() {
+        createBooking(LocalDate.of(2025, 1, 10), LocalDate.of(2025, 1, 15), BookingStatus.ACTIVE);
+
+        boolean exists = bookingRepository.existsOverlappingBooking(
+                fishingRod.getId(),
+                LocalDate.of(2025, 1, 5),
+                LocalDate.of(2025, 1, 12)
+        );
+
+        assertThat(exists).isTrue();
     }
 }

@@ -1,5 +1,6 @@
 package gofish.pt.service;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -82,6 +83,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should throw error when booking not found")
+    @Requirement("GF-69")
     void createPaymentIntent_WhenBookingNotFound_ShouldThrowError() {
         CreatePaymentIntentDTO dto = new CreatePaymentIntentDTO(999L, 5000L, "eur");
         when(bookingRepository.findById(999L)).thenReturn(Optional.empty());
@@ -95,6 +97,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should throw error when booking is not in PENDING status")
+    @Requirement("GF-69")
     void createPaymentIntent_WhenBookingNotPending_ShouldThrowError() {
         booking.setStatus(BookingStatus.CONFIRMED);
         CreatePaymentIntentDTO dto = new CreatePaymentIntentDTO(booking.getId(), 5000L, "eur");
@@ -109,6 +112,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should create PaymentIntent successfully for valid pending booking")
+    @Requirement("GF-69")
     void createPaymentIntent_WithValidPendingBooking_ShouldSucceed() {
         CreatePaymentIntentDTO dto = new CreatePaymentIntentDTO(booking.getId(), 5000L, "eur");
         when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
@@ -137,6 +141,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should use default currency when not provided")
+    @Requirement("GF-69")
     void createPaymentIntent_WithNullCurrency_ShouldUseEuro() {
         CreatePaymentIntentDTO dto = new CreatePaymentIntentDTO(booking.getId(), 5000L, null);
         when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
@@ -164,6 +169,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should handle Stripe exception gracefully")
+    @Requirement("GF-69")
     void createPaymentIntent_WhenStripeException_ShouldThrowError() {
         CreatePaymentIntentDTO dto = new CreatePaymentIntentDTO(booking.getId(), 5000L, "eur");
         when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
@@ -183,6 +189,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should throw error when payment not found")
+    @Requirement("GF-69")
     void confirmPayment_WhenPaymentNotFound_ShouldThrowError() {
         ConfirmPaymentDTO dto = new ConfirmPaymentDTO("pi_unknown", booking.getId());
         when(paymentRepository.findByStripePaymentIntentId("pi_unknown")).thenReturn(Optional.empty());
@@ -194,6 +201,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should confirm payment and update booking when Stripe status is succeeded")
+    @Requirement("GF-69")
     void confirmPayment_WhenSucceeded_ShouldUpdatePaymentAndBooking() {
         ConfirmPaymentDTO dto = new ConfirmPaymentDTO("pi_test_123", booking.getId());
         when(paymentRepository.findByStripePaymentIntentId("pi_test_123")).thenReturn(Optional.of(payment));
@@ -223,6 +231,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should fail payment when Stripe status requires_payment_method")
+    @Requirement("GF-69")
     void confirmPayment_WhenRequiresPaymentMethod_ShouldFail() {
         ConfirmPaymentDTO dto = new ConfirmPaymentDTO("pi_test_123", booking.getId());
         when(paymentRepository.findByStripePaymentIntentId("pi_test_123")).thenReturn(Optional.of(payment));
@@ -246,6 +255,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should fail payment when Stripe status is canceled")
+    @Requirement("GF-69")
     void confirmPayment_WhenCanceled_ShouldFail() {
         ConfirmPaymentDTO dto = new ConfirmPaymentDTO("pi_test_123", booking.getId());
         when(paymentRepository.findByStripePaymentIntentId("pi_test_123")).thenReturn(Optional.of(payment));
@@ -270,6 +280,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should calculate booking amount correctly for multiple days")
+    @Requirement("GF-69")
     void calculateBookingAmount_ForMultipleDays_ShouldCalculateCorrectly() {
         // 3 days booking at 25.0 per day = 75.0 EUR = 7500 cents
         Long amount = paymentService.calculateBookingAmount(booking);
@@ -280,6 +291,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should return minimum 1 day when duration is less than 1 day")
+    @Requirement("GF-69")
     void calculateBookingAmount_WhenLessThanOneDay_ShouldReturnOneDayPrice() {
         booking.setStartDate(LocalDate.now().plusDays(1));
         booking.setEndDate(LocalDate.now().plusDays(2));
@@ -291,6 +303,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("Should return 0 when item has no price")
+    @Requirement("GF-69")
     void calculateBookingAmount_WhenNoPriceSet_ShouldReturnZero() {
         item.setPrice(null);
 

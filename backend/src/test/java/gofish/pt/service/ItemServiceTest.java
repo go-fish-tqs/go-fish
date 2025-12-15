@@ -1,6 +1,7 @@
 package gofish.pt.service;
 
 import gofish.pt.dto.BlockDateRequestDTO;
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import gofish.pt.dto.ItemDTO;
 import gofish.pt.dto.ItemFilter;
 import gofish.pt.entity.*;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,22 +61,39 @@ class ItemServiceTest {
         owner.setUsername("owner");
         owner.setEmail("owner@test.com");
 
-        i1 = new Item(1L, "simple rod", "very simple", List.of(), Category.RODS, Material.BRASS, 5.0, true, true, null,
-                owner, null,
-                null);
-        i2 = new Item(2L, "cool rod", "very cool", List.of(), Category.RODS, Material.GRAPHITE, 7.0, true, true, null,
-                owner, null,
-                null);
+        i1 = new Item();
+        i1.setId(1L);
+        i1.setName("simple rod");
+        i1.setDescription("very simple");
+        i1.setPhotoUrls(List.of());
+        i1.setCategory(Category.RODS);
+        i1.setMaterial(Material.BRASS);
+        i1.setPrice(5.0);
+        i1.setAvailable(true);
+        i1.setOwner(owner);
+
+        i2 = new Item();
+        i2.setId(2L);
+        i2.setName("cool rod");
+        i2.setDescription("very cool");
+        i2.setPhotoUrls(List.of());
+        i2.setCategory(Category.RODS);
+        i2.setMaterial(Material.GRAPHITE);
+        i2.setPrice(7.0);
+        i2.setAvailable(true);
+        i2.setOwner(owner);
         dto1 = new ItemDTO("simple rod", "very simple", List.of(), Category.RODS, Material.BRASS, 5.0);
         dto2 = new ItemDTO("cool rod", "very cool", List.of(), Category.RODS, Material.GRAPHITE, 7.0);
     }
 
     @Test
+    @Requirement("GF-42")
     void repositoryStartsEmpty() {
         assertThat(itemService.findAll()).isEmpty();
     }
 
     @Test
+    @Requirement("GF-46")
     void findById() {
         when(itemRepository.findById(1L)).thenReturn(Optional.of(i1));
         when(itemRepository.findById(2L)).thenReturn(Optional.of(i2));
@@ -86,12 +105,14 @@ class ItemServiceTest {
     }
 
     @Test
+    @Requirement("GF-42")
     void findAll() {
         when(itemRepository.findAll()).thenReturn(List.of(i1, i2));
         assertThat(itemService.findAll()).hasSize(2);
     }
 
     @Test
+    @Requirement("GF-57")
     void save() {
         when(itemMapper.toEntity(dto1)).thenReturn(i1);
         when(itemRepository.save(i1)).thenReturn(i1);
@@ -100,6 +121,7 @@ class ItemServiceTest {
     }
 
     @Test
+    @Requirement("GF-57")
     void saveReturnsNullWhenMapperReturnsNull() {
         when(itemMapper.toEntity(any(ItemDTO.class))).thenReturn(null);
 
@@ -126,6 +148,7 @@ class ItemServiceTest {
     }
 
     @Test
+    @Requirement("GF-42")
     void findAllSpecWithDefaultSort() {
         List<Item> mockedResult = List.of(i1, i2);
 
@@ -143,6 +166,7 @@ class ItemServiceTest {
     }
 
     @Test
+    @Requirement("GF-42")
     void findAllWithSort() {
         List<Item> mockedResult = List.of(i1, i2);
         ItemFilter filter = new ItemFilter(null, null, null, null, null, "price", Sort.Direction.DESC);
@@ -248,5 +272,74 @@ class ItemServiceTest {
                     .isInstanceOf(ResponseStatusException.class)
                     .hasFieldOrPropertyWithValue("statusCode", HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Test
+    void testGetCategories_ReturnsOnlyTopLevelCategories() {
+        List<Category> categories = itemService.getCategories();
+
+        assertThat(categories).isNotNull();
+        assertThat(categories).isNotEmpty();
+        assertThat(categories).allMatch(Category::isTopLevel);
+        // Verify some known top-level categories exist
+        assertThat(categories).contains(Category.RODS, Category.REELS, Category.BOATS);
+    }
+
+    @Test
+    void testGetMaterials_ReturnsAllMaterialGroups() {
+        Map<Material.MaterialGroup, List<Material>> materials = itemService.getMaterials();
+
+        assertThat(materials).isNotNull();
+        assertThat(materials).hasSize(Material.MaterialGroup.values().length);
+
+        // Verify each group has materials
+        for (Material.MaterialGroup group : Material.MaterialGroup.values()) {
+            assertThat(materials).containsKey(group);
+            assertThat(materials.get(group)).isNotEmpty();
+        }
+    }
+
+    @Test
+    void testGetBlockedDates_ReturnsBlockedDatesInRange() {
+        LocalDate from = LocalDate.of(2025, 1, 1);
+        LocalDate to = LocalDate.of(2025, 1, 31);
+        List<BlockedDate> expectedDates = List.of(
+                new BlockedDate(LocalDate.of(2025, 1, 5), LocalDate.of(2025, 1, 7), "Maintenance", i1),
+                new BlockedDate(LocalDate.of(2025, 1, 20), LocalDate.of(2025, 1, 22), "Vacation", i1));
+
+        when(blockedDateRepository.findBlockedDatesInRange(1L, from, to)).thenReturn(expectedDates);
+
+        List<BlockedDate> result = itemService.getBlockedDates(1L, from, to);
+
+        assertThat(result).hasSize(2);
+        assertThat(result).isEqualTo(expectedDates);
+        verify(blockedDateRepository, times(1)).findBlockedDatesInRange(1L, from, to);
+    }
+
+    @Test
+    void testBlockDateRange_WhenStartDateAfterEndDate_ThenThrowBadRequest() {
+        BlockDateRequestDTO request = new BlockDateRequestDTO();
+        request.setStartDate(LocalDate.now().plusDays(10));
+        request.setEndDate(LocalDate.now()); // End before start
+
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(i1));
+
+        assertThatThrownBy(() -> itemService.blockDateRange(1L, request, 1L))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("statusCode", HttpStatus.BAD_REQUEST)
+                .hasMessageContaining("Start date cannot be after end date");
+    }
+
+    @Test
+    void testFindAll_WhenFilterIsNull_ThenReturnAllItems() {
+        List<Item> allItems = List.of(i1, i2);
+        when(itemRepository.findAll()).thenReturn(allItems);
+
+        List<Item> result = itemService.findAll(null);
+
+        assertThat(result).hasSize(2);
+        assertThat(result).containsExactly(i1, i2);
+        verify(itemRepository, times(1)).findAll();
+        verify(itemRepository, never()).findAll(any(Specification.class), any(Sort.class));
     }
 }

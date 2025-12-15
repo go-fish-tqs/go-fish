@@ -1,12 +1,10 @@
 package gofish.pt.repository;
 
 import gofish.pt.entity.Booking;
-import gofish.pt.entity.BookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.time.LocalDate;
 import java.util.List;
 
