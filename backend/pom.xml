@@ -19,6 +19,7 @@
 
         <sonar.organization>go-fish-tqs</sonar.organization>
         <sonar.projectKey>go-fish-tqs_go-fish</sonar.projectKey>
+        <sonar.exclusions>**/DataInitializer.java</sonar.exclusions>
 
         <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
@@ -222,19 +223,7 @@
             <version>6.4.5</version>
         </dependency>
 
-        <!-- Spring Security for Authentication -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <version>3.5.7</version>
-        </dependency>
 
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <version>6.4.5</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- JWT for authentication tokens -->
         <dependency>
@@ -311,6 +300,10 @@
                     <excludes>
                         <exclude>**/config/*</exclude>
                         <exclude>**/*Config.class</exclude>
+                        <exclude>**/DataInitializer.class</exclude>
+                        <exclude>**/SecurityConfig.class</exclude>
+                        <exclude>**/CorsConfig.class</exclude>
+                        <exclude>**/DevWebConfig.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>

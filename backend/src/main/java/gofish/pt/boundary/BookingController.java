@@ -29,10 +29,10 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<BookingResponseDTO> createBooking(@Valid @RequestBody BookingRequestDTO request) {
 
-        try{
+        try {
             // Get authenticated user ID from JWT token
             Long authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
-            
+
             // Create booking with authenticated user
             Booking booking = bookingService.createBooking(
                     authenticatedUserId,
@@ -43,7 +43,7 @@ public class BookingController {
             BookingResponseDTO response = bookingMapper.toDTO(booking);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
@@ -88,6 +88,28 @@ public class BookingController {
             @PathVariable Long itemId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start) {
         List<Booking> bookings = bookingService.getBookingsByItemAndWeek(itemId, start);
+        List<BookingResponseDTO> response = bookings.stream()
+                .map(bookingMapper::toDTO)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    // Get all bookings on items owned by the current user
+    @GetMapping("/my-items")
+    public ResponseEntity<List<BookingResponseDTO>> getBookingsOnMyItems() {
+        Long authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+        List<Booking> bookings = bookingService.getBookingsByItemOwnerId(authenticatedUserId);
+        List<BookingResponseDTO> response = bookings.stream()
+                .map(bookingMapper::toDTO)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    // Get all bookings made by the current user
+    @GetMapping("/my")
+    public ResponseEntity<List<BookingResponseDTO>> getMyBookings() {
+        Long authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+        List<Booking> bookings = bookingService.getBookingsByUserId(authenticatedUserId);
         List<BookingResponseDTO> response = bookings.stream()
                 .map(bookingMapper::toDTO)
                 .toList();

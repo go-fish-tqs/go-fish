@@ -108,11 +108,14 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
     // Create review mutation
     const createReviewMutation = useMutation({
         mutationFn: async (data: { rating: number; comment: string }) => {
+            const token = localStorage.getItem("token");
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token && { "Authorization": `Bearer ${token}` })
+                },
                 body: JSON.stringify({
-                    userId: CURRENT_USER_ID,
                     itemId: Number(itemId),
                     rating: data.rating,
                     comment: data.comment,
@@ -140,10 +143,13 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
     // Delete review mutation
     const deleteReviewMutation = useMutation({
         mutationFn: async (reviewId: number) => {
+            const token = localStorage.getItem("token");
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${reviewId}`, {
                 method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: CURRENT_USER_ID }),
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token && { "Authorization": `Bearer ${token}` })
+                },
             });
             if (!res.ok && res.status !== 204) {
                 const error = await res.json();

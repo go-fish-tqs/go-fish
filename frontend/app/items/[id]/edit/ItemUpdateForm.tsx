@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getAuthHeaders } from "@/app/lib/auth";
-import { Item } from "../types";
+import { Item } from "../../types";
 
 interface ItemUpdateFormProps {
   itemId: string;
@@ -11,12 +11,12 @@ interface ItemUpdateFormProps {
 
 export default function ItemUpdateForm({ itemId }: ItemUpdateFormProps) {
   const router = useRouter();
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [newPhotoUrl, setNewPhotoUrl] = useState("");
-  
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -37,28 +37,28 @@ export default function ItemUpdateForm({ itemId }: ItemUpdateFormProps) {
         });
 
         console.log("Response status:", response.status);
-        
+
         if (!response.ok) {
           throw new Error(`Failed to load item: ${response.status}`);
         }
 
         const item: Item = await response.json();
         console.log("Loaded item:", item);
-        
+
         // Extract category and material as strings
         // Category comes as object: {id: "ANCHORS", displayName: "Anchors", ...}
         // Material comes as string: "TITANIUM"
         const categoryValue = typeof item.category === 'object' && item.category !== null
           ? (item.category as any).id || ""
           : item.category || "";
-        
+
         const materialValue = typeof item.material === 'object' && item.material !== null
           ? (item.material as any).id || ""
           : item.material || "";
-        
+
         console.log("Setting category to:", categoryValue);
         console.log("Setting material to:", materialValue);
-        
+
         setFormData({
           name: item.name || "",
           description: item.description || "",
@@ -93,7 +93,7 @@ export default function ItemUpdateForm({ itemId }: ItemUpdateFormProps) {
       const updateData: Record<string, any> = {
         available: formData.available, // Always include availability
       };
-      
+
       // Add other fields only if they have values
       if (formData.name?.trim()) updateData.name = formData.name.trim();
       if (formData.description?.trim()) updateData.description = formData.description.trim();
@@ -397,7 +397,7 @@ export default function ItemUpdateForm({ itemId }: ItemUpdateFormProps) {
           ) : (
             <p className="text-sm text-gray-500 italic py-2">No photos added yet</p>
           )}
-          
+
           {/* Add new photo */}
           <div className="border-t border-gray-200 pt-3">
             <div className="flex gap-2">

@@ -20,14 +20,26 @@ public class JwtService {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(Long userId, String email) {
+    /**
+     * Generate JWT token with userId, email, and role claims.
+     */
+    public String generateToken(Long userId, String email, String role) {
         return Jwts.builder()
                 .subject(email)
                 .claim("userId", userId)
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key)
                 .compact();
+    }
+
+    /**
+     * @deprecated Use {@link #generateToken(Long, String, String)} instead
+     */
+    @Deprecated
+    public String generateToken(Long userId, String email) {
+        return generateToken(userId, email, "USER");
     }
 
     public String extractEmail(String token) {
@@ -46,6 +58,15 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload()
                 .get("userId", Long.class);
+    }
+
+    public String extractRole(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("role", String.class);
     }
 
     public boolean validateToken(String token) {

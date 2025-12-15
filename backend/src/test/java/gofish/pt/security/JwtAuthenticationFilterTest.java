@@ -1,6 +1,7 @@
 package gofish.pt.security;
 
 import gofish.pt.service.JwtService;
+import gofish.pt.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
+
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,6 +27,9 @@ class JwtAuthenticationFilterTest {
 
     @Mock
     private JwtService jwtService;
+
+    @Mock
+    private UserService userService;
 
     @Mock
     private HttpServletRequest request;
@@ -81,6 +86,8 @@ class JwtAuthenticationFilterTest {
         when(request.getHeader("Authorization")).thenReturn(authHeader);
         when(jwtService.validateToken(validToken)).thenReturn(true);
         when(jwtService.extractUserId(validToken)).thenReturn(userId);
+        when(jwtService.extractRole(validToken)).thenReturn("USER");
+        when(userService.isUserActive(userId)).thenReturn(true);
 
         // Act
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
@@ -93,7 +100,9 @@ class JwtAuthenticationFilterTest {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         assertNotNull(authentication);
         assertEquals(userId, authentication.getPrincipal());
-        assertTrue(authentication.getAuthorities().isEmpty());
+        assertFalse(authentication.getAuthorities().isEmpty());
+        assertTrue(authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_USER")));
     }
 
     @Test
@@ -118,7 +127,8 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    void testDoFilterInternal_TokenValidationThrowsException_ContinuesWithoutAuth() throws ServletException, IOException {
+    void testDoFilterInternal_TokenValidationThrowsException_ContinuesWithoutAuth()
+            throws ServletException, IOException {
         // Arrange
         String malformedToken = "malformed.jwt.token";
         String authHeader = "Bearer " + malformedToken;

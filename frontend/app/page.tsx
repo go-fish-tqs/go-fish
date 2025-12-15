@@ -33,7 +33,7 @@ export default function Home() {
   }
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950" />
 
@@ -75,7 +75,7 @@ export default function Home() {
             <span className="relative z-10">Create Account</span>
             <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
           </Link>
-          
+
           <Link
             href="/login"
             className="flex-1 px-8 py-4 bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 text-blue-600 dark:text-blue-400 font-semibold rounded-xl shadow-lg backdrop-blur-sm border border-blue-200/50 dark:border-blue-800/50 transition-all duration-200 hover:shadow-2xl hover:scale-105 text-center"

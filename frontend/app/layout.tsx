@@ -4,6 +4,7 @@ import "./globals.css";
 import Sidebar from "@/app/ui/Sidebar";
 import Providers from "@/app/providers";
 import { Toaster } from "react-hot-toast";
+import SuspendedBanner from "@/app/components/SuspendedBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,6 +51,7 @@ export default function RootLayout({
             }}
           />
           <Sidebar />
+          <SuspendedBanner />
           <main className="flex-1 p-4 h-full overflow-y-auto">{children}</main>
         </Providers>
       </body>

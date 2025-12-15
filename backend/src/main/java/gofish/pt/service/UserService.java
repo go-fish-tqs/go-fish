@@ -2,6 +2,25 @@ package gofish.pt.service;
 
 import gofish.pt.dto.LoginRequestDTO;
 import gofish.pt.dto.LoginResponseDTO;
+import gofish.pt.dto.UserRegistrationDTO;
+import gofish.pt.entity.Booking;
+import gofish.pt.entity.Item;
+import gofish.pt.entity.User;
+import gofish.pt.entity.UserRole;
+import gofish.pt.entity.UserStatus;
+import gofish.pt.exception.DuplicateEmailException;
+import gofish.pt.exception.InvalidCredentialsException;
+import gofish.pt.repository.UserRepository;
+import gofish.pt.repository.UserRoleRepository;
+import gofish.pt.repository.UserStatusRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 import gofish.pt.entity.Booking;
 import gofish.pt.entity.Item;
 import gofish.pt.entity.User;
@@ -22,8 +41,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final UserStatusRepository userStatusRepository;
     private final JwtService jwtService;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public User registerUser(UserRegistrationDTO registrationDTO) {
@@ -40,7 +61,17 @@ public class UserService {
         user.setLocation(registrationDTO.getLocation());
         user.setBalance(0.0);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // Create default role (USER)
+        UserRole role = new UserRole(savedUser.getId(), UserRole.ROLE_USER);
+        userRoleRepository.save(role);
+
+        // Create default status (ACTIVE)
+        UserStatus status = new UserStatus(savedUser.getId(), UserStatus.STATUS_ACTIVE);
+        userStatusRepository.save(status);
+
+        return savedUser;
     }
 
     @Transactional(readOnly = true)
@@ -49,22 +80,39 @@ public class UserService {
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
 
+        // Check if user is not deleted
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .orElse(null);
+        if (userStatus != null && UserStatus.STATUS_DELETED.equals(userStatus.getStatus())) {
+            throw new InvalidCredentialsException("Invalid credentials");
+        }
+
         // Verify password
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid credentials");
         }
 
-        // Generate token
-        String token = jwtService.generateToken(user.getId(), user.getEmail());
+        // Get user role
+        String role = userRoleRepository.findByUserId(user.getId())
+                .map(UserRole::getRole)
+                .orElse(UserRole.ROLE_USER);
 
-        // Return response with token and user info
+        // Get user status for response (we already fetched it above but let's be clean)
+        String status = userStatus != null ? userStatus.getStatus() : UserStatus.STATUS_ACTIVE;
+
+        // Generate token with role
+        String token = jwtService.generateToken(user.getId(), user.getEmail(), role);
+
+        // Return response with token, user info, role, and status
         return new LoginResponseDTO(
                 user.getId(),
                 token,
                 user.getUsername(),
-                user.getEmail()
-        );
+                user.getEmail(),
+                role,
+                status);
     }
+
     public List<Booking> getUserBookings(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
@@ -88,5 +136,21 @@ public class UserService {
         return user.getItems();
     }
 
+    /**
+     * Check if a user is active (not suspended or deleted)
+     */
+    public boolean isUserActive(Long userId) {
+        return userStatusRepository.findByUserId(userId)
+                .map(status -> UserStatus.STATUS_ACTIVE.equals(status.getStatus()))
+                .orElse(true); // Default to active if no status record exists
+    }
 
+    /**
+     * Get user role
+     */
+    public String getUserRole(Long userId) {
+        return userRoleRepository.findByUserId(userId)
+                .map(UserRole::getRole)
+                .orElse(UserRole.ROLE_USER);
+    }
 }

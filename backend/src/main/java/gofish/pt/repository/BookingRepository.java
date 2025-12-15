@@ -48,4 +48,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                         @Param("start") LocalDate start,
                         @Param("end") LocalDate end);
 
+        // Find all bookings on items owned by a specific user
+        @Query("SELECT b FROM Booking b " +
+                        "WHERE b.item.owner.id = :ownerId " +
+                        "ORDER BY b.startDate DESC")
+        List<Booking> findAllByItemOwnerId(@Param("ownerId") Long ownerId);
+
 }
