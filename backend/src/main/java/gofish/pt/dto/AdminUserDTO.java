@@ -9,11 +9,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponseDTO {
-    private Long userId;
-    private String token;
-    private String name;
+public class AdminUserDTO {
+    private Long id;
+    private String username;
     private String email;
+    private String location;
     private String role;
     private String status;
+    private String statusReason;
+    private int itemCount;
+    private int bookingCount;
 }

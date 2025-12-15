@@ -27,6 +27,7 @@ public class BookingService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BlockedDateRepository blockedDateRepository;
+    private final UserService userService;
 
     // GET methods
 
@@ -46,6 +47,10 @@ public class BookingService {
         return bookingRepository.findAllByItemId(itemId);
     }
 
+    public List<Booking> getBookingsByItemOwnerId(Long ownerId) {
+        return bookingRepository.findAllByItemOwnerId(ownerId);
+    }
+
     public List<Booking> getBookingsByItemAndMonth(Long itemId, int year, int month) {
         YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate start = yearMonth.atDay(1);
@@ -60,13 +65,24 @@ public class BookingService {
 
     // POST method
 
-    public Booking createBooking(Long userId, Long itemId, LocalDate startDate, LocalDate endDate) throws IllegalArgumentException {
+    public Booking createBooking(Long userId, Long itemId, LocalDate startDate, LocalDate endDate)
+            throws IllegalArgumentException {
         // Lógica para criar uma reserva (omiti detalhes para focar na disponibilidade)
         // 1. Validar utilizador e item
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Utilizador não encontrado"));
         var item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
+
+        // 1.1 Check if user is suspended
+        if (!userService.isUserActive(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Conta suspensa. Não é possível fazer reservas.");
+        }
+
+        // 1.2 Check if item is active (not deactivated by admin)
+        if (!item.getActive()) {
+            throw new IllegalArgumentException("Este item foi desativado e não está disponível para reserva.");
+        }
 
         // 2. Validar que o utilizador não está a tentar alugar o seu próprio item
         if (item.getOwner().getId().equals(userId)) {

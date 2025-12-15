@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveUserData } from "../lib/auth";
+import { useUser } from "../context/UserContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setUser } = useUser();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -70,17 +72,32 @@ export default function LoginPage() {
 
       if (response.status === 200) {
         const data = await response.json();
-        
-        // Save all user data
+
+        // Save all user data including role and status
         saveUserData({
           token: data.token,
           userId: data.userId,
           userName: data.name,
-          userEmail: data.email
+          userEmail: data.email,
+          role: data.role,
+          status: data.status
         });
-        
-        // Redirect to dashboard
-        router.push("/dashboard");
+
+        // Update UserContext
+        setUser({
+          id: data.userId,
+          username: data.name,
+          email: data.email,
+          role: data.role,
+          status: data.status
+        });
+
+        // Redirect admin to admin dashboard, regular users to dashboard
+        if (data.role === 'ADMIN') {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
       } else if (response.status === 401) {
         const data = await response.json();
         setErrors({ general: data.error || "Invalid credentials" });
@@ -139,11 +156,10 @@ export default function LoginPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.email
-                    ? "border-red-300 dark:border-red-700"
-                    : "border-gray-300 dark:border-gray-600"
-                } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
+                className={`w-full px-4 py-3 rounded-lg border ${errors.email
+                  ? "border-red-300 dark:border-red-700"
+                  : "border-gray-300 dark:border-gray-600"
+                  } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
                 placeholder="your.email@example.com"
                 disabled={isSubmitting}
               />
@@ -167,11 +183,10 @@ export default function LoginPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    errors.password
-                      ? "border-red-300 dark:border-red-700"
-                      : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
+                  className={`w-full px-4 py-3 rounded-lg border ${errors.password
+                    ? "border-red-300 dark:border-red-700"
+                    : "border-gray-300 dark:border-gray-600"
+                    } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
                   placeholder="Enter your password"
                   disabled={isSubmitting}
                 />

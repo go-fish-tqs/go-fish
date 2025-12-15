@@ -1,5 +1,6 @@
 package gofish.pt.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,11 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponseDTO {
-    private Long userId;
-    private String token;
-    private String name;
-    private String email;
-    private String role;
-    private String status;
+public class DeactivateItemDTO {
+    @NotBlank(message = "Deactivation reason is required")
+    private String reason;
 }

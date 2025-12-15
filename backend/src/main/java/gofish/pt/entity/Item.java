@@ -52,6 +52,13 @@ public class Item {
     @Column(nullable = false)
     private Boolean available = true;
 
+    // Admin deactivation - separate from owner's available toggle
+    @Column(nullable = false)
+    private Boolean active = true;
+
+    @Column(length = 512)
+    private String deactivationReason;
+
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     @JsonIgnoreProperties({ "email", "password", "location", "balance" })
@@ -74,8 +81,10 @@ public class Item {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Item item = (Item) o;
         return getId() != null && getId().equals(item.getId());
     }
@@ -84,6 +93,7 @@ public class Item {
     public int hashCode() {
         return getClass().hashCode();
     }
+
     @OneToMany
     @JoinColumn(name = "item_id")
     @com.fasterxml.jackson.annotation.JsonIgnore

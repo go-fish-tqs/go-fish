@@ -39,6 +39,10 @@ public class ItemService {
         return itemRepository.findAll();
     }
 
+    public List<Item> findByOwnerId(Long ownerId) {
+        return itemRepository.findAllByOwnerId(ownerId);
+    }
+
     public List<Item> findAll(ItemFilter filter) {
 
         if (filter == null)
@@ -47,7 +51,8 @@ public class ItemService {
         Specification<Item> spec = Specification.allOf(nameContains(filter.name()),
                 categoryIs(filter.category()),
                 materialIs(filter.material()),
-                priceBetween(filter.minPrice(), filter.maxPrice()));
+                priceBetween(filter.minPrice(), filter.maxPrice()),
+                activeIs(true));
 
         String sortBy = (filter.sortBy() != null) ? filter.sortBy() : "id";
         Sort.Direction direction = (filter.direction() != null) ? filter.direction() : Sort.Direction.ASC;

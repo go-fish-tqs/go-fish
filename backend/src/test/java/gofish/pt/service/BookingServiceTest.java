@@ -38,6 +38,9 @@ class BookingServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private UserService userService;
+
     @InjectMocks
     private BookingService bookingService;
 
@@ -49,7 +52,8 @@ class BookingServiceTest {
 
     @BeforeEach
     void setup() {
-        bookingService = new BookingService(bookingRepository, itemRepository, userRepository, blockedDateRepository);
+        bookingService = new BookingService(bookingRepository, itemRepository, userRepository, blockedDateRepository,
+                userService);
         renter = new User();
         renter.setId(10L);
         renter.setUsername("ze_aluga");
@@ -62,6 +66,7 @@ class BookingServiceTest {
         fishingRod.setId(5L);
         fishingRod.setName("Cana Boa");
         fishingRod.setOwner(owner); // O item é do Manel
+        fishingRod.setActive(true); // Item is active
 
         booking = new Booking();
         booking.setId(100L);
@@ -83,6 +88,8 @@ class BookingServiceTest {
 
         when(userRepository.findById(renter.getId())).thenReturn(Optional.of(renter));
         when(itemRepository.findById(fishingRod.getId())).thenReturn(Optional.of(fishingRod));
+        // User is active (not suspended)
+        when(userService.isUserActive(renter.getId())).thenReturn(true);
         // O repositório diz que NÃO há sobreposição (false)
         when(bookingRepository.existsOverlappingBooking(fishingRod.getId(), start, end)).thenReturn(false);
         // Quando salvar, devolve a reserva criada
@@ -108,6 +115,8 @@ class BookingServiceTest {
 
         when(userRepository.findById(renter.getId())).thenReturn(Optional.of(renter));
         when(itemRepository.findById(fishingRod.getId())).thenReturn(Optional.of(fishingRod));
+        // User is active (not suspended)
+        when(userService.isUserActive(renter.getId())).thenReturn(true);
 
         // O repositório diz que SIM, há sobreposição (true)
         when(bookingRepository.existsOverlappingBooking(fishingRod.getId(), start, end)).thenReturn(true);
@@ -143,8 +152,10 @@ class BookingServiceTest {
         // Arrange
         when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
 
-        // Act & Assert (O Zé (renter) tenta confirmar a reserva dele próprio -> PROIBIDO!)
-        assertThatThrownBy(() -> bookingService.updateBookingStatus(booking.getId(), BookingStatus.CONFIRMED, renter.getId()))
+        // Act & Assert (O Zé (renter) tenta confirmar a reserva dele próprio ->
+        // PROIBIDO!)
+        assertThatThrownBy(
+                () -> bookingService.updateBookingStatus(booking.getId(), BookingStatus.CONFIRMED, renter.getId()))
                 .isInstanceOf(ResponseStatusException.class);
     }
 
@@ -156,7 +167,8 @@ class BookingServiceTest {
         when(bookingRepository.findById(booking.getId())).thenReturn(Optional.of(booking));
 
         // Act & Assert
-        assertThatThrownBy(() -> bookingService.updateBookingStatus(booking.getId(), BookingStatus.CANCELLED, owner.getId()))
+        assertThatThrownBy(
+                () -> bookingService.updateBookingStatus(booking.getId(), BookingStatus.CANCELLED, owner.getId()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("já foi tratada");
     }
@@ -192,7 +204,7 @@ class BookingServiceTest {
         // 2. O dia da reserva existente (daqui a 2 dias)
         assertThat(blockedDates).contains(
                 today.minusDays(1), // Passado
-                today.plusDays(2)   // Reservado
+                today.plusDays(2) // Reservado
         );
 
         // O dia de hoje e o dia 3, 4, 5 devem estar livres (não aparecem na lista)
@@ -207,4 +219,5 @@ class BookingServiceTest {
 
         assertThatThrownBy(() -> bookingService.getUnavailableDates(1L, start, end))
                 .isInstanceOf(IllegalArgumentException.class);
-    }}
+    }
+}

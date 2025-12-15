@@ -20,7 +20,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -59,10 +58,12 @@ class ItemServiceTest {
         owner.setId(1L);
         owner.setUsername("owner");
         owner.setEmail("owner@test.com");
-        
-        i1 = new Item(1L, "simple rod", "very simple", List.of(), Category.RODS, Material.BRASS, 5.0, true, owner, null,
+
+        i1 = new Item(1L, "simple rod", "very simple", List.of(), Category.RODS, Material.BRASS, 5.0, true, true, null,
+                owner, null,
                 null);
-        i2 = new Item(2L, "cool rod", "very cool", List.of(), Category.RODS, Material.GRAPHITE, 7.0, true, owner, null,
+        i2 = new Item(2L, "cool rod", "very cool", List.of(), Category.RODS, Material.GRAPHITE, 7.0, true, true, null,
+                owner, null,
                 null);
         dto1 = new ItemDTO("simple rod", "very simple", List.of(), Category.RODS, Material.BRASS, 5.0);
         dto2 = new ItemDTO("cool rod", "very cool", List.of(), Category.RODS, Material.GRAPHITE, 7.0);
@@ -168,7 +169,8 @@ class ItemServiceTest {
 
             when(itemRepository.findById(1L)).thenReturn(Optional.of(i1));
             when(bookingRepository.existsOverlappingBooking(anyLong(), any(), any())).thenReturn(false);
-            when(blockedDateRepository.save(any(BlockedDate.class))).thenAnswer(invocation -> invocation.getArgument(0));
+            when(blockedDateRepository.save(any(BlockedDate.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
 
             BlockedDate result = itemService.blockDateRange(1L, request, 1L);
 

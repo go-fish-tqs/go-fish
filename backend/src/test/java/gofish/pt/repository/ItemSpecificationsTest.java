@@ -56,6 +56,8 @@ class ItemSpecificationsTest {
                 Material.CARBON_FIBER,
                 19.99,
                 true,
+                true, // active (admin status)
+                null, // deactivationReason
                 zePescador, // <--- Mete aqui o USER que criaste!
                 null, // bookings (pode ser null se a lista for opcional no construtor)
                 null // reviews
@@ -70,6 +72,8 @@ class ItemSpecificationsTest {
                 Material.ALUMINUM,
                 7.99,
                 true,
+                true, // active (admin status)
+                null, // deactivationReason
                 zePescador, // <--- O mesmo dono
                 null, // bookings
                 null // reviews
