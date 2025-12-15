@@ -11,30 +11,25 @@ import org.springframework.data.jpa.domain.Specification;
 public class ItemSpecifications {
 
     public static Specification<Item> nameContains(String text) {
-        return (root, query, builder) ->
-                text == null ? null :
-                        builder.like(
-                                builder.lower(root.get("name")),
-                                "%" + text.toLowerCase() + "%"
-                        );
+        return (root, query, builder) -> text == null ? null
+                : builder.like(
+                        builder.lower(root.get("name")),
+                        "%" + text.toLowerCase() + "%");
     }
 
     public static Specification<Item> categoryIs(Category category) {
-        return (root, query, builder) ->
-                category == null ? null :
-                        builder.equal(root.get("category"), category);
+        return (root, query, builder) -> category == null ? null : builder.equal(root.get("category"), category);
     }
 
     public static Specification<Item> materialIs(Material material) {
-        return (root, query, builder) ->
-                material == null ? null :
-                        builder.equal(root.get("material"), material);
+        return (root, query, builder) -> material == null ? null : builder.equal(root.get("material"), material);
     }
 
     public static Specification<Item> priceBetween(Double min, Double max) {
         String priceField = "price";
         return (root, query, builder) -> {
-            if (min == null && max == null) return null;
+            if (min == null && max == null)
+                return null;
 
             if (min == null)
                 return builder.lessThanOrEqualTo(root.get(priceField), max);
@@ -47,8 +42,10 @@ public class ItemSpecifications {
     }
 
     public static Specification<Item> availableIs(Boolean available) {
-        return (root, query, builder) ->
-                available == null ? null :
-                        builder.equal(root.get("available"), available);
+        return (root, query, builder) -> available == null ? null : builder.equal(root.get("available"), available);
+    }
+
+    public static Specification<Item> activeIs(Boolean active) {
+        return (root, query, builder) -> active == null ? null : builder.equal(root.get("active"), active);
     }
 }

@@ -1,17 +1,20 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 
 interface User {
   id: number;
   username: string;
   email: string;
+  role: string;
+  status: string;
 }
 
 interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   isLoading: boolean;
+  isAdmin: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -19,6 +22,9 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Compute isAdmin from user role
+  const isAdmin = useMemo(() => user?.role === 'ADMIN', [user]);
 
   useEffect(() => {
     // Load user data from localStorage on mount
@@ -44,7 +50,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, isLoading }}>
+    <UserContext.Provider value={{ user, setUser, isLoading, isAdmin }}>
       {children}
     </UserContext.Provider>
   );

@@ -23,6 +23,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
     depends_on:
       db:
         condition: service_healthy

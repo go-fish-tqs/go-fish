@@ -4,6 +4,7 @@ import gofish.pt.dto.BlockDateRequestDTO;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import gofish.pt.dto.ItemDTO;
 import gofish.pt.dto.ItemFilter;
+import gofish.pt.dto.ItemUpdateDTO;
 import gofish.pt.entity.*;
 import gofish.pt.mapper.ItemMapper;
 import gofish.pt.repository.BlockedDateRepository;
@@ -20,7 +21,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
-
 
 import java.time.LocalDate;
 import java.util.List;
@@ -194,7 +194,8 @@ class ItemServiceTest {
 
             when(itemRepository.findById(1L)).thenReturn(Optional.of(i1));
             when(bookingRepository.existsOverlappingBooking(anyLong(), any(), any())).thenReturn(false);
-            when(blockedDateRepository.save(any(BlockedDate.class))).thenAnswer(invocation -> invocation.getArgument(0));
+            when(blockedDateRepository.save(any(BlockedDate.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
 
             BlockedDate result = itemService.blockDateRange(1L, request, 1L);
 
@@ -291,7 +292,7 @@ class ItemServiceTest {
 
         assertThat(materials).isNotNull();
         assertThat(materials).hasSize(Material.MaterialGroup.values().length);
-        
+
         // Verify each group has materials
         for (Material.MaterialGroup group : Material.MaterialGroup.values()) {
             assertThat(materials).containsKey(group);
@@ -304,9 +305,8 @@ class ItemServiceTest {
         LocalDate from = LocalDate.of(2025, 1, 1);
         LocalDate to = LocalDate.of(2025, 1, 31);
         List<BlockedDate> expectedDates = List.of(
-            new BlockedDate(LocalDate.of(2025, 1, 5), LocalDate.of(2025, 1, 7), "Maintenance", i1),
-            new BlockedDate(LocalDate.of(2025, 1, 20), LocalDate.of(2025, 1, 22), "Vacation", i1)
-        );
+                new BlockedDate(LocalDate.of(2025, 1, 5), LocalDate.of(2025, 1, 7), "Maintenance", i1),
+                new BlockedDate(LocalDate.of(2025, 1, 20), LocalDate.of(2025, 1, 22), "Vacation", i1));
 
         when(blockedDateRepository.findBlockedDatesInRange(1L, from, to)).thenReturn(expectedDates);
 
@@ -343,5 +343,148 @@ class ItemServiceTest {
         verify(itemRepository, times(1)).findAll();
         verify(itemRepository, never()).findAll(any(Specification.class), any(Sort.class));
     }
-}
 
+    @Nested
+    @DisplayName("Tests for updateItem method")
+    class UpdateItemTests {
+
+        @Test
+        @DisplayName("Should update all fields when owner provides full update")
+        void whenOwnerUpdatesAllFields_thenItemIsUpdated() {
+            ItemUpdateDTO updateDTO = new ItemUpdateDTO();
+            updateDTO.setName("Updated Name");
+            updateDTO.setDescription("Updated Description");
+            updateDTO.setPhotoUrls(List.of("http://photo1.jpg", "http://photo2.jpg"));
+            updateDTO.setCategory(Category.REELS);
+            updateDTO.setMaterial(Material.GRAPHITE);
+            updateDTO.setPrice(15.0);
+            updateDTO.setAvailable(false);
+
+            when(itemRepository.findById(1L)).thenReturn(Optional.of(i1));
+            when(itemRepository.save(any(Item.class))).thenAnswer(inv -> inv.getArgument(0));
+
+            Item result = itemService.updateItem(1L, updateDTO, owner.getId());
+
+            assertThat(result.getName()).isEqualTo("Updated Name");
+            assertThat(result.getDescription()).isEqualTo("Updated Description");
+            assertThat(result.getPhotoUrls()).containsExactly("http://photo1.jpg", "http://photo2.jpg");
+            assertThat(result.getCategory()).isEqualTo(Category.REELS);
+            assertThat(result.getMaterial()).isEqualTo(Material.GRAPHITE);
+            assertThat(result.getPrice()).isEqualTo(15.0);
+            assertThat(result.getAvailable()).isFalse();
+            verify(itemRepository, times(1)).save(i1);
+        }
+
+        @Test
+        @DisplayName("Should only update provided fields (partial update)")
+        void whenOwnerUpdatesPartialFields_thenOnlyThoseFieldsChange() {
+            String originalDescription = i1.getDescription();
+            Category originalCategory = i1.getCategory();
+            Double originalPrice = i1.getPrice();
+
+            ItemUpdateDTO updateDTO = new ItemUpdateDTO();
+            updateDTO.setName("Only Name Changed");
+            // Leave other fields null
+
+            when(itemRepository.findById(1L)).thenReturn(Optional.of(i1));
+            when(itemRepository.save(any(Item.class))).thenAnswer(inv -> inv.getArgument(0));
+
+            Item result = itemService.updateItem(1L, updateDTO, owner.getId());
+
+            assertThat(result.getName()).isEqualTo("Only Name Changed");
+            assertThat(result.getDescription()).isEqualTo(originalDescription);
+            assertThat(result.getCategory()).isEqualTo(originalCategory);
+            assertThat(result.getPrice()).isEqualTo(originalPrice);
+            verify(itemRepository, times(1)).save(i1);
+        }
+
+        @Test
+        @DisplayName("Should throw 404 when item not found")
+        void whenItemNotFound_thenThrowNotFound() {
+            ItemUpdateDTO updateDTO = new ItemUpdateDTO();
+            updateDTO.setName("New Name");
+
+            when(itemRepository.findById(999L)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> itemService.updateItem(999L, updateDTO, owner.getId()))
+                    .isInstanceOf(ResponseStatusException.class)
+                    .hasFieldOrPropertyWithValue("statusCode", HttpStatus.NOT_FOUND)
+                    .hasMessageContaining("Item not found");
+
+            verify(itemRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Should throw 403 when non-owner tries to update")
+        void whenNonOwnerTriesToUpdate_thenThrowForbidden() {
+            ItemUpdateDTO updateDTO = new ItemUpdateDTO();
+            updateDTO.setName("Hacker Name");
+
+            Long nonOwnerId = 999L;
+
+            when(itemRepository.findById(1L)).thenReturn(Optional.of(i1));
+
+            assertThatThrownBy(() -> itemService.updateItem(1L, updateDTO, nonOwnerId))
+                    .isInstanceOf(ResponseStatusException.class)
+                    .hasFieldOrPropertyWithValue("statusCode", HttpStatus.FORBIDDEN)
+                    .hasMessageContaining("Only the item owner can update this item");
+
+            verify(itemRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Should throw 403 when item has no owner")
+        void whenItemHasNoOwner_thenThrowForbidden() {
+            Item itemWithNoOwner = new Item();
+            itemWithNoOwner.setId(3L);
+            itemWithNoOwner.setName("Orphan Item");
+            itemWithNoOwner.setOwner(null);
+
+            ItemUpdateDTO updateDTO = new ItemUpdateDTO();
+            updateDTO.setName("New Name");
+
+            when(itemRepository.findById(3L)).thenReturn(Optional.of(itemWithNoOwner));
+
+            assertThatThrownBy(() -> itemService.updateItem(3L, updateDTO, owner.getId()))
+                    .isInstanceOf(ResponseStatusException.class)
+                    .hasFieldOrPropertyWithValue("statusCode", HttpStatus.FORBIDDEN);
+
+            verify(itemRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Should update only price without affecting other fields")
+        void whenOnlyPriceUpdated_thenOnlyPriceChanges() {
+            String originalName = i1.getName();
+            String originalDescription = i1.getDescription();
+
+            ItemUpdateDTO updateDTO = new ItemUpdateDTO();
+            updateDTO.setPrice(99.99);
+
+            when(itemRepository.findById(1L)).thenReturn(Optional.of(i1));
+            when(itemRepository.save(any(Item.class))).thenAnswer(inv -> inv.getArgument(0));
+
+            Item result = itemService.updateItem(1L, updateDTO, owner.getId());
+
+            assertThat(result.getPrice()).isEqualTo(99.99);
+            assertThat(result.getName()).isEqualTo(originalName);
+            assertThat(result.getDescription()).isEqualTo(originalDescription);
+        }
+
+        @Test
+        @DisplayName("Should update availability status")
+        void whenAvailabilityUpdated_thenStatusChanges() {
+            i1.setAvailable(true);
+
+            ItemUpdateDTO updateDTO = new ItemUpdateDTO();
+            updateDTO.setAvailable(false);
+
+            when(itemRepository.findById(1L)).thenReturn(Optional.of(i1));
+            when(itemRepository.save(any(Item.class))).thenAnswer(inv -> inv.getArgument(0));
+
+            Item result = itemService.updateItem(1L, updateDTO, owner.getId());
+
+            assertThat(result.getAvailable()).isFalse();
+        }
+    }
+}
