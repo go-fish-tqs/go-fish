@@ -27,7 +27,9 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     private static final String ADMIN_EMAIL = "admin@gofish.pt";
-    private static final String ADMIN_PASSWORD = "admin123";
+    @org.springframework.beans.factory.annotation.Value("${ADMIN_PASSWORD:admin123}")
+    private String adminPassword;
+
     private static final String ADMIN_USERNAME = "admin";
 
     @Override
@@ -47,7 +49,7 @@ public class DataInitializer implements CommandLineRunner {
         User admin = new User();
         admin.setUsername(ADMIN_USERNAME);
         admin.setEmail(ADMIN_EMAIL);
-        admin.setPassword(passwordEncoder.encode(ADMIN_PASSWORD));
+        admin.setPassword(passwordEncoder.encode(adminPassword));
         admin.setLocation("Admin HQ");
         admin.setBalance(0.0);
 
@@ -68,6 +70,6 @@ public class DataInitializer implements CommandLineRunner {
         userStatusRepository.save(adminStatus);
         log.info("Admin status set to ACTIVE");
 
-        log.info("Admin user setup complete! Email: {} Password: {}", ADMIN_EMAIL, ADMIN_PASSWORD);
+        log.info("Admin user setup complete! Email: {} Password: {}", ADMIN_EMAIL, "******");
     }
 }
