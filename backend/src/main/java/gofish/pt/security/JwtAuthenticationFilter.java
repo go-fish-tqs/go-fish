@@ -33,7 +33,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 1. Extract Authorization header
         final String authHeader = request.getHeader("Authorization");
         
+        logger.info("Request to: " + request.getRequestURI());
+        logger.info("Authorization header: " + (authHeader != null ? "present" : "missing"));
+        
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.info("No valid authorization header, continuing without authentication");
             filterChain.doFilter(request, response);
             return;
         }
@@ -41,10 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             // 2. Extract JWT token
             final String jwt = authHeader.substring(7);
+            logger.info("JWT token extracted, length: " + jwt.length());
             
             // 3. Validate token and extract userId
             if (jwtService.validateToken(jwt)) {
                 Long userId = jwtService.extractUserId(jwt);
+                logger.info("Token valid, userId: " + userId);
                 
                 // 4. Create authentication token and set in SecurityContext
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -55,6 +61,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                logger.info("Authentication set in SecurityContext");
+            } else {
+                logger.warn("Token validation failed");
             }
         } catch (Exception e) {
             // Token is invalid, continue without authentication

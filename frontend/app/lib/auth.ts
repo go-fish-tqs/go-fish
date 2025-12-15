@@ -6,7 +6,7 @@
  * Get authentication headers for API requests
  */
 export function getAuthHeaders(): HeadersInit {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
   
   return {
     'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export function saveUserData(userData: {
 }) {
   if (typeof window === 'undefined') return;
   
-  localStorage.setItem('token', userData.token);
+  localStorage.setItem('authToken', userData.token);
   localStorage.setItem('userId', userData.userId.toString());
   
   if (userData.userName) {
@@ -46,7 +46,7 @@ export function saveUserData(userData: {
 export function logout() {
   if (typeof window === 'undefined') return;
   
-  localStorage.removeItem('token');
+  localStorage.removeItem('authToken');
   localStorage.removeItem('userId');
   localStorage.removeItem('userName');
   localStorage.removeItem('userEmail');
@@ -60,7 +60,7 @@ export function logout() {
 export function isAuthenticated(): boolean {
   if (typeof window === 'undefined') return false;
   
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('authToken');
   return !!token;
 }
 

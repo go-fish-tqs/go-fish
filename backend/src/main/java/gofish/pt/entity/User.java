@@ -41,6 +41,15 @@ public class User {
     @Column(nullable = false)
     private String location;
 
+    @Column(length = 20)
+    private String phone;
+
+    @Column(length = 255)
+    private String address;
+
+    @Column(length = 512)
+    private String profilePhoto;
+
     @NotNull
     @Column(nullable = false)
     private Double balance = 0.0;
