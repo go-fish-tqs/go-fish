@@ -268,6 +268,9 @@ class BookingServiceTest {
 
         when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
         when(itemRepository.findById(fishingRod.getId())).thenReturn(Optional.of(fishingRod));
+        // User is active (not suspended) - this check happens before the "own item"
+        // check
+        when(userService.isUserActive(owner.getId())).thenReturn(true);
 
         assertThatThrownBy(() -> bookingService.createBooking(owner.getId(), fishingRod.getId(), start, end))
                 .isInstanceOf(IllegalArgumentException.class)
