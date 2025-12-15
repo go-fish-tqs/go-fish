@@ -35,7 +35,7 @@ export default function ItemSummary({ item }: ItemSummaryProps) {
         <div className="flex-1 flex flex-col">
             {/* Large Hero Image */}
             <div
-                className={`relative h-80 rounded-2xl overflow-hidden mb-6 group ${hasImages ? 'cursor-pointer' : ''}`}
+                className={`relative h-80 w-full rounded-2xl overflow-hidden mb-6 group flex-shrink-0 ${hasImages ? 'cursor-pointer' : ''}`}
                 onClick={() => openCarousel(0)}
             >
                 {hasImages ? (
@@ -43,6 +43,8 @@ export default function ItemSummary({ item }: ItemSummaryProps) {
                         <img
                             src={getImageUrl(item.photoUrls![0])}
                             alt={item.name}
+                            width={500}
+                            height={320}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                         {/* Click hint overlay */}

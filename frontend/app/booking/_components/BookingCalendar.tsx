@@ -116,7 +116,7 @@ export default function BookingCalendar({
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div>
-          <h3 className="text-sm font-semibold text-gray-800">Select Dates</h3>
+          <h2 className="text-sm font-semibold text-gray-800">Select Dates</h2>
           <p className="text-xs text-gray-600">
             {selectionMode === "start"
               ? "Select start date"
