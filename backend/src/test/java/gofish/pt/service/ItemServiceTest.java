@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -272,4 +273,75 @@ class ItemServiceTest {
                     .hasFieldOrPropertyWithValue("statusCode", HttpStatus.NOT_FOUND);
         }
     }
+
+    @Test
+    void testGetCategories_ReturnsOnlyTopLevelCategories() {
+        List<Category> categories = itemService.getCategories();
+
+        assertThat(categories).isNotNull();
+        assertThat(categories).isNotEmpty();
+        assertThat(categories).allMatch(Category::isTopLevel);
+        // Verify some known top-level categories exist
+        assertThat(categories).contains(Category.RODS, Category.REELS, Category.BOATS);
+    }
+
+    @Test
+    void testGetMaterials_ReturnsAllMaterialGroups() {
+        Map<Material.MaterialGroup, List<Material>> materials = itemService.getMaterials();
+
+        assertThat(materials).isNotNull();
+        assertThat(materials).hasSize(Material.MaterialGroup.values().length);
+        
+        // Verify each group has materials
+        for (Material.MaterialGroup group : Material.MaterialGroup.values()) {
+            assertThat(materials).containsKey(group);
+            assertThat(materials.get(group)).isNotEmpty();
+        }
+    }
+
+    @Test
+    void testGetBlockedDates_ReturnsBlockedDatesInRange() {
+        LocalDate from = LocalDate.of(2025, 1, 1);
+        LocalDate to = LocalDate.of(2025, 1, 31);
+        List<BlockedDate> expectedDates = List.of(
+            new BlockedDate(LocalDate.of(2025, 1, 5), LocalDate.of(2025, 1, 7), "Maintenance", i1),
+            new BlockedDate(LocalDate.of(2025, 1, 20), LocalDate.of(2025, 1, 22), "Vacation", i1)
+        );
+
+        when(blockedDateRepository.findBlockedDatesInRange(1L, from, to)).thenReturn(expectedDates);
+
+        List<BlockedDate> result = itemService.getBlockedDates(1L, from, to);
+
+        assertThat(result).hasSize(2);
+        assertThat(result).isEqualTo(expectedDates);
+        verify(blockedDateRepository, times(1)).findBlockedDatesInRange(1L, from, to);
+    }
+
+    @Test
+    void testBlockDateRange_WhenStartDateAfterEndDate_ThenThrowBadRequest() {
+        BlockDateRequestDTO request = new BlockDateRequestDTO();
+        request.setStartDate(LocalDate.now().plusDays(10));
+        request.setEndDate(LocalDate.now()); // End before start
+
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(i1));
+
+        assertThatThrownBy(() -> itemService.blockDateRange(1L, request, 1L))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("statusCode", HttpStatus.BAD_REQUEST)
+                .hasMessageContaining("Start date cannot be after end date");
+    }
+
+    @Test
+    void testFindAll_WhenFilterIsNull_ThenReturnAllItems() {
+        List<Item> allItems = List.of(i1, i2);
+        when(itemRepository.findAll()).thenReturn(allItems);
+
+        List<Item> result = itemService.findAll(null);
+
+        assertThat(result).hasSize(2);
+        assertThat(result).containsExactly(i1, i2);
+        verify(itemRepository, times(1)).findAll();
+        verify(itemRepository, never()).findAll(any(Specification.class), any(Sort.class));
+    }
 }
+
