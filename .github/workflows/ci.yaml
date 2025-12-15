@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  frontend-build:
+  lighthouse:
     name: Frontend Build
     runs-on: ubuntu-latest
     defaults:
@@ -33,6 +33,12 @@ jobs:
 
       - name: Run Build
         run: pnpm build
+
+      - name: Run Lighthouse CI
+        # This runs the wizard, collecting data and uploading reports
+        run: pnpm dlx @lhci/cli@0.13.x autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
   build-test:
     name: Build & Test
@@ -143,3 +149,31 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
+
+  security-audit:
+    name: Security & Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog Secret Scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: ${{ github.event.pull_request.head.sha }}
+          extra_args: --debug --only-verified
+
+      # - name: Trivy Vulnerability Scanner
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     scan-type: "fs"
+      #     scan-ref: "."
+      #     ignore-unfixed: true
+      #     format: "table"
+      #     # Only fail on CRITICAL bugs (keeps it "less rigid")
+      #     exit-code: "1"
+      #     severity: "CRITICAL"
