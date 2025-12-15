@@ -154,12 +154,18 @@ export default function ItemUpdateForm({ itemId }: ItemUpdateFormProps) {
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto text-center py-8">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+      <div className="max-w-3xl mx-auto space-y-6 bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+        <div className="border-b border-gray-200 pb-4 space-y-3">
+          <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse flex-shrink-0"></div>
+          <div className="h-4 bg-gray-200 rounded w-full animate-pulse flex-shrink-0"></div>
         </div>
-        <p className="mt-4 text-gray-600">Loading item details...</p>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-1/4 animate-pulse flex-shrink-0"></div>
+            <div className="h-10 bg-gray-200 rounded animate-pulse flex-shrink-0"></div>
+          </div>
+        ))}
+        <div className="h-12 bg-gray-200 rounded animate-pulse flex-shrink-0"></div>
       </div>
     );
   }
@@ -187,7 +193,7 @@ export default function ItemUpdateForm({ itemId }: ItemUpdateFormProps) {
     >
       {/* Header */}
       <div className="border-b border-gray-200 pb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Edit Item Details</h2>
+        <h1 className="text-2xl font-bold text-gray-900">Edit Item Details</h1>
         <p className="text-sm text-gray-700 mt-1">
           Update any field you want to change. Leave others as they are.
         </p>

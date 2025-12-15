@@ -4,6 +4,7 @@ import "./globals.css";
 import Sidebar from "@/app/ui/Sidebar";
 import Providers from "@/app/providers";
 import { Toaster } from "react-hot-toast";
+import CLSMonitor from "@/app/components/CLSMonitor";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,32 +29,34 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className="bg-blue-100 h-full flex overflow-hidden">
+        <CLSMonitor />
         <Providers>
           <Toaster
             position="top-right"
             toastOptions={{
               duration: 3000,
               style: {
-                background: 'rgba(255, 255, 255, 0.9)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.5)',
-                borderRadius: '12px',
-                padding: '12px 16px',
-                fontSize: '14px',
+                background: "rgba(255, 255, 255, 0.9)",
+                backdropFilter: "blur(10px)",
+                border: "1px solid rgba(255, 255, 255, 0.5)",
+                borderRadius: "12px",
+                padding: "12px 16px",
+                fontSize: "14px",
               },
               success: {
-                iconTheme: { primary: '#10b981', secondary: '#fff' },
+                iconTheme: { primary: "#10b981", secondary: "#fff" },
               },
               error: {
-                iconTheme: { primary: '#ef4444', secondary: '#fff' },
+                iconTheme: { primary: "#ef4444", secondary: "#fff" },
               },
             }}
           />
           <Sidebar />
-          <main className="flex-1 p-4 h-full overflow-y-auto">{children}</main>
+          <main className="flex-1 h-full min-w-0 overflow-y-auto">
+            {children}
+          </main>
         </Providers>
       </body>
     </html>
   );
 }
-

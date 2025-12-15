@@ -15,14 +15,14 @@ export default function ItemInfo({ item }: ItemInfoProps) {
   useEffect(() => {
     // Check if current user is the owner
     const userId = localStorage.getItem("userId");
-    
+
     console.log("Debug ownership check:", {
       userId,
       itemOwnerId: item.owner?.id,
       itemOwner: item.owner,
-      fullItem: item
+      fullItem: item,
     });
-    
+
     if (userId && item.owner?.id) {
       const ownershipMatch = parseInt(userId) === item.owner.id;
       console.log("Is owner?", ownershipMatch);
@@ -77,7 +77,7 @@ export default function ItemInfo({ item }: ItemInfoProps) {
 
       {/* Description */}
       <div className="overflow-hidden">
-        <h3 className="text-sm font-medium text-gray-900">Description</h3>
+        <h2 className="text-sm font-medium text-gray-900">Description</h2>
         <div className="mt-2 text-base text-gray-600 whitespace-pre-line break-words overflow-wrap-anywhere">
           {item.description}
         </div>
@@ -91,21 +91,41 @@ export default function ItemInfo({ item }: ItemInfoProps) {
             href={`/items/${item.id}/edit`}
             className="w-full flex items-center justify-center gap-2 rounded-lg px-8 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 transition-all"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
             </svg>
             Edit Item
           </Link>
         )}
-        
+
         {/* Manage Availability Button - Only for owner */}
         {isOwner && (
           <Link
             href={`/items/${item.id}/manage-availability`}
             className="w-full flex items-center justify-center gap-2 rounded-lg px-8 py-3 text-base font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 hover:border-blue-300 transition-all"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
             Manage Availability
           </Link>
@@ -116,9 +136,10 @@ export default function ItemInfo({ item }: ItemInfoProps) {
           <Link
             href={`/booking/add?itemId=${item.id}`}
             className={`w-full flex items-center justify-center rounded-lg px-8 py-3 text-base font-medium text-white 
-              ${item.available
-                ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
-                : "bg-gray-400 cursor-not-allowed pointer-events-none"
+              ${
+                item.available
+                  ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
+                  : "bg-gray-400 cursor-not-allowed pointer-events-none"
               }`}
           >
             {item.available ? "Request booking" : "Unavailable"}
