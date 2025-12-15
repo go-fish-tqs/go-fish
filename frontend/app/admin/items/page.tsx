@@ -31,7 +31,7 @@ export default function AdminItemsPage() {
 
     const fetchItems = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/items`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -61,7 +61,7 @@ export default function AdminItemsPage() {
 
         setActionLoading(itemId);
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/items/${itemId}/deactivate`, {
                 method: 'PUT',
                 headers: {
@@ -84,7 +84,7 @@ export default function AdminItemsPage() {
     const handleReactivate = async (itemId: number) => {
         setActionLoading(itemId);
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/items/${itemId}/reactivate`, {
                 method: 'PUT',
                 headers: {

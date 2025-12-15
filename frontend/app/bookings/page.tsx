@@ -40,8 +40,8 @@ export default function BookingsPage() {
 
     const fetchBookings = async () => {
         try {
-            // Check for token with either key (accessToken or token)
-            const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+            // Get authentication token
+            const token = localStorage.getItem("authToken");
 
             if (!token) {
                 setLoading(false);

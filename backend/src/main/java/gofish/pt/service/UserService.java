@@ -113,7 +113,7 @@ public class UserService {
                 token,
                 user.getUsername(),
                 user.getEmail(),
-                user.getProfilePhoto()
+                user.getProfilePhoto(),
                 role,
                 status);
     }
@@ -205,6 +205,8 @@ public class UserService {
                 user.getLocation(),
                 user.getBalance()
         );
+    }
+
     /**
      * Check if a user is active (not suspended or deleted)
      */

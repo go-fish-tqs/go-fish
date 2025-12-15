@@ -108,7 +108,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
     // Create review mutation
     const createReviewMutation = useMutation({
         mutationFn: async (data: { rating: number; comment: string }) => {
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("authToken");
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews`, {
                 method: "POST",
                 headers: {
@@ -143,7 +143,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
     // Delete review mutation
     const deleteReviewMutation = useMutation({
         mutationFn: async (reviewId: number) => {
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("authToken");
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${reviewId}`, {
                 method: "DELETE",
                 headers: {
