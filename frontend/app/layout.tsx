@@ -5,6 +5,7 @@ import Sidebar from "@/app/ui/Sidebar";
 import Providers from "@/app/providers";
 import { Toaster } from "react-hot-toast";
 import CLSMonitor from "@/app/components/CLSMonitor";
+import SuspendedBanner from "@/app/components/SuspendedBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,6 +53,7 @@ export default function RootLayout({
             }}
           />
           <Sidebar />
+
           <main className="flex-1 h-full min-w-0 overflow-y-auto">
             {children}
           </main>

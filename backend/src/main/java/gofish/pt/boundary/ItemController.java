@@ -32,14 +32,13 @@ public class ItemController {
     private final UserRepository userRepository; // Adicionar Repositório
 
     @Autowired
-    public ItemController(ItemService itemService, 
-                          BookingService bookingService, 
-                          UserRepository userRepository) { // Injetar Repositório
+    public ItemController(ItemService itemService,
+            BookingService bookingService,
+            UserRepository userRepository) { // Injetar Repositório
         this.itemService = itemService;
         this.bookingService = bookingService;
         this.userRepository = userRepository;
     }
-
 
     @PostMapping("/filter")
     public List<Item> getItems(@Valid @RequestBody(required = false) ItemFilter filter) {
@@ -83,6 +82,14 @@ public class ItemController {
         return itemService.getMaterials();
     }
 
+    // Get all items owned by the current user
+    @GetMapping("/my")
+    public ResponseEntity<List<Item>> getMyItems() {
+        Long ownerId = getCurrentUserId();
+        List<Item> items = itemService.findByOwnerId(ownerId);
+        return ResponseEntity.ok(items);
+    }
+
     @GetMapping("/{id}/unavailability")
     public ResponseEntity<List<LocalDate>> checkAvailability(
             @PathVariable Long id,
@@ -99,7 +106,7 @@ public class ItemController {
             @PathVariable Long itemId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        
+
         List<BlockedDate> blockedDates = itemService.getBlockedDates(itemId, from, to);
         return ResponseEntity.ok(blockedDates);
     }
@@ -108,7 +115,7 @@ public class ItemController {
     public ResponseEntity<BlockedDate> blockDates(
             @PathVariable Long itemId,
             @Valid @RequestBody BlockDateRequestDTO request) {
-        
+
         Long ownerId = getCurrentUserId();
         BlockedDate savedBlockedDate = itemService.blockDateRange(itemId, request, ownerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedBlockedDate);
@@ -126,27 +133,30 @@ public class ItemController {
      */
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
+
         System.out.println("=== GET CURRENT USER DEBUG ===");
         System.out.println("Authentication: " + authentication);
         System.out.println("Is authenticated: " + (authentication != null && authentication.isAuthenticated()));
         System.out.println("Principal: " + (authentication != null ? authentication.getPrincipal() : "null"));
-        System.out.println("Principal class: " + (authentication != null && authentication.getPrincipal() != null ? authentication.getPrincipal().getClass() : "null"));
-        
-        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+        System.out.println("Principal class: " + (authentication != null && authentication.getPrincipal() != null
+                ? authentication.getPrincipal().getClass()
+                : "null"));
+
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
         }
 
         // O JWT retorna o userId diretamente como principal
         Object principal = authentication.getPrincipal();
-        
+
         try {
             // Se o principal já é um Long (userId) - usado em produção com JWT
             if (principal instanceof Long) {
                 System.out.println("Principal is Long: " + principal);
                 return (Long) principal;
             }
-            
+
             // Se for UserDetails (usado em testes com @WithMockUser)
             if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
                 String username = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
@@ -156,7 +166,7 @@ public class ItemController {
                 System.out.println("Found user ID: " + user.getId());
                 return user.getId();
             }
-            
+
             // Tenta converter String para Long (caso seja o userId como string)
             String principalStr = principal.toString();
             System.out.println("Principal as String: " + principalStr);
@@ -176,7 +186,8 @@ public class ItemController {
             throw e;
         } catch (Exception e) {
             System.out.println("Error getting user ID: " + e.getMessage());
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid user authentication: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "Invalid user authentication: " + e.getMessage());
         }
     }
 }

@@ -128,6 +128,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
   // Create review mutation
   const createReviewMutation = useMutation({
     mutationFn: async (data: { rating: number; comment: string }) => {
+      const token = localStorage.getItem("token");
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/reviews`,
         {

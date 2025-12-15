@@ -56,10 +56,13 @@ export default function PaymentModal({
             const calculatedAmount = Math.round(item.price * 100 * days);
             setAmount(calculatedAmount);
 
+            const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/payments/create-intent`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     bookingId: bookingId,
@@ -85,11 +88,13 @@ export default function PaymentModal({
         // Confirm payment with backend
         if (clientSecret) {
             try {
+                const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
                 const paymentIntentId = clientSecret.split("_secret_")[0];
                 await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/payments/confirm`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
                     },
                     body: JSON.stringify({
                         paymentIntentId,

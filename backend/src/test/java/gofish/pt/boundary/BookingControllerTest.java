@@ -37,8 +37,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(BookingController.class)
-@AutoConfigureMockMvc(addFilters = false)  // Disable security filters for unit tests
-@ActiveProfiles("test")  // Activate test profile to exclude production security config
+@AutoConfigureMockMvc(addFilters = false) // Disable security filters for unit tests
+@ActiveProfiles("test") // Activate test profile to exclude production security config
 class BookingControllerTest {
 
     @Autowired
@@ -226,5 +226,39 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$", hasSize(0)));
 
         verify(bookingService).getBookingsByItemAndMonth(1L, 2024, 1);
+    }
+
+    @Test
+    @DisplayName("GET /api/bookings/my-items - Should return bookings on user's items")
+    @Requirement("GF-50")
+    void getBookingsOnMyItems_returnsBookingsList() throws Exception {
+        TestSecurityContextHelper.setAuthenticatedUser(1L);
+
+        when(bookingService.getBookingsByItemOwnerId(1L)).thenReturn(List.of(testBooking));
+        when(bookingMapper.toDTO(testBooking)).thenReturn(testResponseDTO);
+
+        mockMvc.perform(get("/api/bookings/my-items"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(1));
+
+        verify(bookingService).getBookingsByItemOwnerId(1L);
+    }
+
+    @Test
+    @DisplayName("GET /api/bookings/my - Should return user's bookings")
+    @Requirement("GF-51")
+    void getMyBookings_returnsBookingsList() throws Exception {
+        TestSecurityContextHelper.setAuthenticatedUser(1L);
+
+        when(bookingService.getBookingsByUserId(1L)).thenReturn(List.of(testBooking));
+        when(bookingMapper.toDTO(testBooking)).thenReturn(testResponseDTO);
+
+        mockMvc.perform(get("/api/bookings/my"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(1));
+
+        verify(bookingService).getBookingsByUserId(1L);
     }
 }
