@@ -32,8 +32,8 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('backend/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build & run unit tests
-        run: mvn -B clean test
+      - name: Build & run unit tests (Unit + Integration)
+        run: mvn -B clean verify
 
       - name: Import JUnit XML results to Xray
         if: always()
@@ -43,9 +43,9 @@ jobs:
           password: ${{ secrets.XRAY_CLIENT_SECRET }}
           testFormat: "junit"
           projectKey: "GF"
-          testPaths: "backend/target/surefire-reports/*.xml"
+          testPaths: "backend/target/*-reports/*.xml"
           testEnvironments: "CI"
-          responseTimeout: 180000
+          responseTimeout: 300000
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
