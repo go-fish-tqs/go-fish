@@ -72,8 +72,4 @@ public class Item {
         booking.setItem(null);
     }
 
-    @OneToMany
-    @JoinColumn(name = "item_id")
-    @com.fasterxml.jackson.annotation.JsonIgnore
-    private List<Review> reviews = new java.util.ArrayList<>();
 }

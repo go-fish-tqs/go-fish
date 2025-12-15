@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Item } from "@/app/items/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ItemCardProps {
   item: Item;
@@ -12,10 +12,20 @@ interface ItemCardProps {
 export default function ItemCard({ item, index = 0 }: ItemCardProps) {
   const staggerClass = `stagger-${(index % 6) + 1}`;
   const [imageError, setImageError] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    const itemOwnerId = item.owner?.id?.toString();
+    setIsOwner(userId === itemOwnerId);
+  }, [item.owner]);
+
+  // If owner, go to details; if not owner, go directly to booking
+  const href = isOwner ? `/items/${item.id}` : `/booking/add?itemId=${item.id}`;
 
   return (
     <Link
-      href={`/booking/add?itemId=${item.id}`}
+      href={href}
       className={`
         group relative bg-white rounded-2xl overflow-hidden
         shadow-lg hover:shadow-2xl
