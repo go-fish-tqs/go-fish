@@ -177,3 +177,60 @@ jobs:
       #     # Only fail on CRITICAL bugs (keeps it "less rigid")
       #     exit-code: "1"
       #     severity: "CRITICAL"
+
+  # performance-test:
+  #   name: Load Test (k6)
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Start Backend & DB
+  #       run: |
+  #         # Set environment variables
+  #         export POSTGRES_DB=fishdb
+  #         export POSTGRES_USER=fish_user
+  #         export POSTGRES_PASSWORD=fish_password
+  #         export JWT_SECRET_KEY=super_secret_dummy_key_for_testing_only_12345
+  #         export JWT_EXPIRATION_TIME=86400000
+  #         export NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_dummy
+
+  #         # Create dummy .env.prod
+  #         touch deployment/.env.prod
+
+  #         # Create override to EXPOSE PORT 8080 (Needed for the curl healthcheck below)
+  #         cat <<EOF > deployment/docker-compose.override.yaml
+  #         services:
+  #           backend:
+  #             ports:
+  #               - "8080:8080"
+  #         EOF
+
+  #         # Start containers
+  #         docker compose -f deployment/compose.prod.yaml up -d --build backend db
+
+  #         # 5. Wait for Backend (using localhost because we are on the runner)
+  #         echo "Waiting for Backend..."
+  #         timeout 60s bash -c 'until curl -s http://localhost:8080/actuator/health | grep "UP"; do sleep 2; done' || (docker compose -f deployment/compose.prod.yaml logs backend && exit 1)
+  #         echo "Backend is UP!"
+
+  #     - name: Run k6 Browse Test
+  #       run: |
+  #         # 1. Get the ID of the running backend container
+  #         BACKEND_CONTAINER_ID=$(docker compose -f deployment/compose.prod.yaml ps -q backend)
+
+  #         # 2. Extract the exact network name attached to that container
+  #         NETWORK_NAME=$(docker inspect $BACKEND_CONTAINER_ID --format '{{range .NetworkSettings.Networks}}{{.Name}}{{end}}')
+
+  #         echo "✅ Detected Network: $NETWORK_NAME"
+
+  #         # 3. Run k6 on that same network
+  #         docker run --rm \
+  #           --network "$NETWORK_NAME" \
+  #           -v "${{ github.workspace }}/performance-tests:/scripts" \
+  #           -e BASE_URL="http://backend:8080" \
+  #           grafana/k6:latest run /scripts/browse-test.js
+
+  #     - name: Stop Containers
+  #       if: always()
+  #       run: docker compose -f deployment/compose.prod.yaml down
