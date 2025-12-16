@@ -177,3 +177,100 @@ jobs:
       #     # Only fail on CRITICAL bugs (keeps it "less rigid")
       #     exit-code: "1"
       #     severity: "CRITICAL"
+
+  e2e-tests:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: gofish_dev
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: dev_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Backend Setup
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: "maven"
+
+      - name: Build Backend
+        working-directory: ./backend
+        run: mvn -B clean package -DskipTests
+
+      - name: Start Backend
+        working-directory: ./backend
+        env:
+          SPRING_PROFILES_ACTIVE: dev
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/gofish_dev
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: dev_password
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+        run: |
+          nohup java -jar target/*.jar > backend.log 2>&1 &
+          echo "Waiting for Backend to start..."
+          # Wait for port 8080 to be ready
+          timeout 120s bash -c 'until curl -s http://localhost:8080/actuator/health; do sleep 5; done'
+          cat backend.log
+
+      # Frontend Setup
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: ./frontend/pnpm-lock.yaml
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        working-directory: ./frontend
+        run: pnpm exec playwright install --with-deps
+
+      - name: Start Frontend
+        working-directory: ./frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8080
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+        run: |
+          pnpm build
+          nohup pnpm start > frontend.log 2>&1 &
+          echo "Waiting for Frontend to start..."
+          timeout 60s bash -c 'until curl -s http://localhost:3000; do sleep 2; done'
+
+      - name: Run Playwright Tests
+        working-directory: ./frontend
+        run: pnpm exec playwright test
+        env:
+          CI: true
+
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 30

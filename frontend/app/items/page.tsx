@@ -42,8 +42,10 @@ export default function ItemsPage() {
   const { data: materialsMap = {} } = useQuery({
     queryKey: ["materials"],
     queryFn: async () => {
-      // UPDATED PATH: /api/items/materials
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items/materials`);
+      // UPDATED PATH: /items/materials
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/items/materials`
+      );
       if (!res.ok) throw new Error("Failed");
       return res.json() as Promise<MaterialMap>;
     },
@@ -53,8 +55,10 @@ export default function ItemsPage() {
   const { data: categoryTree = [] } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      // UPDATED PATH: /api/items/categories
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items/categories`);
+      // UPDATED PATH: /items/categories
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/items/categories`
+      );
       if (!res.ok) throw new Error("Failed");
       return res.json() as Promise<CategoryNode[]>;
     },
@@ -76,11 +80,14 @@ export default function ItemsPage() {
         maxPrice: priceRange[1],
       };
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items/filter`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(filter),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/items/filter`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(filter),
+        }
+      );
 
       if (!res.ok) throw new Error("Failed");
       return res.json() as Promise<Item[]>;

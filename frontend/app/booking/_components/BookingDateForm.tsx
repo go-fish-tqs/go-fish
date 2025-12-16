@@ -1,4 +1,5 @@
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 interface BookingDateFormProps {
   startDate: string;
@@ -7,6 +8,7 @@ interface BookingDateFormProps {
   onEndDateChange: (date: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   isSubmitting: boolean;
+  unavailableDates?: string[];
 }
 
 export default function BookingDateForm({
@@ -16,8 +18,76 @@ export default function BookingDateForm({
   onEndDateChange,
   onSubmit,
   isSubmitting,
+  unavailableDates = [],
 }: BookingDateFormProps) {
   const today = new Date().toISOString().split("T")[0];
+
+  // Helper function to check if a date conflicts with unavailable dates
+  const isDateUnavailable = (dateStr: string): boolean => {
+    if (!dateStr || unavailableDates.length === 0) return false;
+
+    const date = new Date(dateStr);
+    return unavailableDates.some(blockedDate => {
+      const blocked = new Date(blockedDate);
+      return date.toDateString() === blocked.toDateString();
+    });
+  };
+
+  // Check if date range overlaps with blocked dates
+  const doDateRangesOverlap = (start: string, end: string): boolean => {
+    if (!start || !end || unavailableDates.length === 0) return false;
+
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    return unavailableDates.some(blockedDateStr => {
+      const blockedDate = new Date(blockedDateStr);
+      return blockedDate >= startDate && blockedDate <= endDate;
+    });
+  };
+
+  // Handle start date change with validation
+  const handleStartDateChange = (date: string) => {
+    if (isDateUnavailable(date)) {
+      toast.error("This date is already booked. Please select a different date.");
+      return;
+    }
+
+    // Check if new range would overlap with blocked dates
+    if (endDate && doDateRangesOverlap(date, endDate)) {
+      toast.error("Selected date range includes dates that are already booked.");
+    }
+
+    onStartDateChange(date);
+  };
+
+  // Handle end date change with validation
+  const handleEndDateChange = (date: string) => {
+    if (isDateUnavailable(date)) {
+      toast.error("This date is already booked. Please select a different date.");
+      return;
+    }
+
+    // Check if new range would overlap with blocked dates
+    if (startDate && doDateRangesOverlap(startDate, date)) {
+      toast.error("Selected date range includes dates that are already booked.");
+    }
+
+    onEndDateChange(date);
+  };
+
+  // Handle form submission with date conflict validation
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Check for date conflicts before submitting
+    if (startDate && endDate && doDateRangesOverlap(startDate, endDate)) {
+      toast.error("Selected dates conflict with existing bookings. Please choose different dates.");
+      return;
+    }
+
+    onSubmit(e);
+  };
 
   // Calculate duration and total
   const calculateDays = () => {
@@ -32,8 +102,11 @@ export default function BookingDateForm({
 
   const days = calculateDays();
 
+  // Check if current selection has conflicts
+  const hasConflict = startDate && endDate && doDateRangesOverlap(startDate, endDate);
+
   return (
-    <form onSubmit={onSubmit} className="flex-1 flex flex-col">
+    <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
       {/* Glass Card */}
       <div className="backdrop-blur-xl bg-white/60 border border-white/40 rounded-2xl p-6 shadow-xl flex-1 flex flex-col">
         <h2 className="text-lg font-semibold text-gray-800 mb-6">
@@ -52,7 +125,7 @@ export default function BookingDateForm({
               type="date"
               id="startDate"
               value={startDate}
-              onChange={(e) => onStartDateChange(e.target.value)}
+              onChange={(e) => handleStartDateChange(e.target.value)}
               min={today}
               required
               className="w-full px-4 py-3.5 rounded-xl bg-white/80 backdrop-blur border border-gray-200/50 focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 focus:outline-none transition-all shadow-sm"
@@ -70,7 +143,7 @@ export default function BookingDateForm({
               type="date"
               id="endDate"
               value={endDate}
-              onChange={(e) => onEndDateChange(e.target.value)}
+              onChange={(e) => handleEndDateChange(e.target.value)}
               min={startDate || today}
               required
               className="w-full px-4 py-3.5 rounded-xl bg-white/80 backdrop-blur border border-gray-200/50 focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 focus:outline-none transition-all shadow-sm"
@@ -79,13 +152,20 @@ export default function BookingDateForm({
 
           {/* Duration Display */}
           {days > 0 && (
-            <div className="mt-2 p-4 rounded-xl bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-100/50">
+            <div className={`mt-2 p-4 rounded-xl border ${hasConflict
+              ? 'bg-gradient-to-r from-red-50/80 to-orange-50/80 border-red-100/50'
+              : 'bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border-blue-100/50'}`}>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Duration</span>
                 <span className="font-semibold text-gray-800">
                   {days} day{days !== 1 ? "s" : ""}
                 </span>
               </div>
+              {hasConflict && (
+                <p className="text-red-600 text-sm mt-2">
+                  ⚠️ Selected dates conflict with existing bookings
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -94,7 +174,7 @@ export default function BookingDateForm({
         <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-gray-200/50">
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || hasConflict}
             className="w-full bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 hover:from-blue-600 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0"
           >
             {isSubmitting ? (
@@ -120,6 +200,8 @@ export default function BookingDateForm({
                 </svg>
                 Creating Booking...
               </span>
+            ) : hasConflict ? (
+              "Cannot Book - Dates Unavailable"
             ) : (
               "Create Booking"
             )}

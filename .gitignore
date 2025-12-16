@@ -19,6 +19,7 @@ deployment/.env.*
 frontend/.env
 frontend/.env.*
 !frontend/.env.example
+frontend/test-results/*
 
 # Backend application properties with secrets
 backend/src/main/resources/application-secrets.properties

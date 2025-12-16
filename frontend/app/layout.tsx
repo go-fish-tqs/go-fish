@@ -52,9 +52,10 @@ export default function RootLayout({
               },
             }}
           />
+          <SuspendedBanner />
           <Sidebar />
 
-          <main className="flex-1 h-full min-w-0 overflow-y-auto">
+          <main className="flex-1 w-full h-full min-w-0 overflow-y-auto">
             {children}
           </main>
         </Providers>

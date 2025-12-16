@@ -130,11 +130,10 @@ export default function FeaturedItemCarousel() {
     <div className="relative group">
       {/* Main Container with glassmorphism */}
       <div
-        className={`relative h-[480px] rounded-[2rem] overflow-hidden transition-all duration-700 ease-out flex-shrink-0 ${
-          isTransitioning
+        className={`relative h-[480px] rounded-[2rem] overflow-hidden transition-all duration-700 ease-out flex-shrink-0 ${isTransitioning
             ? "opacity-0 scale-[0.98] blur-sm"
             : "opacity-100 scale-100 blur-0"
-        }`}
+          }`}
       >
         {/* Background Image with parallax effect */}
         <div className="absolute inset-0 scale-105 group-hover:scale-110 transition-transform duration-[2000ms] ease-out">
@@ -332,16 +331,14 @@ export default function FeaturedItemCarousel() {
                 setIsTransitioning(false);
               }, 300);
             }}
-            className={`relative h-3 rounded-full transition-all duration-500 overflow-hidden ${
-              idx === currentIndex ? "w-12" : "w-3 hover:w-4"
-            }`}
+            className={`relative h-3 rounded-full transition-all duration-500 overflow-hidden ${idx === currentIndex ? "w-12" : "w-3 hover:w-4"
+              }`}
           >
             <div
-              className={`absolute inset-0 transition-all duration-300 ${
-                idx === currentIndex
+              className={`absolute inset-0 transition-all duration-300 ${idx === currentIndex
                   ? "bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500"
                   : "bg-gray-300/50 hover:bg-gray-300"
-              }`}
+                }`}
             ></div>
             {idx === currentIndex && (
               <div
