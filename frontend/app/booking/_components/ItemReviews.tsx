@@ -104,7 +104,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
     queryKey: ["reviews", itemId],
     queryFn: async () => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/item/${itemId}?page=0&size=10`
+        `${process.env.NEXT_PUBLIC_API_URL}/reviews/item/${itemId}?page=0&size=10`
       );
       if (!res.ok) throw new Error("Failed to fetch reviews");
       return res.json() as Promise<ReviewsResponse>;
@@ -117,7 +117,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
     queryKey: ["reviews", itemId, "rating"],
     queryFn: async () => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/item/${itemId}/rating`
+        `${process.env.NEXT_PUBLIC_API_URL}/reviews/item/${itemId}/rating`
       );
       if (!res.ok) throw new Error("Failed to fetch rating");
       return res.json() as Promise<number>;
@@ -129,19 +129,16 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
   const createReviewMutation = useMutation({
     mutationFn: async (data: { rating: number; comment: string }) => {
       const token = localStorage.getItem("token");
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: CURRENT_USER_ID,
-            itemId: Number(itemId),
-            rating: data.rating,
-            comment: data.comment,
-          }),
-        }
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: CURRENT_USER_ID,
+          itemId: Number(itemId),
+          rating: data.rating,
+          comment: data.comment,
+        }),
+      });
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.message || "Failed to create review");
@@ -167,7 +164,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
   const deleteReviewMutation = useMutation({
     mutationFn: async (reviewId: number) => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${reviewId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/reviews/${reviewId}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
