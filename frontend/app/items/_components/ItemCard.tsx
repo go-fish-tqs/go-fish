@@ -36,11 +36,13 @@ export default function ItemCard({ item, index = 0 }: ItemCardProps) {
       `}
     >
       {/* Image Container */}
-      <div className="relative h-48 bg-gradient-to-br from-blue-100 to-indigo-100 overflow-hidden">
+      <div className="relative w-full h-48 bg-gradient-to-br from-blue-100 to-indigo-100 overflow-hidden flex-shrink-0">
         {item.photoUrls && item.photoUrls.length > 0 && !imageError ? (
           <img
             src={item.photoUrls[0]}
             alt={item.name}
+            width={400}
+            height={192}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
             onError={() => setImageError(true)}
           />

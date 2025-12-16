@@ -1,0 +1,65 @@
+[CI-pipeline/Frontend Type Check] ⭐ Run Set up job
+[CI-pipeline/Frontend Type Check] 🚀  Start image=catthehacker/ubuntu:act-latest
+[CI-pipeline/Frontend Type Check]   🐳  docker pull image=catthehacker/ubuntu:act-latest platform= username= forcePull=true
+[CI-pipeline/Frontend Type Check]   🐳  docker create image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CI-pipeline/Frontend Type Check]   🐳  docker run image=catthehacker/ubuntu:act-latest platform= entrypoint=["tail" "-f" "/dev/null"] cmd=[] network="host"
+[CI-pipeline/Frontend Type Check]   🐳  docker exec cmd=[node --no-warnings -e console.log(process.execPath)] user= workdir=
+[CI-pipeline/Frontend Type Check]   ✅  Success - Set up job
+[CI-pipeline/Frontend Type Check]   ☁  git clone 'https://github.com/pnpm/action-setup' # ref=v3
+[CI-pipeline/Frontend Type Check]   ☁  git clone 'https://github.com/actions/setup-node' # ref=v4
+[CI-pipeline/Frontend Type Check] ⭐ Run Main Checkout code
+[CI-pipeline/Frontend Type Check]   🐳  docker cp src=/home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/. dst=/home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish
+[CI-pipeline/Frontend Type Check]   ✅  Success - Main Checkout code [359.061631ms]
+[CI-pipeline/Frontend Type Check] ⭐ Run Main Install pnpm
+[CI-pipeline/Frontend Type Check]   🐳  docker cp src=/home/tiago/.cache/act/pnpm-action-setup@v3/ dst=/var/run/act/actions/pnpm-action-setup@v3/
+[CI-pipeline/Frontend Type Check]   🐳  docker exec cmd=[/opt/acttoolcache/node/18.20.8/x64/bin/node /var/run/act/actions/pnpm-action-setup@v3/dist/index.js] user= workdir=
+[CI-pipeline/Frontend Type Check]   ❓  ::group::Running self-installer...
+[CI-pipeline/Frontend Type Check]   | Progress: resolved 1, reused 0, downloaded 0, added 0
+[CI-pipeline/Frontend Type Check]   | Packages: +1
+[CI-pipeline/Frontend Type Check]   | +
+[CI-pipeline/Frontend Type Check]   | Progress: resolved 1, reused 0, downloaded 1, added 1, done
+[CI-pipeline/Frontend Type Check]   | 
+[CI-pipeline/Frontend Type Check]   | dependencies:
+[CI-pipeline/Frontend Type Check]   | + pnpm 9.15.9 (10.26.0 is available)
+[CI-pipeline/Frontend Type Check]   | 
+[CI-pipeline/Frontend Type Check]   | Done in 1.8s
+[CI-pipeline/Frontend Type Check]   ❓  ::endgroup::
+[CI-pipeline/Frontend Type Check]   | Installation Completed!
+[CI-pipeline/Frontend Type Check]   ✅  Success - Main Install pnpm [2.30657466s]
+[CI-pipeline/Frontend Type Check]   ⚙  ::set-env:: PNPM_HOME=/root/setup-pnpm/node_modules/.bin
+[CI-pipeline/Frontend Type Check]   ⚙  ::set-output:: dest=/root/setup-pnpm
+[CI-pipeline/Frontend Type Check]   ⚙  ::set-output:: bin_dest=/root/setup-pnpm/node_modules/.bin
+[CI-pipeline/Frontend Type Check]   ⚙  ::add-path:: /root/setup-pnpm/node_modules/.bin
+[CI-pipeline/Frontend Type Check]   ⚙  ::add-path:: /root/setup-pnpm/node_modules/.bin
+[CI-pipeline/Frontend Type Check] ⭐ Run Main Set up Node.js
+[CI-pipeline/Frontend Type Check]   🐳  docker cp src=/home/tiago/.cache/act/actions-setup-node@v4/ dst=/var/run/act/actions/actions-setup-node@v4/
+[CI-pipeline/Frontend Type Check]   🐳  docker exec cmd=[/opt/acttoolcache/node/18.20.8/x64/bin/node /var/run/act/actions/actions-setup-node@v4/dist/setup/index.js] user= workdir=
+[CI-pipeline/Frontend Type Check]   | Found in cache @ /opt/hostedtoolcache/node/20.19.6/x64
+[CI-pipeline/Frontend Type Check]   ❓  ::group::Environment details
+[CI-pipeline/Frontend Type Check]   | node: v20.19.6
+[CI-pipeline/Frontend Type Check]   | npm: 10.8.2
+[CI-pipeline/Frontend Type Check]   | yarn: 
+[CI-pipeline/Frontend Type Check]   ❓  ::endgroup::
+[CI-pipeline/Frontend Type Check]   | [command]/root/setup-pnpm/node_modules/.bin/pnpm store path --silent
+[CI-pipeline/Frontend Type Check]   | /home/tiago/OneDrive/LEI/Matricula3/Semestre1/TQS/go-fish/.pnpm-store/v3
+[CI-pipeline/Frontend Type Check]   | pnpm cache is not found
+[CI-pipeline/Frontend Type Check]   ❓ add-matcher /run/act/actions/actions-setup-node@v4/.github/tsc.json
+[CI-pipeline/Frontend Type Check]   ❓ add-matcher /run/act/actions/actions-setup-node@v4/.github/eslint-stylish.json
+[CI-pipeline/Frontend Type Check]   ❓ add-matcher /run/act/actions/actions-setup-node@v4/.github/eslint-compact.json
+[CI-pipeline/Frontend Type Check]   ✅  Success - Main Set up Node.js [1.830215094s]
+[CI-pipeline/Frontend Type Check]   ⚙  ::set-output:: node-version=v20.19.6
+[CI-pipeline/Frontend Type Check]   ⚙  ::set-output:: cache-hit=false
+[CI-pipeline/Frontend Type Check]   ⚙  ::add-path:: /opt/hostedtoolcache/node/20.19.6/x64/bin
+[CI-pipeline/Frontend Type Check] ⭐ Run Main Install dependencies
+[CI-pipeline/Frontend Type Check]   🐳  docker exec cmd=[bash -e /var/run/act/workflow/3] user= workdir=./frontend
+[CI-pipeline/Frontend Type Check]   |  ERROR  packages field missing or empty
+[CI-pipeline/Frontend Type Check]   | For help, run: pnpm help install
+[CI-pipeline/Frontend Type Check]   ❌  Failure - Main Install dependencies [1.03773473s]
+[CI-pipeline/Frontend Type Check] exitcode '1': failure
+[CI-pipeline/Frontend Type Check] ⭐ Run Post Install pnpm
+[CI-pipeline/Frontend Type Check]   🐳  docker exec cmd=[/opt/acttoolcache/node/18.20.8/x64/bin/node /var/run/act/actions/pnpm-action-setup@v3/dist/index.js] user= workdir=
+[CI-pipeline/Frontend Type Check]   | Pruning is unnecessary.
+[CI-pipeline/Frontend Type Check]   ✅  Success - Post Install pnpm [266.226484ms]
+[CI-pipeline/Frontend Type Check] ⭐ Run Complete job
+[CI-pipeline/Frontend Type Check]   ✅  Success - Complete job
+[CI-pipeline/Frontend Type Check] 🏁  Job failed

@@ -28,9 +28,9 @@ export function PriceField() {
         } focus:ring-2 focus:outline-none bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 transition-colors`}
         placeholder="0.00"
       />
-      {errors.price && (
-        <p className="mt-1 text-sm text-red-500">{errors.price}</p>
-      )}
+      <div className="h-6 mt-1">
+        {errors.price && <p className="text-sm text-red-500">{errors.price}</p>}
+      </div>
     </div>
   );
 }
