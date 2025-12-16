@@ -13,9 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Cleanup Old Volumes (Reset DB)
+      - name: Cleanup Old Containers
         working-directory: ./deployment
-        run: docker compose -f compose.prod.yaml down -v
+        run: docker compose -f compose.prod.yaml down
 
       - name: Create .env file
         working-directory: ./deployment
