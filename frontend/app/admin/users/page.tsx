@@ -22,7 +22,7 @@ export default function AdminUsersPage() {
 
     const fetchUsers = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -49,7 +49,7 @@ export default function AdminUsersPage() {
 
         setActionLoading(userId);
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${userId}/suspend`, {
                 method: 'PUT',
                 headers: {
@@ -72,7 +72,7 @@ export default function AdminUsersPage() {
     const handleReactivate = async (userId: number) => {
         setActionLoading(userId);
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${userId}/reactivate`, {
                 method: 'PUT',
                 headers: {
@@ -97,7 +97,7 @@ export default function AdminUsersPage() {
 
         setActionLoading(userId);
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${userId}`, {
                 method: 'DELETE',
                 headers: {

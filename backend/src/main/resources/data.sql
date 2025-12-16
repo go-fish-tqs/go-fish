@@ -2,8 +2,8 @@
 -- Note: Admin user is created programmatically at startup (see DataInitializer.java)
 
 -- Test user (password: password123)
-INSERT INTO users (id, username, email, password, location, balance) 
-VALUES (1, 'user1', 'user1@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZRGf6I.mLq4D1AZWZ7L3xWXqJCqSe', 'Location1', 0.0)
+INSERT INTO users (id, username, email, password, location, balance, phone, address, profile_photo) 
+VALUES (1, 'user1', 'user1@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZRGf6I.mLq4D1AZWZ7L3xWXqJCqSe', 'Location1', 0.0, NULL, NULL, NULL)
 ON CONFLICT (id) DO NOTHING;
 
 -- User roles (test user only - admin role is set by DataInitializer)

@@ -37,8 +37,7 @@ export default function MyItemsPage() {
 
     const fetchMyItems = async () => {
         try {
-            // Check for token with either key (accessToken or token)
-            const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+            const token = localStorage.getItem("authToken");
 
             if (!token) {
                 setLoading(false);

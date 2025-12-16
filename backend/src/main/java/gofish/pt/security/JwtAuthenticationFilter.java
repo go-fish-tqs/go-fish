@@ -35,8 +35,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 1. Extract Authorization header
         final String authHeader = request.getHeader("Authorization");
-
+        
+        logger.info("Request to: " + request.getRequestURI());
+        logger.info("Authorization header: " + (authHeader != null ? "present" : "missing"));
+        
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.info("No valid authorization header, continuing without authentication");
             filterChain.doFilter(request, response);
             return;
         }
@@ -73,6 +77,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                logger.info("Authentication set in SecurityContext");
+            } else {
+                logger.warn("Token validation failed");
             }
         } catch (Exception e) {
             // Token is invalid, continue without authentication

@@ -2,6 +2,8 @@ package gofish.pt.service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +14,13 @@ import java.util.Date;
 @Service
 public class JwtService {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
     private static final long EXPIRATION_TIME = 86400000; // 24 hours in milliseconds
 
     private final SecretKey key;
 
     public JwtService(@Value("${jwt.secret}") String secretKey) {
+        logger.info("Initializing JwtService with secret key length: {}", secretKey.length());
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -77,6 +81,8 @@ public class JwtService {
                     .parseSignedClaims(token);
             return true;
         } catch (Exception e) {
+            logger.error("Token validation failed: {}", e.getMessage());
+            logger.error("Exception type: {}", e.getClass().getName());
             return false;
         }
     }

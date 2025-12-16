@@ -91,6 +91,21 @@ export default function LoginPage() {
           role: data.role,
           status: data.status
         });
+        
+        // Save or clear profile photo
+        if (data.profilePhoto) {
+          console.log("✅ Saving profilePhoto:", data.profilePhoto);
+          localStorage.setItem("profilePhoto", data.profilePhoto);
+        } else {
+          console.log("🗑️ No profilePhoto, clearing old value");
+          localStorage.removeItem("profilePhoto");
+        }
+        
+        // Trigger event to update sidebar
+        window.dispatchEvent(new Event('userDataUpdated'));
+        
+        // Redirect to dashboard
+        router.push("/dashboard");
 
         // Redirect admin to admin dashboard, regular users to dashboard
         if (data.role === 'ADMIN') {

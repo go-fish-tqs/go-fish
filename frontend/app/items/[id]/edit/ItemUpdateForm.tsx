@@ -116,17 +116,14 @@ export default function ItemUpdateForm({ itemId }: ItemUpdateFormProps) {
 
       const headers = getAuthHeaders();
       console.log("Request headers:", headers);
-      console.log("Token from localStorage:", localStorage.getItem("token"));
-      console.log("UserId from localStorage:", localStorage.getItem("userId"));
+      console.log("Token from localStorage:", localStorage.getItem('authToken'));
+      console.log("UserId from localStorage:", localStorage.getItem('userId'));
 
-      const response = await fetch(
-        `http://localhost:8080/api/items/${itemId}`,
-        {
-          method: "PUT",
-          headers: headers,
-          body: JSON.stringify(updateData),
-        }
-      );
+      const response = await fetch(`http://localhost:8080/api/items/${itemId}`, {
+        method: "PUT",
+        headers: headers,
+        body: JSON.stringify(updateData),
+      });
 
       console.log("Update response status:", response.status);
 

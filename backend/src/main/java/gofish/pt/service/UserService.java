@@ -30,7 +30,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import gofish.pt.dto.LoginRequestDTO;
+import gofish.pt.dto.LoginResponseDTO;
 import gofish.pt.dto.UserRegistrationDTO;
+import gofish.pt.dto.UserResponseDTO;
+import gofish.pt.dto.UserUpdateDTO;
 import gofish.pt.exception.DuplicateEmailException;
 import gofish.pt.exception.InvalidCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -109,6 +113,7 @@ public class UserService {
                 token,
                 user.getUsername(),
                 user.getEmail(),
+                user.getProfilePhoto(),
                 role,
                 status);
     }
@@ -134,6 +139,72 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
         return user.getItems();
+    }
+
+    @Transactional
+    public UserResponseDTO updateUser(Long userId, Long authenticatedUserId, UserUpdateDTO updateDTO) {
+        // Verify that the user can only update their own profile
+        if (!userId.equals(authenticatedUserId)) {
+            throw new IllegalArgumentException("You can only update your own profile");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        // Check email uniqueness if email is being changed
+        if (updateDTO.getEmail() != null && !updateDTO.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(updateDTO.getEmail())) {
+                throw new DuplicateEmailException("Email already in use");
+            }
+            user.setEmail(updateDTO.getEmail());
+        }
+
+        // Update fields if provided
+        if (updateDTO.getUsername() != null) {
+            user.setUsername(updateDTO.getUsername());
+        }
+        if (updateDTO.getPhone() != null) {
+            user.setPhone(updateDTO.getPhone());
+        }
+        if (updateDTO.getAddress() != null) {
+            user.setAddress(updateDTO.getAddress());
+        }
+        if (updateDTO.getProfilePhoto() != null) {
+            user.setProfilePhoto(updateDTO.getProfilePhoto());
+        }
+        if (updateDTO.getLocation() != null) {
+            user.setLocation(updateDTO.getLocation());
+        }
+
+        User updatedUser = userRepository.save(user);
+
+        return new UserResponseDTO(
+                updatedUser.getId(),
+                updatedUser.getUsername(),
+                updatedUser.getEmail(),
+                updatedUser.getPhone(),
+                updatedUser.getAddress(),
+                updatedUser.getProfilePhoto(),
+                updatedUser.getLocation(),
+                updatedUser.getBalance()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponseDTO getUserProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        return new UserResponseDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getAddress(),
+                user.getProfilePhoto(),
+                user.getLocation(),
+                user.getBalance()
+        );
     }
 
     /**

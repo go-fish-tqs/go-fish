@@ -11,7 +11,7 @@ export default function Home() {
 
   useEffect(() => {
     // Check if user is already logged in
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("authToken");
     if (token) {
       setIsAuthenticated(true);
       // Redirect to dashboard if already logged in

@@ -30,7 +30,7 @@ export default function AdminAuditPage() {
 
     const fetchLogs = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             let url = `${process.env.NEXT_PUBLIC_API_URL}/api/admin/audit`;
             if (filter) {
                 url += `?action=${filter}`;

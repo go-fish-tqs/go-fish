@@ -45,6 +45,14 @@ public class ItemController {
         return itemService.findAll(filter);
     }
 
+    // Get all items owned by the current user (must come before /{id})
+    @GetMapping("/my")
+    public ResponseEntity<List<Item>> getMyItems() {
+        Long ownerId = getCurrentUserId();
+        List<Item> items = itemService.findByOwnerId(ownerId);
+        return ResponseEntity.ok(items);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Item> getItem(@PathVariable Long id) {
         return itemService.findById(id)
@@ -80,14 +88,6 @@ public class ItemController {
     @GetMapping("/materials")
     public Map<Material.MaterialGroup, List<Material>> getMaterials() {
         return itemService.getMaterials();
-    }
-
-    // Get all items owned by the current user
-    @GetMapping("/my")
-    public ResponseEntity<List<Item>> getMyItems() {
-        Long ownerId = getCurrentUserId();
-        List<Item> items = itemService.findByOwnerId(ownerId);
-        return ResponseEntity.ok(items);
     }
 
     @GetMapping("/{id}/unavailability")
@@ -134,14 +134,6 @@ public class ItemController {
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        System.out.println("=== GET CURRENT USER DEBUG ===");
-        System.out.println("Authentication: " + authentication);
-        System.out.println("Is authenticated: " + (authentication != null && authentication.isAuthenticated()));
-        System.out.println("Principal: " + (authentication != null ? authentication.getPrincipal() : "null"));
-        System.out.println("Principal class: " + (authentication != null && authentication.getPrincipal() != null
-                ? authentication.getPrincipal().getClass()
-                : "null"));
-
         if (authentication == null || !authentication.isAuthenticated()
                 || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
@@ -153,39 +145,31 @@ public class ItemController {
         try {
             // Se o principal já é um Long (userId) - usado em produção com JWT
             if (principal instanceof Long) {
-                System.out.println("Principal is Long: " + principal);
                 return (Long) principal;
             }
 
             // Se for UserDetails (usado em testes com @WithMockUser)
             if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
                 String username = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
-                System.out.println("Principal is UserDetails, username: " + username);
                 User user = userRepository.findByUsername(username)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
-                System.out.println("Found user ID: " + user.getId());
                 return user.getId();
             }
 
             // Tenta converter String para Long (caso seja o userId como string)
             String principalStr = principal.toString();
-            System.out.println("Principal as String: " + principalStr);
             try {
                 Long userId = Long.parseLong(principalStr);
-                System.out.println("Parsed userId: " + userId);
                 return userId;
             } catch (NumberFormatException e) {
                 // Se não for número, assume que é username
-                System.out.println("Not a number, treating as username");
                 User user = userRepository.findByUsername(principalStr)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
-                System.out.println("Found user ID: " + user.getId());
                 return user.getId();
             }
         } catch (ResponseStatusException e) {
             throw e;
         } catch (Exception e) {
-            System.out.println("Error getting user ID: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                     "Invalid user authentication: " + e.getMessage());
         }

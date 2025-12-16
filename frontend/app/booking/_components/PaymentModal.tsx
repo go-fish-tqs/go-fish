@@ -56,7 +56,7 @@ export default function PaymentModal({
             const calculatedAmount = Math.round(item.price * 100 * days);
             setAmount(calculatedAmount);
 
-            const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+            const token = localStorage.getItem("authToken");
 
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/payments/create-intent`, {
                 method: "POST",
@@ -88,7 +88,7 @@ export default function PaymentModal({
         // Confirm payment with backend
         if (clientSecret) {
             try {
-                const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+                const token = localStorage.getItem("authToken");
                 const paymentIntentId = clientSecret.split("_secret_")[0];
                 await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/payments/confirm`, {
                     method: "POST",

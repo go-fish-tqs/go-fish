@@ -13,7 +13,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <UserProvider>
         {children}
       </UserProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
