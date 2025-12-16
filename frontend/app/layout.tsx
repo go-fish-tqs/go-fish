@@ -29,6 +29,10 @@ export default function RootLayout({
 
   return (
     <html lang="en" className="h-full">
+      <head>
+        <title>GoFish - Fishing Equipment Rental Platform</title>
+        <meta name="description" content="Rent high-quality fishing equipment easily. Browse rods, reels, boats and more. Your perfect fishing adventure starts here." />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-full flex overflow-hidden`}>
         <CLSMonitor />
         <Providers>
