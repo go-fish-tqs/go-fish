@@ -103,7 +103,7 @@ export default function BookingDateForm({
   const days = calculateDays();
 
   // Check if current selection has conflicts
-  const hasConflict = startDate && endDate && doDateRangesOverlap(startDate, endDate);
+  const hasConflict = Boolean(startDate && endDate && doDateRangesOverlap(startDate, endDate));
 
   return (
     <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
