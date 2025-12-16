@@ -55,7 +55,7 @@ function BookingFormContent() {
       if (!itemId) throw new Error("Item ID is missing");
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      const res = await fetch(`${apiUrl}/api/items/${itemId}`);
+      const res = await fetch(`${apiUrl}/items/${itemId}`);
 
       // Lê o texto primeiro para não estoirar no json()
       const text = await res.text();
@@ -83,7 +83,7 @@ function BookingFormContent() {
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
       const res = await fetch(
-        `${apiUrl}/api/items/${itemId}/unavailability?from=${today}&to=${nextYear}`
+        `${apiUrl}/items/${itemId}/unavailability?from=${today}&to=${nextYear}`
       );
 
       const text = await res.text();
@@ -118,7 +118,7 @@ function BookingFormContent() {
       endDate: string;
     }) => {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || ""}/api/bookings`,
+        `${process.env.NEXT_PUBLIC_API_URL || ""}/bookings`,
         {
           method: "POST",
           headers: getAuthHeaders(),

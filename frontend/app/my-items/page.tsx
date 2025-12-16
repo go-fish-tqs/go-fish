@@ -46,7 +46,7 @@ export default function MyItemsPage() {
         return;
       }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items/my`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/items/my`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -110,10 +110,11 @@ export default function MyItemsPage() {
           )}
           {/* Status Badge */}
           <div
-            className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${item.active
+            className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${
+              item.active
                 ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
                 : "bg-red-100 text-red-700 border border-red-200"
-              }`}
+            }`}
           >
             {item.active ? "Active" : "Inactive"}
           </div>

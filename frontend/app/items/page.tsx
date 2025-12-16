@@ -44,7 +44,7 @@ export default function ItemsPage() {
     queryFn: async () => {
       // UPDATED PATH: /items/materials
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/items/materials`
+        `${process.env.NEXT_PUBLIC_API_URL}/items/materials`
       );
       if (!res.ok) throw new Error("Failed");
       return res.json() as Promise<MaterialMap>;
@@ -57,7 +57,7 @@ export default function ItemsPage() {
     queryFn: async () => {
       // UPDATED PATH: /items/categories
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/items/categories`
+        `${process.env.NEXT_PUBLIC_API_URL}/items/categories`
       );
       if (!res.ok) throw new Error("Failed");
       return res.json() as Promise<CategoryNode[]>;
@@ -81,7 +81,7 @@ export default function ItemsPage() {
       };
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/items/filter`,
+        `${process.env.NEXT_PUBLIC_API_URL}/items/filter`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

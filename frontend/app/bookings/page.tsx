@@ -56,8 +56,8 @@ export default function BookingsPage() {
 
       // Fetch both types of bookings
       const [myRes, publishedRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/my`, { headers }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/my-items`, {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings/my`, { headers }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings/my-items`, {
           headers,
         }),
       ]);
@@ -84,7 +84,7 @@ export default function BookingsPage() {
       const token =
         localStorage.getItem("accessToken") || localStorage.getItem("token");
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${bookingId}/status`,
+        `${process.env.NEXT_PUBLIC_API_URL}/bookings/${bookingId}/status`,
         {
           method: "PATCH",
           headers: {
@@ -176,8 +176,9 @@ export default function BookingsPage() {
               </p>
             </div>
             <span
-              className={`px-3 py-1 rounded-full text-xs font-semibold border ${statusColors[booking.status] || statusColors.PENDING
-                }`}
+              className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                statusColors[booking.status] || statusColors.PENDING
+              }`}
             >
               {booking.status}
             </span>
@@ -274,18 +275,20 @@ export default function BookingsPage() {
           <div className="flex gap-2 bg-white/60 backdrop-blur-xl rounded-2xl p-1.5 border border-white/50 shadow-lg w-fit">
             <button
               onClick={() => setActiveTab("my-bookings")}
-              className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${activeTab === "my-bookings"
+              className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                activeTab === "my-bookings"
                   ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25"
                   : "text-gray-600 hover:bg-gray-100"
-                }`}
+              }`}
             >
               My Bookings
               {myBookings.length > 0 && (
                 <span
-                  className={`ml-2 px-2 py-0.5 rounded-full text-xs ${activeTab === "my-bookings"
+                  className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                    activeTab === "my-bookings"
                       ? "bg-white/20"
                       : "bg-blue-100 text-blue-600"
-                    }`}
+                  }`}
                 >
                   {myBookings.length}
                 </span>
@@ -293,18 +296,20 @@ export default function BookingsPage() {
             </button>
             <button
               onClick={() => setActiveTab("my-items")}
-              className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${activeTab === "my-items"
+              className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                activeTab === "my-items"
                   ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25"
                   : "text-gray-600 hover:bg-gray-100"
-                }`}
+              }`}
             >
               Published Items
               {publishedBookings.length > 0 && (
                 <span
-                  className={`ml-2 px-2 py-0.5 rounded-full text-xs ${activeTab === "my-items"
+                  className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                    activeTab === "my-items"
                       ? "bg-white/20"
                       : "bg-emerald-100 text-emerald-600"
-                    }`}
+                  }`}
                 >
                   {publishedBookings.length}
                 </span>

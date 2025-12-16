@@ -47,11 +47,13 @@ function StarRating({
       {[1, 2, 3, 4, 5].map((star) => (
         <svg
           key={star}
-          className={`${sizeClass} transition-all duration-200 ${interactive ? "cursor-pointer hover:scale-110" : ""
-            } ${star <= (hoverRating || rating)
+          className={`${sizeClass} transition-all duration-200 ${
+            interactive ? "cursor-pointer hover:scale-110" : ""
+          } ${
+            star <= (hoverRating || rating)
               ? "text-amber-400 drop-shadow-[0_0_3px_rgba(251,191,36,0.5)]"
               : "text-gray-300/50"
-            }`}
+          }`}
           fill="currentColor"
           viewBox="0 0 20 20"
           onClick={() => interactive && onRate?.(star)}
@@ -102,7 +104,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
     queryKey: ["reviews", itemId],
     queryFn: async () => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/item/${itemId}?page=0&size=10`
+        `${process.env.NEXT_PUBLIC_API_URL}/reviews/item/${itemId}?page=0&size=10`
       );
       if (!res.ok) throw new Error("Failed to fetch reviews");
       return res.json() as Promise<ReviewsResponse>;
@@ -115,7 +117,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
     queryKey: ["reviews", itemId, "rating"],
     queryFn: async () => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/item/${itemId}/rating`
+        `${process.env.NEXT_PUBLIC_API_URL}/reviews/item/${itemId}/rating`
       );
       if (!res.ok) throw new Error("Failed to fetch rating");
       return res.json() as Promise<number>;
@@ -127,7 +129,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
   const createReviewMutation = useMutation({
     mutationFn: async (data: { rating: number; comment: string }) => {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -162,7 +164,7 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
   const deleteReviewMutation = useMutation({
     mutationFn: async (reviewId: number) => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${reviewId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/reviews/${reviewId}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -343,10 +345,11 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
             reviews.map((review, idx) => (
               <div
                 key={review.id}
-                className={`group relative p-3 rounded-xl bg-white/60 border border-white/80 hover:bg-white/80 hover:border-blue-200/50 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 ${review.userId === CURRENT_USER_ID
+                className={`group relative p-3 rounded-xl bg-white/60 border border-white/80 hover:bg-white/80 hover:border-blue-200/50 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 ${
+                  review.userId === CURRENT_USER_ID
                     ? "ring-2 ring-emerald-300/50"
                     : ""
-                  }`}
+                }`}
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
                 <div className="flex items-start gap-2.5">

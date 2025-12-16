@@ -34,7 +34,7 @@ export function MaterialField() {
     queryKey: ["materials"],
     queryFn: async () => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/items/materials`
+        `${process.env.NEXT_PUBLIC_API_URL}/items/materials`
       );
       if (!res.ok) throw new Error("Failed to fetch materials");
       return res.json() as Promise<MaterialMap>;
@@ -70,10 +70,11 @@ export function MaterialField() {
         value={formData.material}
         onChange={(e) => updateField("material", e.target.value)}
         disabled={isLoading}
-        className={`w-full px-4 py-3 rounded-lg border ${errors.material
+        className={`w-full px-4 py-3 rounded-lg border ${
+          errors.material
             ? "border-red-500 focus:ring-red-500"
             : "border-gray-300 dark:border-gray-600 focus:ring-blue-500"
-          } focus:ring-2 focus:outline-none bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 transition-colors disabled:opacity-50`}
+        } focus:ring-2 focus:outline-none bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 transition-colors disabled:opacity-50`}
       >
         <option value="">
           {isLoading ? "Loading materials..." : "Select a material"}
