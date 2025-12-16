@@ -250,22 +250,44 @@ jobs:
         working-directory: ./frontend
         run: pnpm exec playwright install --with-deps
 
-      - name: Start Frontend
+      - name: Build Frontend
         working-directory: ./frontend
         env:
           NEXT_PUBLIC_API_URL: http://localhost:8080
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
         run: |
+          echo "Building with NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}"
           pnpm build
+
+      - name: Start Frontend
+        working-directory: ./frontend
+        run: |
           nohup pnpm start > frontend.log 2>&1 &
           echo "Waiting for Frontend to start..."
           timeout 60s bash -c 'until curl -s http://localhost:3000; do sleep 2; done'
+
+      - name: Debug - Check services
+        run: |
+          echo "=== Backend health check ==="
+          curl -s http://localhost:8080/actuator/health || echo "Backend health check failed"
+          echo ""
+          echo "=== Frontend check ==="
+          curl -s http://localhost:3000 | head -c 500 || echo "Frontend check failed"
 
       - name: Run Playwright Tests
         working-directory: ./frontend
         run: pnpm exec playwright test
         env:
           CI: true
+
+      - name: Debug - Show logs on failure
+        if: failure()
+        run: |
+          echo "=== Backend logs ==="
+          cat backend/backend.log 2>/dev/null || echo "No backend log found"
+          echo ""
+          echo "=== Frontend logs ==="
+          cat frontend/frontend.log 2>/dev/null || echo "No frontend log found"
 
       - name: Upload Playwright Report
         if: always()
