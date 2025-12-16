@@ -47,13 +47,11 @@ function StarRating({
       {[1, 2, 3, 4, 5].map((star) => (
         <svg
           key={star}
-          className={`${sizeClass} transition-all duration-200 ${
-            interactive ? "cursor-pointer hover:scale-110" : ""
-          } ${
-            star <= (hoverRating || rating)
+          className={`${sizeClass} transition-all duration-200 ${interactive ? "cursor-pointer hover:scale-110" : ""
+            } ${star <= (hoverRating || rating)
               ? "text-amber-400 drop-shadow-[0_0_3px_rgba(251,191,36,0.5)]"
               : "text-gray-300/50"
-          }`}
+            }`}
           fill="currentColor"
           viewBox="0 0 20 20"
           onClick={() => interactive && onRate?.(star)}
@@ -131,9 +129,11 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
       const token = localStorage.getItem("token");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
         body: JSON.stringify({
-          userId: CURRENT_USER_ID,
           itemId: Number(itemId),
           rating: data.rating,
           comment: data.comment,
@@ -163,12 +163,15 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
   // Delete review mutation
   const deleteReviewMutation = useMutation({
     mutationFn: async (reviewId: number) => {
+      const token = localStorage.getItem("token");
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/reviews/${reviewId}`,
         {
           method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: CURRENT_USER_ID }),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
         }
       );
       if (!res.ok && res.status !== 204) {
@@ -345,11 +348,10 @@ export default function ItemReviews({ itemId }: ItemReviewsProps) {
             reviews.map((review, idx) => (
               <div
                 key={review.id}
-                className={`group relative p-3 rounded-xl bg-white/60 border border-white/80 hover:bg-white/80 hover:border-blue-200/50 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 ${
-                  review.userId === CURRENT_USER_ID
+                className={`group relative p-3 rounded-xl bg-white/60 border border-white/80 hover:bg-white/80 hover:border-blue-200/50 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 ${review.userId === CURRENT_USER_ID
                     ? "ring-2 ring-emerald-300/50"
                     : ""
-                }`}
+                  }`}
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
                 <div className="flex items-start gap-2.5">
