@@ -37,8 +37,22 @@ export async function login(page: Page, email: string, password: string): Promis
     await page.locator('input[name="email"]').fill(email);
     await page.locator('input[name="password"]').fill(password);
     await page.locator('button[type="submit"]').click();
-    // Wait for redirect
-    await page.waitForURL(/\/(admin|dashboard|items)/);
+
+    // Wait for either successful redirect or error message
+    const result = await Promise.race([
+        page.waitForURL(/\/(admin|dashboard|items)/, { timeout: 15000 })
+            .then(() => ({ success: true, error: null })),
+        page.locator('.bg-red-50, [class*="error"], [class*="red"]').first()
+            .waitFor({ state: 'visible', timeout: 15000 })
+            .then(async () => {
+                const errorText = await page.locator('.bg-red-50 p, [class*="error"]').first().textContent();
+                return { success: false, error: errorText || 'Login failed with unknown error' };
+            }),
+    ]);
+
+    if (!result.success) {
+        throw new Error(`Login failed for ${email}: ${result.error}`);
+    }
 }
 
 /**
