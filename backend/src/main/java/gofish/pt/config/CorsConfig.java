@@ -21,6 +21,7 @@ public class CorsConfig {
                 // Development
                 // Dev (Direct access)
                 "http://localhost:3000",
+                "http://127.0.0.1:3000",
 
                 // ✅ TEST FIX: Allow Nginx HTTPS access locally
                 "https://localhost",
@@ -29,8 +30,8 @@ public class CorsConfig {
                 "http://127.0.0.1",
 
                 // Production VM (Keep this for later)
-                "https://deti-tqs-03.ua.pt",   // <-- YOUR VM (HTTP fallback)
-                "http://deti-tqs-03.ua.pt"   // <-- YOUR VM (HTTP fallback)
+                "https://deti-tqs-03.ua.pt", // <-- YOUR VM (HTTP fallback)
+                "http://deti-tqs-03.ua.pt" // <-- YOUR VM (HTTP fallback)
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

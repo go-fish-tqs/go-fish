@@ -60,8 +60,18 @@ export default function LoginPage() {
     setErrors({});
 
     try {
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
+      console.log("Login API URL:", apiUrl);
+
+      // Validate that API URL is configured
+      if (!process.env.NEXT_PUBLIC_API_URL) {
+        setErrors({ general: "API URL not configured. Please contact support." });
+        setIsSubmitting(false);
+        return;
+      }
+
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+        apiUrl,
         {
           method: "POST",
           headers: {
@@ -110,14 +120,16 @@ export default function LoginPage() {
           setErrors(data);
         }
       } else {
+        // Include status code for debugging
+        console.error("Login failed with status:", response.status);
         setErrors({
-          general: "An unexpected error occurred. Please try again.",
+          general: `Login failed (status ${response.status}). Please try again.`,
         });
       }
     } catch (error) {
       console.error("Login error:", error);
       setErrors({
-        general: "Network error. Please check your connection and try again.",
+        general: `Network error: ${error instanceof Error ? error.message : 'Unknown error'}. Please check your connection.`,
       });
     } finally {
       setIsSubmitting(false);
@@ -164,8 +176,8 @@ export default function LoginPage() {
                 value={formData.email}
                 onChange={handleChange}
                 className={`w-full px-4 py-3 rounded-lg border ${errors.email
-                    ? "border-red-300 dark:border-red-700"
-                    : "border-gray-300 dark:border-gray-600"
+                  ? "border-red-300 dark:border-red-700"
+                  : "border-gray-300 dark:border-gray-600"
                   } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
                 placeholder="your.email@example.com"
                 disabled={isSubmitting}
@@ -193,8 +205,8 @@ export default function LoginPage() {
                   value={formData.password}
                   onChange={handleChange}
                   className={`w-full px-4 py-3 rounded-lg border ${errors.password
-                      ? "border-red-300 dark:border-red-700"
-                      : "border-gray-300 dark:border-gray-600"
+                    ? "border-red-300 dark:border-red-700"
+                    : "border-gray-300 dark:border-gray-600"
                     } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
                   placeholder="Enter your password"
                   disabled={isSubmitting}
