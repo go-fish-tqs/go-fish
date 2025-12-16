@@ -18,10 +18,7 @@ interface Item {
     available: boolean;
     active: boolean;
     deactivationReason: string | null;
-    owner: {
-        id: number;
-        username: string;
-    };
+    owner: { id: number; username: string };
 }
 
 export default function AdminItemsPage() {
@@ -32,74 +29,49 @@ export default function AdminItemsPage() {
     const fetchItems = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/items`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/items`, {
+                headers: { 'Authorization': `Bearer ${token}` },
             });
-
             if (!response.ok) throw new Error('Failed to fetch items');
-            const data = await response.json();
-            setItems(data);
-        } catch (err) {
+            setItems(await response.json());
+        } catch {
             toast.error('Failed to load items');
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchItems();
-    }, []);
+    useEffect(() => { fetchItems(); }, []);
 
     const handleDeactivate = async (itemId: number) => {
         const reason = prompt('Enter deactivation reason (required):');
-        if (!reason) {
-            toast.error('Deactivation reason is required');
-            return;
-        }
-
+        if (!reason) { toast.error('Deactivation reason is required'); return; }
         setActionLoading(itemId);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/items/${itemId}/deactivate`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/items/${itemId}/deactivate`, {
                 method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reason }),
             });
-
-            if (!response.ok) throw new Error('Failed to deactivate item');
+            if (!response.ok) throw new Error('Failed');
             toast.success('Item deactivated successfully');
             fetchItems();
-        } catch (err) {
-            toast.error('Failed to deactivate item');
-        } finally {
-            setActionLoading(null);
-        }
+        } catch { toast.error('Failed to deactivate item'); } finally { setActionLoading(null); }
     };
 
     const handleReactivate = async (itemId: number) => {
         setActionLoading(itemId);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/items/${itemId}/reactivate`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/items/${itemId}/reactivate`, {
                 method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
+                headers: { 'Authorization': `Bearer ${token}` },
             });
-
-            if (!response.ok) throw new Error('Failed to reactivate item');
+            if (!response.ok) throw new Error('Failed');
             toast.success('Item reactivated successfully');
             fetchItems();
-        } catch (err) {
-            toast.error('Failed to reactivate item');
-        } finally {
-            setActionLoading(null);
-        }
+        } catch { toast.error('Failed to reactivate item'); } finally { setActionLoading(null); }
     };
 
     if (loading) {
@@ -111,57 +83,56 @@ export default function AdminItemsPage() {
     }
 
     return (
-        <div>
-            <h1 className="text-3xl font-bold text-white mb-8">Item Management</h1>
+        <div className="p-6 space-y-6">
+            <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Item Management</h1>
+                <p className="text-gray-500 mt-1">Manage platform listings and item status</p>
+            </div>
 
-            <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+            <div className="backdrop-blur-xl bg-white/70 rounded-2xl border border-white/50 shadow-xl overflow-hidden">
                 <table className="w-full">
-                    <thead className="bg-gray-900">
-                        <tr>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Item</th>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Owner</th>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Price</th>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+                    <thead>
+                        <tr className="bg-gradient-to-r from-gray-50/80 to-blue-50/80 border-b border-gray-200/50">
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Item</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Owner</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Price</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-700">
+                    <tbody className="divide-y divide-gray-100/50">
                         {items.map((item) => (
-                            <tr key={item.id} className="hover:bg-gray-700/50 transition-colors">
+                            <tr key={item.id} className="hover:bg-blue-50/30 transition-colors">
                                 <td className="px-6 py-4">
-                                    <div>
-                                        <p className="text-white font-medium">{item.name}</p>
-                                        <p className="text-gray-400 text-sm">{item.category?.displayName}</p>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-md">
+                                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="text-gray-800 font-medium">{item.name}</p>
+                                            <p className="text-gray-500 text-sm">{item.category?.displayName}</p>
+                                        </div>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 text-gray-300">{item.owner?.username || 'Unknown'}</td>
-                                <td className="px-6 py-4 text-white">€{item.price?.toFixed(2)}</td>
+                                <td className="px-6 py-4 text-gray-700">{item.owner?.username || 'Unknown'}</td>
+                                <td className="px-6 py-4 text-gray-800 font-semibold">€{item.price?.toFixed(2)}</td>
                                 <td className="px-6 py-4">
-                                    <div className="flex flex-col gap-1">
-                                        <span className={`px-2 py-1 rounded text-xs font-medium inline-block w-fit ${item.active ? 'bg-green-600 text-green-100' : 'bg-red-600 text-red-100'
-                                            }`}>
-                                            {item.active ? 'Active' : 'Deactivated'}
-                                        </span>
-                                        {!item.active && item.deactivationReason && (
-                                            <p className="text-xs text-gray-500">{item.deactivationReason}</p>
-                                        )}
-                                    </div>
+                                    <span className={`px-3 py-1.5 rounded-full text-xs font-semibold text-white shadow-sm ${item.active ? 'bg-gradient-to-r from-emerald-500 to-green-600' : 'bg-gradient-to-r from-rose-500 to-red-600'}`}>
+                                        {item.active ? 'Active' : 'Deactivated'}
+                                    </span>
+                                    {!item.active && item.deactivationReason && <p className="text-xs text-gray-500 mt-1 truncate max-w-[150px]">{item.deactivationReason}</p>}
                                 </td>
                                 <td className="px-6 py-4">
                                     {item.active ? (
-                                        <button
-                                            onClick={() => handleDeactivate(item.id)}
-                                            disabled={actionLoading === item.id}
-                                            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded disabled:opacity-50"
-                                        >
+                                        <button onClick={() => handleDeactivate(item.id)} disabled={actionLoading === item.id}
+                                            className="px-3 py-1.5 bg-gradient-to-r from-rose-500 to-red-600 text-white text-xs font-medium rounded-lg shadow-sm disabled:opacity-50">
                                             {actionLoading === item.id ? '...' : 'Deactivate'}
                                         </button>
                                     ) : (
-                                        <button
-                                            onClick={() => handleReactivate(item.id)}
-                                            disabled={actionLoading === item.id}
-                                            className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded disabled:opacity-50"
-                                        >
+                                        <button onClick={() => handleReactivate(item.id)} disabled={actionLoading === item.id}
+                                            className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-medium rounded-lg shadow-sm disabled:opacity-50">
                                             {actionLoading === item.id ? '...' : 'Reactivate'}
                                         </button>
                                     )}

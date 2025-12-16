@@ -54,7 +54,7 @@ function BookingFormContent() {
       // Se não houver ID, nem vale a pena ir lá
       if (!itemId) throw new Error("Item ID is missing");
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const res = await fetch(`${apiUrl}/items/${itemId}`);
 
       // Lê o texto primeiro para não estoirar no json()
@@ -81,7 +81,7 @@ function BookingFormContent() {
     queryFn: async () => {
       if (!itemId) return [];
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const res = await fetch(
         `${apiUrl}/items/${itemId}/unavailability?from=${today}&to=${nextYear}`
       );
@@ -231,11 +231,10 @@ function BookingFormContent() {
               <div className="lg:w-1/2">
                 {/* Success Message */}
                 <div
-                  className={`transition-all duration-300 ${
-                    success
-                      ? "mb-6 opacity-100 h-auto"
-                      : "mb-0 opacity-0 h-0 overflow-hidden"
-                  }`}
+                  className={`transition-all duration-300 ${success
+                    ? "mb-6 opacity-100 h-auto"
+                    : "mb-0 opacity-0 h-0 overflow-hidden"
+                    }`}
                 >
                   {success && (
                     <div className="p-4 rounded-xl bg-green-50 border border-green-200 shadow-sm\">
@@ -263,11 +262,10 @@ function BookingFormContent() {
 
                 {/* Error Message */}
                 <div
-                  className={`transition-all duration-300 ${
-                    error
-                      ? "mb-6 opacity-100 h-auto"
-                      : "mb-0 opacity-0 h-0 overflow-hidden"
-                  }`}
+                  className={`transition-all duration-300 ${error
+                    ? "mb-6 opacity-100 h-auto"
+                    : "mb-0 opacity-0 h-0 overflow-hidden"
+                    }`}
                 >
                   {error && (
                     <div className="p-4 rounded-xl bg-red-50 border border-red-200 shadow-sm\">
@@ -309,6 +307,7 @@ function BookingFormContent() {
                   onEndDateChange={setEndDate}
                   onSubmit={handleSubmit}
                   isSubmitting={isSubmitting}
+                  unavailableDates={blockedDates}
                 />
               </div>
             </div>

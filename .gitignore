@@ -2,6 +2,7 @@
 
 # Environment files - CRITICAL: Never commit these!
 .env
+.env.dev
 .env.*
 !.env.example
 !.env.*.example
@@ -19,6 +20,7 @@ deployment/.env.*
 frontend/.env
 frontend/.env.*
 !frontend/.env.example
+frontend/test-results/*
 
 # Backend application properties with secrets
 backend/src/main/resources/application-secrets.properties

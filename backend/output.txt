@@ -11,7 +11,7 @@ OS name: "linux", version: "5.15.0-126-generic", arch: "amd64", family: "unix"
 [DEBUG]   Imported: org.apache.maven.* < plexus.core
 [DEBUG]   Imported: org.apache.maven.artifact < plexus.core
 [DEBUG]   Imported: org.apache.maven.classrealm < plexus.core
-[DEBUG]   Imported: org.apache.maven.cli < plexus.core
+[DEBUG]   Imported: org.apachee.maven.cli < plexus.core
 [DEBUG]   Imported: org.apache.maven.configuration < plexus.core
 [DEBUG]   Imported: org.apache.maven.exception < plexus.core
 [DEBUG]   Imported: org.apache.maven.execution < plexus.core

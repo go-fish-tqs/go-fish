@@ -101,7 +101,7 @@ export default function PaymentModal({
           localStorage.getItem("accessToken") || localStorage.getItem("token");
         const paymentIntentId = clientSecret.split("_secret_")[0];
         await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || ""}/api/payments/confirm`,
+          `${process.env.NEXT_PUBLIC_API_URL || ""}/payments/confirm`,
           {
             method: "POST",
             headers: {
@@ -133,9 +133,9 @@ export default function PaymentModal({
   const days =
     start && end
       ? Math.max(
-          1,
-          Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-        )
+        1,
+        Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+      )
       : 0;
 
   if (!isOpen) return null;

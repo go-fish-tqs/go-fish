@@ -15,12 +15,12 @@ interface AuditLog {
     createdAt: string;
 }
 
-const ACTION_LABELS: Record<string, { label: string; color: string }> = {
-    SUSPEND_USER: { label: 'Suspend User', color: 'bg-yellow-600' },
-    REACTIVATE_USER: { label: 'Reactivate User', color: 'bg-green-600' },
-    DELETE_USER: { label: 'Delete User', color: 'bg-red-600' },
-    DEACTIVATE_ITEM: { label: 'Deactivate Item', color: 'bg-orange-600' },
-    REACTIVATE_ITEM: { label: 'Reactivate Item', color: 'bg-blue-600' },
+const ACTION_STYLES: Record<string, { label: string; gradient: string }> = {
+    SUSPEND_USER: { label: 'Suspend User', gradient: 'from-amber-500 to-orange-600' },
+    REACTIVATE_USER: { label: 'Reactivate User', gradient: 'from-emerald-500 to-green-600' },
+    DELETE_USER: { label: 'Delete User', gradient: 'from-rose-500 to-red-600' },
+    DEACTIVATE_ITEM: { label: 'Deactivate Item', gradient: 'from-orange-500 to-amber-600' },
+    REACTIVATE_ITEM: { label: 'Reactivate Item', gradient: 'from-blue-500 to-indigo-600' },
 };
 
 export default function AdminAuditPage() {
@@ -28,45 +28,29 @@ export default function AdminAuditPage() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<string>('');
 
-    const fetchLogs = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            let url = `${process.env.NEXT_PUBLIC_API_URL}/api/admin/audit`;
-            if (filter) {
-                url += `?action=${filter}`;
-            }
-
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-
-            if (!response.ok) throw new Error('Failed to fetch audit logs');
-            const data = await response.json();
-            setLogs(data);
-        } catch (err) {
-            toast.error('Failed to load audit logs');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
+        const fetchLogs = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                let url = `${process.env.NEXT_PUBLIC_API_URL}/admin/audit`;
+                if (filter) url += `?action=${filter}`;
+                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!response.ok) throw new Error('Failed');
+                setLogs(await response.json());
+            } catch {
+                toast.error('Failed to load audit logs');
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchLogs();
     }, [filter]);
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleString();
-    };
+    const formatDate = (dateString: string) => new Date(dateString).toLocaleString();
 
     const parseDetails = (details: string | null): Record<string, string> | null => {
         if (!details) return null;
-        try {
-            return JSON.parse(details);
-        } catch {
-            return null;
-        }
+        try { return JSON.parse(details); } catch { return null; }
     };
 
     if (loading) {
@@ -78,15 +62,14 @@ export default function AdminAuditPage() {
     }
 
     return (
-        <div>
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-bold text-white">Audit Log</h1>
-
-                <select
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                    className="bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2"
-                >
+        <div className="p-6 space-y-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Audit Log</h1>
+                    <p className="text-gray-500 mt-1">Track all admin actions on the platform</p>
+                </div>
+                <select value={filter} onChange={(e) => setFilter(e.target.value)}
+                    className="backdrop-blur-xl bg-white/70 text-gray-700 border border-white/50 rounded-xl px-4 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50">
                     <option value="">All Actions</option>
                     <option value="SUSPEND_USER">Suspend User</option>
                     <option value="REACTIVATE_USER">Reactivate User</option>
@@ -97,40 +80,34 @@ export default function AdminAuditPage() {
             </div>
 
             {logs.length === 0 ? (
-                <div className="bg-gray-800 rounded-xl border border-gray-700 p-8 text-center text-gray-400">
-                    No audit logs found
+                <div className="backdrop-blur-xl bg-white/70 rounded-2xl border border-white/50 p-12 text-center shadow-lg">
+                    <p className="text-gray-500 text-lg">No audit logs found</p>
                 </div>
             ) : (
                 <div className="space-y-4">
                     {logs.map((log) => {
-                        const actionInfo = ACTION_LABELS[log.action] || { label: log.action, color: 'bg-gray-600' };
+                        const actionInfo = ACTION_STYLES[log.action] || { label: log.action, gradient: 'from-gray-500 to-gray-600' };
                         const details = parseDetails(log.details);
-
                         return (
-                            <div
-                                key={log.id}
-                                className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:border-gray-600 transition-colors"
-                            >
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <span className={`${actionInfo.color} px-3 py-1 rounded text-xs font-medium text-white`}>
+                            <div key={log.id} className="backdrop-blur-xl bg-white/70 rounded-2xl border border-white/50 p-6 shadow-lg hover:shadow-xl transition-all">
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex items-start gap-4">
+                                        <span className={`bg-gradient-to-r ${actionInfo.gradient} px-3 py-1.5 rounded-full text-xs font-semibold text-white shadow-md`}>
                                             {actionInfo.label}
                                         </span>
                                         <div>
-                                            <p className="text-white">
-                                                <span className="font-medium">{log.adminUsername}</span>
-                                                <span className="text-gray-400"> {actionInfo.label.toLowerCase()} </span>
-                                                <span className="font-medium">{log.targetName}</span>
-                                                <span className="text-gray-500"> ({log.targetType} #{log.targetId})</span>
+                                            <p className="text-gray-800">
+                                                <span className="font-semibold">{log.adminUsername}</span>
+                                                <span className="text-gray-500"> performed </span>
+                                                <span className="font-medium">{actionInfo.label.toLowerCase()}</span>
+                                                <span className="text-gray-500"> on </span>
+                                                <span className="font-semibold">{log.targetName}</span>
+                                                <span className="text-gray-400 text-sm ml-1">({log.targetType} #{log.targetId})</span>
                                             </p>
-                                            {details?.reason && (
-                                                <p className="text-gray-400 text-sm mt-1">
-                                                    Reason: {details.reason}
-                                                </p>
-                                            )}
+                                            {details?.reason && <p className="text-gray-500 text-sm mt-2 italic">&quot;{details.reason}&quot;</p>}
                                         </div>
                                     </div>
-                                    <p className="text-gray-500 text-sm">{formatDate(log.createdAt)}</p>
+                                    <p className="text-gray-500 text-sm flex-shrink-0">{formatDate(log.createdAt)}</p>
                                 </div>
                             </div>
                         );

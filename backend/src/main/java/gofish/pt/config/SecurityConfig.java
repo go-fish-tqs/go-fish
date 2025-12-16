@@ -37,6 +37,7 @@ public class SecurityConfig {
                         // Public endpoints that don't require authentication
                         .requestMatchers("/api/auth/**").permitAll()
                         // User's own items require authentication (must come before public GET)
+                        .requestMatchers("/v3/api-docs/*", "/swagger-ui/*", "/swagger-ui.html").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/items/my").authenticated()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/items/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/items/filter").permitAll() // Filter/search

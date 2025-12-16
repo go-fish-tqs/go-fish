@@ -267,7 +267,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="h-screen w-64  overflow-hidden flex flex-col">
+    <aside className="relative h-screen w-64 overflow-hidden flex flex-col">
       {/* Glassmorphism Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-blue-50/50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800" />
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5" />
@@ -320,10 +320,9 @@ export default function Sidebar() {
                 className={`
                   group relative flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm
                   transition-all duration-300 ease-out
-                  ${
-                    active
-                      ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-slate-800/50 hover:text-gray-900 dark:hover:text-white"
+                  ${active
+                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-slate-800/50 hover:text-gray-900 dark:hover:text-white"
                   }
                 `}
               >
@@ -336,11 +335,10 @@ export default function Sidebar() {
                 <span
                   className={`
                   transition-transform duration-300 group-hover:scale-110
-                  ${
-                    active
+                  ${active
                       ? "text-white"
                       : "text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400"
-                  }
+                    }
                 `}
                 >
                   {item.icon}

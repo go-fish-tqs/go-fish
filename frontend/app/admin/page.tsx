@@ -21,7 +21,7 @@ export default function AdminDashboard() {
         const fetchStats = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/dashboard`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/dashboard`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -53,107 +53,61 @@ export default function AdminDashboard() {
 
     if (error) {
         return (
-            <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 text-red-400">
+            <div className="m-6 backdrop-blur-xl bg-red-50/80 border border-red-200/50 rounded-2xl p-6 text-red-600">
                 Error: {error}
             </div>
         );
     }
 
     const statCards = [
-        {
-            label: 'Active Bookings',
-            value: stats?.activeBookings || 0,
-            icon: (
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-            ),
-            color: 'bg-green-600'
-        },
-        {
-            label: 'Pending Bookings',
-            value: stats?.pendingBookings || 0,
-            icon: (
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-            ),
-            color: 'bg-yellow-600'
-        },
-        {
-            label: 'Total Users',
-            value: stats?.totalUsers || 0,
-            icon: (
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-            ),
-            color: 'bg-blue-600'
-        },
-        {
-            label: 'Suspended Users',
-            value: stats?.suspendedUsers || 0,
-            icon: (
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                </svg>
-            ),
-            color: 'bg-red-600'
-        },
-        {
-            label: 'Total Items',
-            value: stats?.totalItems || 0,
-            icon: (
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
-            ),
-            color: 'bg-purple-600'
-        },
-        {
-            label: 'Inactive Items',
-            value: stats?.inactiveItems || 0,
-            icon: (
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                </svg>
-            ),
-            color: 'bg-orange-600'
-        },
+        { label: 'Active Bookings', value: stats?.activeBookings || 0, gradient: 'from-emerald-500 to-green-600', iconBg: 'bg-emerald-500/20' },
+        { label: 'Pending Bookings', value: stats?.pendingBookings || 0, gradient: 'from-amber-500 to-orange-600', iconBg: 'bg-amber-500/20' },
+        { label: 'Total Users', value: stats?.totalUsers || 0, gradient: 'from-blue-500 to-indigo-600', iconBg: 'bg-blue-500/20' },
+        { label: 'Suspended Users', value: stats?.suspendedUsers || 0, gradient: 'from-rose-500 to-red-600', iconBg: 'bg-rose-500/20' },
+        { label: 'Total Items', value: stats?.totalItems || 0, gradient: 'from-violet-500 to-purple-600', iconBg: 'bg-violet-500/20' },
+        { label: 'Inactive Items', value: stats?.inactiveItems || 0, gradient: 'from-orange-500 to-amber-600', iconBg: 'bg-orange-500/20' },
     ];
 
     return (
-        <div>
-            <h1 className="text-3xl font-bold text-white mb-8">Admin Dashboard</h1>
+        <div className="p-6 space-y-8">
+            <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                    Admin Dashboard
+                </h1>
+                <p className="text-gray-500 mt-1">Overview of your platform&apos;s performance</p>
+            </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {statCards.map((card) => (
                     <div
                         key={card.label}
-                        className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-colors"
+                        className="backdrop-blur-xl bg-white/70 rounded-2xl p-6 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                     >
                         <div className="flex items-center justify-between mb-4">
-                            <span className="p-2 bg-white/10 rounded-lg">{card.icon}</span>
-                            <span className={`${card.color} px-3 py-1 rounded-full text-xs font-medium text-white`}>
+                            <span className={`p-3 rounded-xl ${card.iconBg}`}>
+                                <svg className="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            </span>
+                            <span className={`bg-gradient-to-r ${card.gradient} px-3 py-1.5 rounded-full text-xs font-semibold text-white shadow-md`}>
                                 {card.label}
                             </span>
                         </div>
-                        <p className="text-4xl font-bold text-white">{card.value}</p>
+                        <p className="text-4xl font-bold text-gray-800">{card.value}</p>
                     </div>
                 ))}
             </div>
 
-            {/* Revenue Card */}
-            <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl p-8 border border-green-500/50">
-                <div className="flex items-center justify-between">
+            <div className="relative overflow-hidden backdrop-blur-xl bg-gradient-to-br from-emerald-500/90 to-green-600/90 rounded-2xl p-8 border border-emerald-400/30 shadow-xl">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
+                <div className="relative z-10 flex items-center justify-between">
                     <div>
-                        <p className="text-green-100 text-sm font-medium mb-1">Total Revenue</p>
-                        <p className="text-4xl font-bold text-white">
+                        <p className="text-emerald-100 text-sm font-medium mb-1">Total Revenue</p>
+                        <p className="text-5xl font-bold text-white">
                             €{stats?.totalRevenue?.toFixed(2) || '0.00'}
                         </p>
                     </div>
-                    <span className="p-3 bg-white/20 rounded-xl">
+                    <span className="p-4 bg-white/20 backdrop-blur-xl rounded-2xl">
                         <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>

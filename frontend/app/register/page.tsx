@@ -137,7 +137,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="h-screen w-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto">
         <div className="bg-white dark:bg-slate-800 shadow-2xl rounded-2xl p-8">
           {/* Header */}
@@ -175,11 +175,10 @@ export default function RegisterPage() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.name
-                    ? "border-red-300 dark:border-red-700"
-                    : "border-gray-300 dark:border-gray-600"
-                } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
+                className={`w-full px-4 py-3 rounded-lg border ${errors.name
+                  ? "border-red-300 dark:border-red-700"
+                  : "border-gray-300 dark:border-gray-600"
+                  } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
                 placeholder="Enter your full name"
                 disabled={isSubmitting}
               />
@@ -204,11 +203,10 @@ export default function RegisterPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.email
-                    ? "border-red-300 dark:border-red-700"
-                    : "border-gray-300 dark:border-gray-600"
-                } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
+                className={`w-full px-4 py-3 rounded-lg border ${errors.email
+                  ? "border-red-300 dark:border-red-700"
+                  : "border-gray-300 dark:border-gray-600"
+                  } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
                 placeholder="your.email@example.com"
                 disabled={isSubmitting}
               />
@@ -234,11 +232,10 @@ export default function RegisterPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    errors.password
-                      ? "border-red-300 dark:border-red-700"
-                      : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
+                  className={`w-full px-4 py-3 rounded-lg border ${errors.password
+                    ? "border-red-300 dark:border-red-700"
+                    : "border-gray-300 dark:border-gray-600"
+                    } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
                   placeholder="At least 6 characters"
                   disabled={isSubmitting}
                 />
@@ -306,11 +303,10 @@ export default function RegisterPage() {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    errors.confirmPassword
-                      ? "border-red-300 dark:border-red-700"
-                      : "border-gray-300 dark:border-gray-600"
-                  } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
+                  className={`w-full px-4 py-3 rounded-lg border ${errors.confirmPassword
+                    ? "border-red-300 dark:border-red-700"
+                    : "border-gray-300 dark:border-gray-600"
+                    } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
                   placeholder="Re-enter your password"
                   disabled={isSubmitting}
                 />
@@ -377,11 +373,10 @@ export default function RegisterPage() {
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.location
-                    ? "border-red-300 dark:border-red-700"
-                    : "border-gray-300 dark:border-gray-600"
-                } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
+                className={`w-full px-4 py-3 rounded-lg border ${errors.location
+                  ? "border-red-300 dark:border-red-700"
+                  : "border-gray-300 dark:border-gray-600"
+                  } bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors`}
                 placeholder="e.g., Lisboa, Porto"
                 disabled={isSubmitting}
               />
