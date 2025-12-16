@@ -15,33 +15,39 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
-        // Allow requests from frontend
+
+        // Combine Dev (localhost) and Prod (deti-tqs-03) domains here
         configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",
-            "http://127.0.0.1:3000",
-            "http://localhost:5173",  // Vite HMR
-            "http://127.0.0.1:5173"
+                // Development
+                "http://localhost:3000",
+                "http://127.0.0.1:3000",
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
+
+                // Production (Your VM)
+                // Note: Add both HTTPS (primary) and HTTP (just in case)
+                "https://deti-tqs-03.ua.pt",
+                "http://deti-tqs-03.ua.pt"
         ));
-        
-        // Allow all HTTP methods
+
+        // Allow all standard HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        
+
         // Allow all headers
         configuration.setAllowedHeaders(List.of("*"));
-        
-        // Allow credentials (cookies, authorization headers)
+
+        // Allow credentials (cookies/auth headers)
         configuration.setAllowCredentials(true);
-        
-        // Expose Authorization header to frontend
+
+        // Expose headers needed by the frontend
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Location"));
-        
-        // Cache preflight response for 1 hour
+
+        // Cache the preflight check for 1 hour to reduce traffic
         configuration.setMaxAge(3600L);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-        
+
         return source;
     }
 }
