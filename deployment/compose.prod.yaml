@@ -7,8 +7,7 @@ services:
         - BUILD_DATE=${BUILD_DATE:-unknown}
         - VERSION=${VERSION:-latest}
     restart: always
-    ports:
-      - "8080:8080"
+    # REMOVED: ports: - "8080:8080" (Only accessible inside network now)
     env_file:
       - .env.prod
     environment:
@@ -45,11 +44,12 @@ services:
       args:
         - BUILD_DATE=${BUILD_DATE:-unknown}
         - VERSION=${VERSION:-latest}
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+        # CHANGE: API is now accessed via Nginx at /api, so we can use a relative path
+        # or the full domain. Relative path is safest for Nginx proxying.
+        - NEXT_PUBLIC_API_URL=/api
         - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
     restart: always
-    ports:
-      - "3000:3000"
+    # REMOVED: ports: - "3000:3000" (Only accessible inside network now)
     healthcheck:
       test:
         [
@@ -67,6 +67,29 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    networks:
+      - gofish-prod
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # --- NEW SERVICE: NGINX ---
+  nginx:
+    image: nginx:stable-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Mount the config file you showed me
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # Mount the SSL certs (required for your config's 'ssl_certificate' lines)
+      - ./certs:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
     networks:
       - gofish-prod
     logging:
@@ -104,7 +127,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # Prometheus for metrics collection
+  # Prometheus (Keep ports if you want to access dashboard directly, or route via Nginx too)
   prometheus:
     image: prom/prometheus:latest
     restart: always
@@ -123,13 +146,7 @@ services:
         condition: service_healthy
     networks:
       - gofish-prod
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
-  # Grafana for visualization
   grafana:
     image: grafana/grafana:latest
     restart: always
@@ -147,11 +164,6 @@ services:
       - prometheus
     networks:
       - gofish-prod
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
 volumes:
   db-prod-data:

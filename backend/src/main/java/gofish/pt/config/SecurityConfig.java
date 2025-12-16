@@ -32,6 +32,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // NOSONAR
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Allow all OPTIONS requests (CORS preflight)
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         // Public endpoints that don't require authentication
                         .requestMatchers("/api/auth/**").permitAll()
                         // User's own items require authentication (must come before public GET)
