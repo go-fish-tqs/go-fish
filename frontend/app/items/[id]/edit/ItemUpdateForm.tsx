@@ -32,12 +32,9 @@ export default function ItemUpdateForm({ itemId }: ItemUpdateFormProps) {
     async function loadItem() {
       try {
         console.log("Loading item:", itemId);
-        const response = await fetch(
-          `http://localhost:8080/api/items/${itemId}`,
-          {
-            headers: getAuthHeaders(),
-          }
-        );
+        const response = await fetch(`http://localhost:8080/items/${itemId}`, {
+          headers: getAuthHeaders(),
+        });
 
         console.log("Response status:", response.status);
 
@@ -119,14 +116,11 @@ export default function ItemUpdateForm({ itemId }: ItemUpdateFormProps) {
       console.log("Token from localStorage:", localStorage.getItem("token"));
       console.log("UserId from localStorage:", localStorage.getItem("userId"));
 
-      const response = await fetch(
-        `http://localhost:8080/api/items/${itemId}`,
-        {
-          method: "PUT",
-          headers: headers,
-          body: JSON.stringify(updateData),
-        }
-      );
+      const response = await fetch(`http://localhost:8080/items/${itemId}`, {
+        method: "PUT",
+        headers: headers,
+        body: JSON.stringify(updateData),
+      });
 
       console.log("Update response status:", response.status);
 

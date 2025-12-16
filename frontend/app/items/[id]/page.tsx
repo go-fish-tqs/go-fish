@@ -27,7 +27,7 @@ export default function ItemPage({ params }: PageProps) {
   } = useQuery({
     queryKey: ["item", id], // <--- Use the unwrapped id
     queryFn: async () => {
-      const res = await fetch(`http://localhost:8080/api/items/${id}`);
+      const res = await fetch(`http://localhost:8080/items/${id}`);
       if (!res.ok) throw new Error("Deu barraca no fetch!");
       return res.json() as Promise<Item>;
     },

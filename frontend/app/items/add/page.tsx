@@ -37,12 +37,12 @@ function ItemForm() {
 
     console.log("Submitting item:", itemData);
 
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/items`, {
-                method: 'POST',
-                headers: getAuthHeaders(),
-                body: JSON.stringify(itemData)
-            });
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/items`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(itemData),
+      });
 
       if (response.ok) {
         setShowSuccessModal(true);

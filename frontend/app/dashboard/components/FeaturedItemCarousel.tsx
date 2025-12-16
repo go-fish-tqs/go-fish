@@ -19,7 +19,7 @@ export default function FeaturedItemCarousel() {
     queryKey: ["featuredItems"],
     queryFn: async () => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || ""}/api/items/filter`,
+        `${process.env.NEXT_PUBLIC_API_URL || ""}/items/filter`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
