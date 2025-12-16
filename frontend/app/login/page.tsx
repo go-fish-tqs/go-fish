@@ -63,13 +63,6 @@ export default function LoginPage() {
       const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
       console.log("Login API URL:", apiUrl);
 
-      // Validate that API URL is configured
-      if (!process.env.NEXT_PUBLIC_API_URL) {
-        setErrors({ general: "API URL not configured. Please contact support." });
-        setIsSubmitting(false);
-        return;
-      }
-
       const response = await fetch(
         apiUrl,
         {

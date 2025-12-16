@@ -253,7 +253,7 @@ jobs:
       - name: Build Frontend
         working-directory: ./frontend
         env:
-          NEXT_PUBLIC_API_URL: http://localhost:8080
+          NEXT_PUBLIC_API_URL: http://localhost:8080/api
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
         run: |
           echo "Building with NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}"
