@@ -32,7 +32,7 @@ export default function ItemUpdateForm({ itemId }: ItemUpdateFormProps) {
     async function loadItem() {
       try {
         console.log("Loading item:", itemId);
-        const response = await fetch(`http://localhost:8080/items/${itemId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/items/${itemId}`, {
           headers: getAuthHeaders(),
         });
 
@@ -116,7 +116,7 @@ export default function ItemUpdateForm({ itemId }: ItemUpdateFormProps) {
       console.log("Token from localStorage:", localStorage.getItem("token"));
       console.log("UserId from localStorage:", localStorage.getItem("userId"));
 
-      const response = await fetch(`http://localhost:8080/items/${itemId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/items/${itemId}`, {
         method: "PUT",
         headers: headers,
         body: JSON.stringify(updateData),

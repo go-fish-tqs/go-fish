@@ -30,13 +30,13 @@ export default function ManageAvailabilityPage({ params }: PageProps) {
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   // Fetch item details
   const { data: item, isLoading: isLoadingItem } = useQuery({
     queryKey: ["item", id],
     queryFn: async () => {
-      const res = await fetch(`${apiUrl}/api/items/${id}`);
+      const res = await fetch(`${apiUrl}/items/${id}`);
       if (!res.ok) throw new Error("Failed to fetch item");
       return res.json();
     },
@@ -52,7 +52,7 @@ export default function ManageAvailabilityPage({ params }: PageProps) {
     queryKey: ["blockedDates", id, today, nextYear],
     queryFn: async () => {
       const res = await fetch(
-        `${apiUrl}/api/items/${id}/blocked-dates?from=${today}&to=${nextYear}`,
+        `${apiUrl}/items/${id}/blocked-dates?from=${today}&to=${nextYear}`,
         { headers: getAuthHeaders() }
       );
       if (!res.ok) throw new Error("Failed to fetch blocked dates");
@@ -64,7 +64,7 @@ export default function ManageAvailabilityPage({ params }: PageProps) {
   // Delete blocked date mutation
   const deleteBlockedDateMutation = useMutation({
     mutationFn: async (blockedDateId: number) => {
-      const res = await fetch(`${apiUrl}/api/items/blocked-dates/${blockedDateId}`, {
+      const res = await fetch(`${apiUrl}/items/blocked-dates/${blockedDateId}`, {
         method: "DELETE",
         headers: getAuthHeaders(),
       });
@@ -89,7 +89,7 @@ export default function ManageAvailabilityPage({ params }: PageProps) {
   // Block dates mutation
   const blockDatesMutation = useMutation({
     mutationFn: async (data: { startDate: string; endDate: string; reason?: string }) => {
-      const res = await fetch(`${apiUrl}/api/items/${id}/blocked-dates`, {
+      const res = await fetch(`${apiUrl}/items/${id}/blocked-dates`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify(data),
@@ -237,7 +237,7 @@ export default function ManageAvailabilityPage({ params }: PageProps) {
                         )}
                       </div>
                     </div>
-                    
+
                     <button
                       onClick={() => handleRemoveBlockedDate(blockedDate.id)}
                       disabled={deleteBlockedDateMutation.isPending}

@@ -1,14 +1,17 @@
-Feature: User Login
+Feature: User Authentication
 
   Scenario: Successful login with valid credentials
-    Given I am on the login page
-    When I enter valid credentials
-    And I click the login button
-    Then I should be redirected to the dashboard
-    And I should see a welcome message
+    Given a user exists with email "test@gofish.pt" and password "password123"
+    When I attempt to login with email "test@gofish.pt" and password "password123"
+    Then the login should be successful
+    And I should receive a valid JWT token
+    And the response should contain user details
 
-  Scenario: Unsuccessful login with invalid credentials
-    Given I am on the login page
-    When I enter invalid credentials
-    And I click the login button
-    Then I should see an error message indicating invalid credentials
+  Scenario: Failed login with invalid password
+    Given a user exists with email "test@gofish.pt" and password "password123"
+    When I attempt to login with email "test@gofish.pt" and password "wrongpassword"
+    Then the login should fail with an invalid credentials error
+
+  Scenario: Failed login with non-existent email
+    When I attempt to login with email "nonexistent@gofish.pt" and password "anypassword"
+    Then the login should fail with an invalid credentials error

@@ -23,7 +23,7 @@ export default function AdminUsersPage() {
     const fetchUsers = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`, {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             if (!response.ok) throw new Error('Failed to fetch users');
@@ -43,7 +43,7 @@ export default function AdminUsersPage() {
         setActionLoading(userId);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${userId}/suspend`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}/suspend`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reason }),
@@ -58,7 +58,7 @@ export default function AdminUsersPage() {
         setActionLoading(userId);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${userId}/reactivate`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}/reactivate`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` },
             });
@@ -75,7 +75,7 @@ export default function AdminUsersPage() {
         setActionLoading(userId);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${userId}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reason }),

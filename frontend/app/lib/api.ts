@@ -1,6 +1,6 @@
 import { getAuthHeaders } from "./auth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Booking API
 export const bookingApi = {

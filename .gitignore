@@ -2,6 +2,7 @@
 
 # Environment files - CRITICAL: Never commit these!
 .env
+.env.dev
 .env.*
 !.env.example
 !.env.*.example

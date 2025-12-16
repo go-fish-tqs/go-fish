@@ -4,7 +4,7 @@ export default function RegisterLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center py-12">
+    <div className="h-screen w-full flex flex-col items-center justify-center">
       {children}
     </div>
   );

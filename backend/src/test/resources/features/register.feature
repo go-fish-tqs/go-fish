@@ -1,14 +1,13 @@
 Feature: User Registration
 
   Scenario: Successful registration with valid data
-    Given I am on the registration page
-    When I enter valid registration details
-    And I click the register button
-    Then I should be redirected to the login page
-    And I should see a success message
+    When I register with name "Test User" email "newuser@gofish.pt" password "password123" and location "Lisbon"
+    Then the registration should be successful
+    And the user should have role "USER"
+    And the user should have status "ACTIVE"
+    And the user should have balance 0.0
 
-  Scenario: Unsuccessful registration with existing email
-    Given I am on the registration page
-    When I enter registration details with an existing email
-    And I click the register button
-    Then I should see an error message indicating email already exists
+  Scenario: Failed registration with existing email
+    Given a user exists with email "existing@gofish.pt" and password "password123"
+    When I register with name "Another User" email "existing@gofish.pt" password "password123" and location "Porto"
+    Then the registration should fail with a duplicate email error

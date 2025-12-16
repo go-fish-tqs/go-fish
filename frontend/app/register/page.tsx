@@ -137,7 +137,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="h-screen w-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto">
         <div className="bg-white dark:bg-slate-800 shadow-2xl rounded-2xl p-8">
           {/* Header */}

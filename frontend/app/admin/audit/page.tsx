@@ -32,7 +32,7 @@ export default function AdminAuditPage() {
         const fetchLogs = async () => {
             try {
                 const token = localStorage.getItem('token');
-                let url = `${process.env.NEXT_PUBLIC_API_URL}/api/admin/audit`;
+                let url = `${process.env.NEXT_PUBLIC_API_URL}/admin/audit`;
                 if (filter) url += `?action=${filter}`;
                 const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (!response.ok) throw new Error('Failed');

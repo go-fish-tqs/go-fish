@@ -1,18 +1,19 @@
-Feature: Admin Management
-
-  Background:
-    Given I am logged in as an admin
-
-  Scenario: Access admin dashboard
-    When I navigate to the admin dashboard
-    Then I should see dashboard statistics
+Feature: Admin Operations
 
   Scenario: Suspend a user
-    Given I am on the user management page
-    When I click suspend on a user
-    Then the user status should change to suspended
+    Given an admin user "admin@gofish.pt" exists
+    And a regular user "tosuspend@gofish.pt" exists
+    When the admin suspends user "tosuspend@gofish.pt"
+    Then user "tosuspend@gofish.pt" should have status "SUSPENDED"
 
-  Scenario: Delete an item
-    Given I am on the item management page
-    When I click delete on an item
-    Then the item should be removed from the list
+  Scenario: Unsuspend a user
+    Given an admin user "admin2@gofish.pt" exists
+    And a suspended user "toreactivate@gofish.pt" exists
+    When the admin unsuspends user "toreactivate@gofish.pt"
+    Then user "toreactivate@gofish.pt" should have status "ACTIVE"
+
+  Scenario: Get all users as admin
+    Given an admin user "admin3@gofish.pt" exists
+    And a regular user "listuser@gofish.pt" exists
+    When the admin requests all users
+    Then the user list should contain user "listuser@gofish.pt"

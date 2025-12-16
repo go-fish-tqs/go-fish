@@ -29,7 +29,7 @@ export default function AdminItemsPage() {
     const fetchItems = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/items`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/items`, {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             if (!response.ok) throw new Error('Failed to fetch items');
@@ -49,7 +49,7 @@ export default function AdminItemsPage() {
         setActionLoading(itemId);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/items/${itemId}/deactivate`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/items/${itemId}/deactivate`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reason }),
@@ -64,7 +64,7 @@ export default function AdminItemsPage() {
         setActionLoading(itemId);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/items/${itemId}/reactivate`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/items/${itemId}/reactivate`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` },
             });

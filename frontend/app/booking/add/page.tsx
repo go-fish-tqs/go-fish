@@ -54,7 +54,7 @@ function BookingFormContent() {
       // Se não houver ID, nem vale a pena ir lá
       if (!itemId) throw new Error("Item ID is missing");
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const res = await fetch(`${apiUrl}/items/${itemId}`);
 
       // Lê o texto primeiro para não estoirar no json()
@@ -81,7 +81,7 @@ function BookingFormContent() {
     queryFn: async () => {
       if (!itemId) return [];
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const res = await fetch(
         `${apiUrl}/items/${itemId}/unavailability?from=${today}&to=${nextYear}`
       );

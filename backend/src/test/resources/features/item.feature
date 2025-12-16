@@ -1,15 +1,26 @@
 Feature: Item Management
 
-  Background:
-    Given I am logged in as a user
+  Scenario: Create a new item
+    Given a user "owner@gofish.pt" exists
+    When "owner@gofish.pt" creates an item with name "Fishing Rod" description "Great rod" and price 50.0
+    Then the item should be created successfully
+    And the item owner should be "owner@gofish.pt"
 
-  Scenario: List a new item
-    Given I am on the list item page
-    When I enter valid item details
-    And I click the submit button
-    Then I should see the item in my items list
+  Scenario: Update item as owner
+    Given a user "itemowner@gofish.pt" exists
+    And an item "Test Item" exists owned by "itemowner@gofish.pt"
+    When "itemowner@gofish.pt" updates the item with name "Updated Fishing Rod"
+    Then the item name should be "Updated Fishing Rod"
 
-  Scenario: View item details
-    Given there are items listed
-    When I click on an item
-    Then I should see the item details page
+  Scenario: Fail to update item as non-owner
+    Given a user "realowner@gofish.pt" exists
+    And a user "intruder@gofish.pt" exists
+    And an item "Protected Item" exists owned by "realowner@gofish.pt"
+    When "intruder@gofish.pt" attempts to update the item
+    Then the update should fail with a forbidden error
+
+  Scenario: Find items by owner
+    Given a user "searcher@gofish.pt" exists
+    And an item "Searchable Item" exists owned by "searcher@gofish.pt"
+    When I search for items owned by "searcher@gofish.pt"
+    Then I should receive items owned by "searcher@gofish.pt"
